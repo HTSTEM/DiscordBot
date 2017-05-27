@@ -297,6 +297,11 @@ namespace stembote
 							var cat = DownloadSiteJSON<RandomCat>("http://random.cat/meow");
 							await e.Channel.SendMessage(cat.file);
 						}
+						else if (cmd == "dog")
+						{
+							var dog = DownloadSiteJSON<RandomDog>("https://random.dog/woof.json");
+							await e.Channel.SendMessage(dog.url);
+						}
 						else if (cmd == "debug" && isOwner)
 						{
 							var roles = e.Server.Roles.OrderBy(role => role.Position).ToList();
@@ -486,6 +491,10 @@ namespace stembote
 		public class RandomCat
 		{
 			public string file { get; set; }
+		}
+		public class RandomDog
+		{
+			public string url { get; set; }
 		}
 		private static T DownloadSiteJSON<T>(string url) where T : new()
 		{
