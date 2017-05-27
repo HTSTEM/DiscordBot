@@ -16,54 +16,54 @@ using Newtonsoft.Json;
 
 namespace stembote
 {
-    class stembote
-    {
-        static void Main(string[] args) => new stembote().Start();
+	class stembote
+	{
+		static void Main(string[] args) => new stembote().Start();
 
-        public static DiscordClient _client = new DiscordClient();
-        public static List<User> users = new List<User>();
+		public static DiscordClient _client = new DiscordClient();
+		public static List<User> users = new List<User>();
 
-        public void Start()
-        {
-            System.Timers.Timer caryCheckTimer = new System.Timers.Timer();
-            caryCheckTimer.Elapsed += new ElapsedEventHandler(caryVideoChecker);
-            caryCheckTimer.Interval = 60000;
-            caryCheckTimer.Enabled = true;
+		public void Start()
+		{
+			System.Timers.Timer caryCheckTimer = new System.Timers.Timer();
+			caryCheckTimer.Elapsed += new ElapsedEventHandler(caryVideoChecker);
+			caryCheckTimer.Interval = 60000;
+			caryCheckTimer.Enabled = true;
 
-            System.Timers.Timer abaCheckTimer = new System.Timers.Timer();
-            abaCheckTimer.Elapsed += new ElapsedEventHandler(abaVideoChecker);
-            abaCheckTimer.Interval = 60000;
-            abaCheckTimer.Enabled = true;
+			System.Timers.Timer abaCheckTimer = new System.Timers.Timer();
+			abaCheckTimer.Elapsed += new ElapsedEventHandler(abaVideoChecker);
+			abaCheckTimer.Interval = 60000;
+			abaCheckTimer.Enabled = true;
 
-            _client.Log.Message += (s, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
+			_client.Log.Message += (s, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
 
-            _client.MessageReceived += async (s, e) =>
-            {
-                string p = "sb?"; // define prefix variable
+			_client.MessageReceived += async (s, e) =>
+			{
+				string p = "sb?"; // define prefix variable
 
-                bool isCmd = false;
-                if (e.Message.Text.StartsWith(p + p))
-                    isCmd = false; // if message has the prefix two (or more) times, set isCmd to false
-                else if (e.Message.Text.StartsWith(p))
-                    isCmd = true; // otherwise, if there's only one prefix, set isCmd to true
-                                  // ^ this is a hacky solution but it works
+				bool isCmd = false;
+				if (e.Message.Text.StartsWith(p + p))
+					isCmd = false; // if message has the prefix two (or more) times, set isCmd to false
+				else if (e.Message.Text.StartsWith(p))
+					isCmd = true; // otherwise, if there's only one prefix, set isCmd to true
+								  // ^ this is a hacky solution but it works
 
-                bool isOwner = e.User.Id == 140564059417346049; // test if user is the owner of the bot
-                string msg = e.Message.Text; // grab contents of message
-                string rawmsg = e.Message.RawText; // grab raw contents of message
+				bool isOwner = e.User.Id == 140564059417346049; // test if user is the owner of the bot
+				string msg = e.Message.Text; // grab contents of message
+				string rawmsg = e.Message.RawText; // grab raw contents of message
 
-                var msgarray = msg.Replace(p, "").Split(' ');
-                string cmd = msgarray.FirstOrDefault().ToString();
-                List<string> args = msgarray.Skip(1).ToList();
+				var msgarray = msg.Replace(p, "").Split(' ');
+				string cmd = msgarray.FirstOrDefault().ToString();
+				List<string> args = msgarray.Skip(1).ToList();
 
-                var argtext = msg.Replace(p + cmd + "", "");
-                if (msg.Contains(p + cmd + " "))
-                    argtext = msg.Replace(p + cmd + " ", "");
+				var argtext = msg.Replace(p + cmd + "", "");
+				if (msg.Contains(p + cmd + " "))
+					argtext = msg.Replace(p + cmd + " ", "");
 
-                if (!e.Channel.IsPrivate)
-                {
-                    if (isCmd && e.Channel.Id == 282500390891683841)
-                    {
+				if (!e.Channel.IsPrivate)
+				{
+					if (isCmd && e.Channel.Id == 282500390891683841)
+					{
 						if (cmd == "help")
 						{
 							string help = $"`{p}help` - lists the bot commands";
@@ -297,192 +297,192 @@ namespace stembote
 							var cat = DownloadSiteJSON<RandomCat>("http://random.cat/meow");
 							await e.Channel.SendMessage(cat.file);
 						}
-                        else if (cmd == "debug" && isOwner)
-                        {
-                            var roles = e.Server.Roles.OrderBy(role => role.Position).ToList();
-                            var rolestring = "Sever roles: ";
-                            foreach (Role role in roles)
-                            {
-                                rolestring += role.Name + " | ";
-                            }
-                            Console.WriteLine(rolestring);
-                        }
-                    }
-                }
+						else if (cmd == "debug" && isOwner)
+						{
+							var roles = e.Server.Roles.OrderBy(role => role.Position).ToList();
+							var rolestring = "Sever roles: ";
+							foreach (Role role in roles)
+							{
+								rolestring += role.Name + " | ";
+							}
+							Console.WriteLine(rolestring);
+						}
+					}
+				}
 
-                bool isHSTEM = false;
-                if (e.Server != null)
-                    if (e.Server.Id == 282219466589208576)
-                        isHSTEM = true;
+				bool isHSTEM = false;
+				if (e.Server != null)
+					if (e.Server.Id == 282219466589208576)
+						isHSTEM = true;
 
-                if (cmd == "yt" && (isHSTEM || e.Channel.IsPrivate))
-                {
-                    if (_client.GetServer(282219466589208576).GetUser(e.User.Id) == null)
-                        await e.Channel.SendMessage($"You must be on HTwins STEM to use this command. You can join it here: https://discord.gg/4Gn4GAC");
+				if (cmd == "yt" && (isHSTEM || e.Channel.IsPrivate))
+				{
+					if (_client.GetServer(282219466589208576).GetUser(e.User.Id) == null)
+						await e.Channel.SendMessage($"You must be on HTwins STEM to use this command. You can join it here: https://discord.gg/4Gn4GAC");
 
-                    else if (args.Count == 1)
-                    {
-                        var hstem = _client.GetServer(282219466589208576);
-                        var huser = hstem.GetUser(e.User.Id);
-                        var role = hstem.GetRole(289942717419749377);
+					else if (args.Count == 1)
+					{
+						var hstem = _client.GetServer(282219466589208576);
+						var huser = hstem.GetUser(e.User.Id);
+						var role = hstem.GetRole(289942717419749377);
 
-                        if (args[0] == "on")
-                        {
-                            await huser.AddRoles(role);
-                            await e.Channel.SendMessage($"You have been given the YouTube notification role on HTwins STEM.");
-                        }
-                        else if (args[0] == "off")
-                        {
-                            await huser.RemoveRoles(role);
-                            await e.Channel.SendMessage($"You have been removed from the YouTube notification role on HTwins STEM.");
-                        }
-                    }
+						if (args[0] == "on")
+						{
+							await huser.AddRoles(role);
+							await e.Channel.SendMessage($"You have been given the YouTube notification role on HTwins STEM.");
+						}
+						else if (args[0] == "off")
+						{
+							await huser.RemoveRoles(role);
+							await e.Channel.SendMessage($"You have been removed from the YouTube notification role on HTwins STEM.");
+						}
+					}
 
-                    else
-                        await e.Channel.SendMessage($"Proper usage: `{p}yt [on/off]`");
-                }
-            };
+					else
+						await e.Channel.SendMessage($"Proper usage: `{p}yt [on/off]`");
+				}
+			};
 
-            _client.UserJoined += (s, e) =>
-            {
-                if (e.Server.Id == 282219466589208576)
-                    users.Add(e.User);
-            };
+			_client.UserJoined += (s, e) =>
+			{
+				if (e.Server.Id == 282219466589208576)
+					users.Add(e.User);
+			};
 
-            _client.UserLeft += (s, e) =>
-            {
-                if (e.Server.Id == 282219466589208576)
-                    users.Remove(e.User);
-            };
+			_client.UserLeft += (s, e) =>
+			{
+				if (e.Server.Id == 282219466589208576)
+					users.Remove(e.User);
+			};
 
-            string token = File.ReadAllText("token.txt");
-            _client.ExecuteAndWait(async () =>
-            {
-                await _client.Connect(token, TokenType.Bot);
-                Console.WriteLine($"Connected as {_client.CurrentUser.Name}#{_client.CurrentUser.Discriminator}");
-            });
+			string token = File.ReadAllText("token.txt");
+			_client.ExecuteAndWait(async () =>
+			{
+				await _client.Connect(token, TokenType.Bot);
+				Console.WriteLine($"Connected as {_client.CurrentUser.Name}#{_client.CurrentUser.Discriminator}");
+			});
 
-        }
+		}
 
-        private static void caryVideoChecker(object source, ElapsedEventArgs e)
-        {
-            SyndicationResourceLoadSettings settings = new SyndicationResourceLoadSettings();
-            settings.RetrievalLimit = 1;
-    
-            Uri feedUrl = new Uri("https://www.youtube.com/feeds/videos.xml?user=carykh");
-            AtomFeed feed = AtomFeed.Create(feedUrl, settings);
-            var videos = feed.Entries;
-    
-            bool alreadyPosted = false;
-    
-            if (videos.Count() == 0)
-                Console.WriteLine("[Error] Feed contained no information.");
-    
-            foreach (var video in videos)
-            {
-	    		try
-	    		{
-	    			string videoUrlsFile = Directory.GetCurrentDirectory() + "/videoUrls.txt"; // String for the video URLS to check if a post is new, uses "videoUrls.txt" in directory the .exe is run from by default
-	    			var logFile = File.ReadAllLines(videoUrlsFile);
-	    			List<string> videoUrls = new List<string>(logFile);
-    
-	    			string newVideoUrl = video.Links.FirstOrDefault().Uri.ToString();
-	    			string videoTitle = video.Title.Content;
-    
-	    			foreach (var videoUrl in videoUrls)
-	    			{
-	    				if (newVideoUrl == videoUrl)
-	    				{
-	    					alreadyPosted = true;
-	    				}
-	    			}
-    
-	    			try
-	    			{
-	    				if (alreadyPosted == false)
-	    				{
-                            string vidinfo = $"\"{videoTitle}\" - {newVideoUrl}";
+		private static void caryVideoChecker(object source, ElapsedEventArgs e)
+		{
+			SyndicationResourceLoadSettings settings = new SyndicationResourceLoadSettings();
+			settings.RetrievalLimit = 1;
 
-	    					Console.WriteLine($"Found new video URL - {vidinfo} - Sending to discord");
-    
-	    					using (StreamWriter text = File.AppendText(videoUrlsFile))
-	    						text.WriteLine(newVideoUrl);
-    
-	    					_client.GetChannel(282225245761306624).SendMessage($"@here `carykh` has uploaded a new YouTube video!\n {vidinfo}");
-	    				}
-	    			}
-	    			catch (Exception error)
-	    			{
-	    				Console.WriteLine($"[Error] Bot ran into an issue while trying to post the video to discord. {error.ToString()}");
-	    			}
-	    		}
-	    		catch (Exception error)
-	    		{
-	    			Console.WriteLine("[Error] An error occured during the video check -" + error.ToString());
-	    		}
-            }
-    
-        }
-    
-        private static void abaVideoChecker(object source, ElapsedEventArgs e)
-        {
-            SyndicationResourceLoadSettings settings = new SyndicationResourceLoadSettings();
-            settings.RetrievalLimit = 1;
-    
-            Uri feedUrl = new Uri("https://www.youtube.com/feeds/videos.xml?user=1abacaba1");
-            AtomFeed feed = AtomFeed.Create(feedUrl, settings);
-            var videos = feed.Entries;
-    
-            bool alreadyPosted = false;
-    
-            if (videos.Count() == 0)
-                Console.WriteLine("[Error] Feed contained no information.");
-    
-            foreach (var video in videos)
-            {
-                string videoUrlsFile = Directory.GetCurrentDirectory() + "/videoUrls.txt"; // String for the video URLS to check if a post is new, uses "videoUrls.txt" in directory the .exe is run from by default
-                var logFile = File.ReadAllLines(videoUrlsFile);
-                List<string> videoUrls = new List<string>(logFile);
-    
-                string newVideoUrl = video.Links.FirstOrDefault().Uri.ToString();
-                string videoTitle = video.Title.Content;
-    
-                foreach (var videoUrl in videoUrls)
-                    if (newVideoUrl == videoUrl)
-                        alreadyPosted = true;
-    
-                try
-                {
-	    				if (alreadyPosted == false)
-	    				{
-                            string vidinfo = $"\"{videoTitle}\" - {newVideoUrl}";
+			Uri feedUrl = new Uri("https://www.youtube.com/feeds/videos.xml?user=carykh");
+			AtomFeed feed = AtomFeed.Create(feedUrl, settings);
+			var videos = feed.Entries;
 
-	    					Console.WriteLine($"Found new video URL - {vidinfo} - Sending to discord");
-    
-	    					using (StreamWriter text = File.AppendText(videoUrlsFile))
-	    						text.WriteLine(newVideoUrl);
-    
-	    					_client.GetChannel(282225245761306624).SendMessage($"@here `abacaba` has uploaded a new YouTube video!\n {vidinfo}");
-	    				}
-                }
-                catch (Exception error)
-                {
-                    Console.WriteLine($"[Error] Bot ran into an issue while trying to post the video to discord. {error.ToString()}");
-                }
-            }
-    
-        }
-        public static string clearformatting(string input)
-        {
-            var output = "[empty string]";
-            if (!string.IsNullOrWhiteSpace(input))
-                output = input.Replace("`", "​`").Replace("*", "​*").Replace("_", "​_").Replace("‮", " ");
-            return output;
-        }
-        public static DateTimeOffset CreationDate(ulong id)
-        {
+			bool alreadyPosted = false;
+
+			if (videos.Count() == 0)
+				Console.WriteLine("[Error] Feed contained no information.");
+
+			foreach (var video in videos)
+			{
+				try
+				{
+					string videoUrlsFile = Directory.GetCurrentDirectory() + "/videoUrls.txt"; // String for the video URLS to check if a post is new, uses "videoUrls.txt" in directory the .exe is run from by default
+					var logFile = File.ReadAllLines(videoUrlsFile);
+					List<string> videoUrls = new List<string>(logFile);
+
+					string newVideoUrl = video.Links.FirstOrDefault().Uri.ToString();
+					string videoTitle = video.Title.Content;
+
+					foreach (var videoUrl in videoUrls)
+					{
+						if (newVideoUrl == videoUrl)
+						{
+							alreadyPosted = true;
+						}
+					}
+
+					try
+					{
+						if (alreadyPosted == false)
+						{
+							string vidinfo = $"\"{videoTitle}\" - {newVideoUrl}";
+
+							Console.WriteLine($"Found new video URL - {vidinfo} - Sending to discord");
+
+							using (StreamWriter text = File.AppendText(videoUrlsFile))
+								text.WriteLine(newVideoUrl);
+
+							_client.GetChannel(282225245761306624).SendMessage($"@here `carykh` has uploaded a new YouTube video!\n {vidinfo}");
+						}
+					}
+					catch (Exception error)
+					{
+						Console.WriteLine($"[Error] Bot ran into an issue while trying to post the video to discord. {error.ToString()}");
+					}
+				}
+				catch (Exception error)
+				{
+					Console.WriteLine("[Error] An error occured during the video check -" + error.ToString());
+				}
+			}
+
+		}
+
+		private static void abaVideoChecker(object source, ElapsedEventArgs e)
+		{
+			SyndicationResourceLoadSettings settings = new SyndicationResourceLoadSettings();
+			settings.RetrievalLimit = 1;
+
+			Uri feedUrl = new Uri("https://www.youtube.com/feeds/videos.xml?user=1abacaba1");
+			AtomFeed feed = AtomFeed.Create(feedUrl, settings);
+			var videos = feed.Entries;
+
+			bool alreadyPosted = false;
+
+			if (videos.Count() == 0)
+				Console.WriteLine("[Error] Feed contained no information.");
+
+			foreach (var video in videos)
+			{
+				string videoUrlsFile = Directory.GetCurrentDirectory() + "/videoUrls.txt"; // String for the video URLS to check if a post is new, uses "videoUrls.txt" in directory the .exe is run from by default
+				var logFile = File.ReadAllLines(videoUrlsFile);
+				List<string> videoUrls = new List<string>(logFile);
+
+				string newVideoUrl = video.Links.FirstOrDefault().Uri.ToString();
+				string videoTitle = video.Title.Content;
+
+				foreach (var videoUrl in videoUrls)
+					if (newVideoUrl == videoUrl)
+						alreadyPosted = true;
+
+				try
+				{
+					if (alreadyPosted == false)
+					{
+						string vidinfo = $"\"{videoTitle}\" - {newVideoUrl}";
+
+						Console.WriteLine($"Found new video URL - {vidinfo} - Sending to discord");
+
+						using (StreamWriter text = File.AppendText(videoUrlsFile))
+							text.WriteLine(newVideoUrl);
+
+						_client.GetChannel(282225245761306624).SendMessage($"@here `abacaba` has uploaded a new YouTube video!\n {vidinfo}");
+					}
+				}
+				catch (Exception error)
+				{
+					Console.WriteLine($"[Error] Bot ran into an issue while trying to post the video to discord. {error.ToString()}");
+				}
+			}
+
+		}
+		public static string clearformatting(string input)
+		{
+			var output = "[empty string]";
+			if (!string.IsNullOrWhiteSpace(input))
+				output = input.Replace("`", "​`").Replace("*", "​*").Replace("_", "​_").Replace("‮", " ");
+			return output;
+		}
+		public static DateTimeOffset CreationDate(ulong id)
+		{
 			return DateTimeOffset.FromUnixTimeMilliseconds((Convert.ToInt64(id) >> 22) + 1420070400000);
-        }
+		}
 		public class RandomCat
 		{
 			public string file { get; set; }
@@ -497,10 +497,10 @@ namespace stembote
 				{
 					json_data = w.DownloadString(url);
 				}
-				catch (Exception error) { Console.WriteLine($"[ERROR] Failed to download webpage JSON: {error.ToString()}");}
+				catch (Exception error) { Console.WriteLine($"[ERROR] Failed to download webpage JSON: {error.ToString()}"); }
 				// if string with JSON data is not empty, deserialize it to class and return its instance 
 				return !string.IsNullOrEmpty(json_data) ? JsonConvert.DeserializeObject<T>(json_data) : new T();
 			}
 		}
-    }
+	}
 }
