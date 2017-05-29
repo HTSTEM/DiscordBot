@@ -297,7 +297,7 @@ namespace stembote
 							var cat = DownloadSiteJSON<RandomCat>("http://random.cat/meow");
 							await e.Channel.SendMessage(cat.file);
 						}
-						else if (cmd == "dog")
+						else if (cmd == "dog" || cmd == "adam")
 						{
 							var dog = DownloadSiteJSON<RandomDog>("https://random.dog/woof.json");
 							await e.Channel.SendMessage(dog.url);
