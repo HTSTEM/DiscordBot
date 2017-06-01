@@ -24,7 +24,7 @@ namespace stembote
 		public static DiscordClient _client = new DiscordClient();
 		public static List<User> users = new List<User>();
 
-        public static ulong moderator_role_id = 290573725366091787;//282661854076076033;
+        public static ulong moderator_role_id = 282661854076076033;
 
         public void Start()
 		{
@@ -65,7 +65,7 @@ namespace stembote
 
 				if (!e.Channel.IsPrivate)
 				{
-					if (isCmd && e.Channel.Id == 282500390891683841 || e.Channel.Id == 290757101914030080)  // REMOVE `|| e.Channel.Id == 290757101914030080` BEFORE PRing OR ACCEPTING PR!!!!!
+					if (isCmd && e.Channel.Id == 282500390891683841)
                     {
 						if (cmd == "help")
 						{
