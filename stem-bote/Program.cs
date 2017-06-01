@@ -321,7 +321,7 @@ namespace stembote
                             }
                             else
                             {
-                                String to_hash = String.Join("", args);
+                                String to_hash = String.Join(" ", args);
                                 String hash = CalculateMD5Hash(to_hash);
                                 await e.Channel.SendMessage($"MD5 hash of `{to_hash}`:\n```{hash}\n```");
                             }
@@ -334,7 +334,7 @@ namespace stembote
                             }
                             else
                             {
-                                String to_hash = String.Join("", args);
+                                String to_hash = String.Join(" ", args);
                                 String hash = CalculateSHA1Hash(to_hash);
                                 await e.Channel.SendMessage($"SAH1 hash of `{to_hash}`:\n```{hash}\n```");
                             }
@@ -347,7 +347,7 @@ namespace stembote
                             }
                             else
                             {
-                                String to_hash = String.Join("", args);
+                                String to_hash = String.Join(" ", args);
                                 String hash = CalculateSHA256Hash(to_hash);
                                 await e.Channel.SendMessage($"SAH256 hash of `{to_hash}`:\n```{hash}\n```");
                             }
@@ -360,9 +360,20 @@ namespace stembote
                             }
                             else
                             {
-                                String to_hash = String.Join("", args);
+                                String to_hash = String.Join(" ", args);
                                 String hash = CalculateSHA512Hash(to_hash);
                                 await e.Channel.SendMessage($"SAH512 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                        else if (cmd == "google" || cmd == "g")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}{cmd} <search term>`");
+                            }
+                            else
+                            {
+                                await e.Channel.SendMessage($"https://google.com/search?q={WebUtility.UrlEncode(String.Join(" ", args))}");
                             }
                         }
                     }
