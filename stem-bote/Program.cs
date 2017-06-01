@@ -378,7 +378,7 @@ namespace stembote
                                 await e.Channel.SendMessage($"https://google.com/search?q={WebUtility.UrlEncode(String.Join(" ", args))}");
                             }
                         }
-                        else if (cmd == "woolfram" || cmd == "wa" || cmd == "alpha" || cmd == "wolfram_alpha")
+                        else if (cmd == "wolfram" || cmd == "wa" || cmd == "alpha" || cmd == "wolfram_alpha")
                         {
                             if (args.Count == 0)
                             {
