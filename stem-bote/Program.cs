@@ -376,6 +376,17 @@ namespace stembote
                                 await e.Channel.SendMessage($"https://google.com/search?q={WebUtility.UrlEncode(String.Join(" ", args))}");
                             }
                         }
+                        else if (cmd == "woolfram" || cmd == "wa" || cmd == "alpha" || cmd == "wolfram_alpha")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}{cmd} <search term>`");
+                            }
+                            else
+                            {
+                                await e.Channel.SendMessage($"https://www.wolframalpha.com/input/?i={WebUtility.UrlEncode(String.Join(" ", args))}");
+                            }
+                        }
                     }
 				}
 
