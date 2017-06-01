@@ -24,7 +24,9 @@ namespace stembote
 		public static DiscordClient _client = new DiscordClient();
 		public static List<User> users = new List<User>();
 
-		public void Start()
+        public static ulong moderator_role_id = 290573725366091787;//282661854076076033;
+
+        public void Start()
 		{
 			System.Timers.Timer caryCheckTimer = new System.Timers.Timer();
 			caryCheckTimer.Elapsed += new ElapsedEventHandler(caryVideoChecker);
@@ -386,6 +388,51 @@ namespace stembote
                             {
                                 await e.Channel.SendMessage($"https://www.wolframalpha.com/input/?i={WebUtility.UrlEncode(String.Join(" ", args))}");
                             }
+                        }
+                        else if (cmd == "mods" || cmd == "moderators" || cmd == "listmods" || cmd == "list_mods" || cmd == "list_moderators")
+                        {
+                            List<User> online_mods = new List<User>();
+                            List<User> idle_mods = new List<User>();
+                            List<User> offline_mods = new List<User>();
+                            List<User> server_members = new List<User>(e.Channel.Users);
+                            Role mod_role = e.Server.GetRole(moderator_role_id);
+                            for (var i = 0; i < server_members.Count; i ++)
+                            {
+                                if (server_members[i].HasRole(mod_role))
+                                {
+                                    if (server_members[i].Status == UserStatus.Online)
+                                        online_mods.Add(server_members[i]);
+                                    else if (server_members[i].Status == UserStatus.Idle)
+                                        idle_mods.Add(server_members[i]);
+                                    else
+                                        offline_mods.Add(server_members[i]);
+                                }
+                            }
+                            String message_out = "";
+                            if (online_mods.Count > 0) {
+                                message_out += "**Online Moderators:**\n";
+                                for (var i = 0; i < online_mods.Count; i++)
+                                {
+                                    message_out += $"{online_mods[i].Name} #{online_mods[i].Discriminator}\n";
+                                }
+                            }
+                            if (idle_mods.Count > 0)
+                            {
+                                message_out += "**Idle Moderators:**\n";
+                                for (var i = 0; i < idle_mods.Count; i++)
+                                {
+                                    message_out += $"{idle_mods[i].Name} #{idle_mods[i].Discriminator}\n";
+                                }
+                            }
+                            if (offline_mods.Count > 0)
+                            {
+                                message_out += "**Offline Moderators:**\n";
+                                for (var i = 0; i < offline_mods.Count; i++)
+                                {
+                                    message_out += $"{offline_mods[i].Name} #{offline_mods[i].Discriminator}\n";
+                                }
+                            }
+                            await e.Channel.SendMessage(message_out);
                         }
                     }
 				}
