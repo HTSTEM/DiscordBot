@@ -8,6 +8,7 @@ using Discord;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Threading;
 using Argotic.Common;
 using Argotic.Syndication;
@@ -62,8 +63,8 @@ namespace stembote
 
 				if (!e.Channel.IsPrivate)
 				{
-					if (isCmd && e.Channel.Id == 282500390891683841)
-					{
+					if (isCmd && e.Channel.Id == 282500390891683841 || e.Channel.Id == 290757101914030080)  // REMOVE `|| e.Channel.Id == 290757101914030080` BEFORE PRing OR ACCEPTING PR!!!!!
+                    {
 						if (cmd == "help")
 						{
 							string help = $"`{p}help` - lists the bot commands";
@@ -312,7 +313,59 @@ namespace stembote
 							}
 							Console.WriteLine(rolestring);
 						}
-					}
+                        else if (cmd == "md5" || cmd == "hash")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}{cmd} <string to hash>`");
+                            }
+                            else
+                            {
+                                String to_hash = String.Join("", args);
+                                String hash = CalculateMD5Hash(to_hash);
+                                await e.Channel.SendMessage($"MD5 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                        else if (cmd == "sha1")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}sha1 <string to hash>`");
+                            }
+                            else
+                            {
+                                String to_hash = String.Join("", args);
+                                String hash = CalculateSHA1Hash(to_hash);
+                                await e.Channel.SendMessage($"SAH1 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                        else if (cmd == "sha256")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}sha256 <string to hash>`");
+                            }
+                            else
+                            {
+                                String to_hash = String.Join("", args);
+                                String hash = CalculateSHA256Hash(to_hash);
+                                await e.Channel.SendMessage($"SAH256 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                        else if (cmd == "sha512")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}sha512 <string to hash>`");
+                            }
+                            else
+                            {
+                                String to_hash = String.Join("", args);
+                                String hash = CalculateSHA512Hash(to_hash);
+                                await e.Channel.SendMessage($"SAH512 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                    }
 				}
 
 				bool isHSTEM = false;
@@ -496,7 +549,67 @@ namespace stembote
 		{
 			public string url { get; set; }
 		}
-		private static T DownloadSiteJSON<T>(string url) where T : new()
+        public string CalculateMD5Hash(string input)
+        {
+            MD5 md5 = System.Security.Cryptography.MD5.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = md5.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+        public string CalculateSHA1Hash(string input)
+        {
+            SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = sha1.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+        public string CalculateSHA256Hash(string input)
+        {
+            SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = sha256.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+        public string CalculateSHA512Hash(string input)
+        {
+            SHA512 sha512 = System.Security.Cryptography.SHA512.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = sha512.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+        private static T DownloadSiteJSON<T>(string url) where T : new()
 		{
 			using (var w = new WebClient())
 			{
