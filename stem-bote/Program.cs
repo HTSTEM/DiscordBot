@@ -77,8 +77,12 @@ namespace stembote
 							string serverinfo = $"`{p}serverinfo` - displays info about the server";
 							string roll = $"`{p}roll [# of sides] [# of dice to roll]` - rolls some dice";
 							string randomuser = $"`{p}randomuser` - selects a random user on the server";
+                            string md5 = $"`{p}md5` - run a string through a MD5 hash";
+                            string sha1 = $"`{p}sha1` - run a string through a SHA1 hash";
+                            string sha256 = $"`{p}sha256` - run a string through a SHA256 hash";
+                            string sha215 = $"`{p}sha215` - run a string through a SHA512 hash";
 
-							string yt = $"`{p}yt [on/off]` - turn YT video notifications on/off";
+                            string yt = $"`{p}yt [on/off]` - turn YT video notifications on/off";
 
 							string cmds = $"\n{help}\n{usercount}\n{userinfo}\n{serverinfo}\n{roll}\n{randomuser}";
 							string greet = "Hi! I'm the STEM part of the HTC-Bote, a super-exclusive part only for the HTwins STEM server. ";
