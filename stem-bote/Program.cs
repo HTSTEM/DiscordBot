@@ -25,15 +25,18 @@ namespace stembote
 
 		public void Start()
 		{
-			System.Timers.Timer caryCheckTimer = new System.Timers.Timer();
-			caryCheckTimer.Elapsed += new ElapsedEventHandler(caryVideoChecker);
-			caryCheckTimer.Interval = 60000;
-			caryCheckTimer.Enabled = true;
+			if (_client.CurrentUser.Id == 140564059417346049)
+			{
+				System.Timers.Timer caryCheckTimer = new System.Timers.Timer();
+				caryCheckTimer.Elapsed += caryVideoChecker;
+				caryCheckTimer.Interval = 1 * 60 * 1000; // replace first number with number of minutes to wait until next video check
+				caryCheckTimer.Enabled = true;
 
-			System.Timers.Timer abaCheckTimer = new System.Timers.Timer();
-			abaCheckTimer.Elapsed += new ElapsedEventHandler(abaVideoChecker);
-			abaCheckTimer.Interval = 60000;
-			abaCheckTimer.Enabled = true;
+				System.Timers.Timer abaCheckTimer = new System.Timers.Timer();
+				abaCheckTimer.Elapsed += abaVideoChecker;
+				abaCheckTimer.Interval = 1 * 60 * 1000; // replace first number with number of minutes to wait until next video check
+				abaCheckTimer.Enabled = true;
+			}
 
 			_client.Log.Message += (s, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
 
@@ -44,8 +47,7 @@ namespace stembote
 				bool isCmd = false;
 				if (e.Message.Text.StartsWith(p + p))
 					isCmd = false; // if message has the prefix two (or more) times, set isCmd to false
-				else if (e.Message.Text.StartsWith(p))
-					isCmd = true; // otherwise, if there's only one prefix, set isCmd to true
+				else isCmd |= e.Message.Text.StartsWith(p); // otherwise, if there's only one prefix, set isCmd to true
 								  // ^ this is a hacky solution but it works
 
 				bool isOwner = e.User.Id == 140564059417346049; // test if user is the owner of the bot
