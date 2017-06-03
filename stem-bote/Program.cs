@@ -25,19 +25,6 @@ namespace stembote
 
 		public void Start()
 		{
-			if (_client.CurrentUser.Id == 140564059417346049)
-			{
-				System.Timers.Timer caryCheckTimer = new System.Timers.Timer();
-				caryCheckTimer.Elapsed += caryVideoChecker;
-				caryCheckTimer.Interval = 1 * 60 * 1000; // replace first number with number of minutes to wait until next video check
-				caryCheckTimer.Enabled = true;
-
-				System.Timers.Timer abaCheckTimer = new System.Timers.Timer();
-				abaCheckTimer.Elapsed += abaVideoChecker;
-				abaCheckTimer.Interval = 1 * 60 * 1000; // replace first number with number of minutes to wait until next video check
-				abaCheckTimer.Enabled = true;
-			}
-
 			_client.Log.Message += (s, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
 
 			_client.MessageReceived += async (s, e) =>
@@ -360,6 +347,22 @@ namespace stembote
 			{
 				if (e.Server.Id == 282219466589208576)
 					users.Remove(e.User);
+			};
+
+			_client.Ready += (s, e) =>
+			{
+                if (_client.CurrentUser.Id == 140564059417346049)
+                {
+                        System.Timers.Timer caryCheckTimer = new System.Timers.Timer();
+                        caryCheckTimer.Elapsed += caryVideoChecker;
+                        caryCheckTimer.Interval = 1 * 60 * 1000; // replace first number with number of minutes to wait until next video check
+                        caryCheckTimer.Enabled = true;
+
+                        System.Timers.Timer abaCheckTimer = new System.Timers.Timer();
+                        abaCheckTimer.Elapsed += abaVideoChecker;
+                        abaCheckTimer.Interval = 1 * 60 * 1000; // replace first number with number of minutes to wait until next video check
+                        abaCheckTimer.Enabled = true;
+                }
 			};
 
 			string token = File.ReadAllText("token.txt");
