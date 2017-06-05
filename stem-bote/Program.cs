@@ -8,6 +8,7 @@ using Discord;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Threading;
 using Argotic.Common;
 using Argotic.Syndication;
@@ -23,7 +24,9 @@ namespace stembote
 		public static DiscordClient _client = new DiscordClient();
 		public static List<User> users = new List<User>();
 
-		public void Start()
+        public static ulong moderator_role_id = 282661854076076033;
+
+        public void Start()
 		{
 			_client.Log.Message += (s, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
 
@@ -52,7 +55,7 @@ namespace stembote
 				if (!e.Channel.IsPrivate)
 				{
 					if (isCmd && e.Channel.Id == 282500390891683841)
-					{
+                    {
 						if (cmd == "help")
 						{
 							string help = $"`{p}help` - lists the bot commands";
@@ -61,8 +64,12 @@ namespace stembote
 							string serverinfo = $"`{p}serverinfo` - displays info about the server";
 							string roll = $"`{p}roll [# of sides] [# of dice to roll]` - rolls some dice";
 							string randomuser = $"`{p}randomuser` - selects a random user on the server";
+                            string md5 = $"`{p}md5` - run a string through a MD5 hash";
+                            string sha1 = $"`{p}sha1` - run a string through a SHA1 hash";
+                            string sha256 = $"`{p}sha256` - run a string through a SHA256 hash";
+                            string sha215 = $"`{p}sha215` - run a string through a SHA512 hash";
 
-							string yt = $"`{p}yt [on/off]` - turn YT video notifications on/off";
+                            string yt = $"`{p}yt [on/off]` - turn YT video notifications on/off";
 
 							string cmds = $"\n{help}\n{usercount}\n{userinfo}\n{serverinfo}\n{roll}\n{randomuser}";
 							string greet = "Hi! I'm the STEM part of the HTC-Bote, a super-exclusive part only for the HTwins STEM server. ";
@@ -301,7 +308,126 @@ namespace stembote
 							}
 							Console.WriteLine(rolestring);
 						}
-					}
+                        else if (cmd == "md5" || cmd == "hash")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}{cmd} <string to hash>`");
+                            }
+                            else
+                            {
+                                String to_hash = String.Join(" ", args);
+                                String hash = CalculateMD5Hash(to_hash);
+                                await e.Channel.SendMessage($"MD5 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                        else if (cmd == "sha1")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}sha1 <string to hash>`");
+                            }
+                            else
+                            {
+                                String to_hash = String.Join(" ", args);
+                                String hash = CalculateSHA1Hash(to_hash);
+                                await e.Channel.SendMessage($"SAH1 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                        else if (cmd == "sha256")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}sha256 <string to hash>`");
+                            }
+                            else
+                            {
+                                String to_hash = String.Join(" ", args);
+                                String hash = CalculateSHA256Hash(to_hash);
+                                await e.Channel.SendMessage($"SAH256 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                        else if (cmd == "sha512")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}sha512 <string to hash>`");
+                            }
+                            else
+                            {
+                                String to_hash = String.Join(" ", args);
+                                String hash = CalculateSHA512Hash(to_hash);
+                                await e.Channel.SendMessage($"SAH512 hash of `{to_hash}`:\n```{hash}\n```");
+                            }
+                        }
+                        else if (cmd == "google" || cmd == "g")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}{cmd} <search term>`");
+                            }
+                            else
+                            {
+                                await e.Channel.SendMessage($"https://google.com/search?q={WebUtility.UrlEncode(String.Join(" ", args))}");
+                            }
+                        }
+                        else if (cmd == "wolfram" || cmd == "wa" || cmd == "alpha" || cmd == "wolfram_alpha")
+                        {
+                            if (args.Count == 0)
+                            {
+                                await e.Channel.SendMessage($"Correct usage: `{p}{cmd} <search term>`");
+                            }
+                            else
+                            {
+                                await e.Channel.SendMessage($"https://www.wolframalpha.com/input/?i={WebUtility.UrlEncode(String.Join(" ", args))}");
+                            }
+                        }
+                        else if (cmd == "mods" || cmd == "moderators" || cmd == "listmods" || cmd == "list_mods" || cmd == "list_moderators")
+                        {
+                            List<User> online_mods = new List<User>();
+                            List<User> idle_mods = new List<User>();
+                            List<User> offline_mods = new List<User>();
+                            List<User> server_members = new List<User>(e.Channel.Users);
+                            Role mod_role = e.Server.GetRole(moderator_role_id);
+                            for (var i = 0; i < server_members.Count; i ++)
+                            {
+                                if (server_members[i].HasRole(mod_role))
+                                {
+                                    if (server_members[i].Status == UserStatus.Online)
+                                        online_mods.Add(server_members[i]);
+                                    else if (server_members[i].Status == UserStatus.Idle)
+                                        idle_mods.Add(server_members[i]);
+                                    else
+                                        offline_mods.Add(server_members[i]);
+                                }
+                            }
+                            String message_out = "";
+                            if (online_mods.Count > 0) {
+                                message_out += "**Online Moderators:**\n";
+                                for (var i = 0; i < online_mods.Count; i++)
+                                {
+                                    message_out += $"{online_mods[i].Name} #{online_mods[i].Discriminator}\n";
+                                }
+                            }
+                            if (idle_mods.Count > 0)
+                            {
+                                message_out += "**Idle Moderators:**\n";
+                                for (var i = 0; i < idle_mods.Count; i++)
+                                {
+                                    message_out += $"{idle_mods[i].Name} #{idle_mods[i].Discriminator}\n";
+                                }
+                            }
+                            if (offline_mods.Count > 0)
+                            {
+                                message_out += "**Offline Moderators:**\n";
+                                for (var i = 0; i < offline_mods.Count; i++)
+                                {
+                                    message_out += $"{offline_mods[i].Name} #{offline_mods[i].Discriminator}\n";
+                                }
+                            }
+                            await e.Channel.SendMessage(message_out);
+                        }
+                    }
 				}
 
 				bool isHSTEM = false;
@@ -501,7 +627,67 @@ namespace stembote
 		{
 			public string url { get; set; }
 		}
-		private static T DownloadSiteJSON<T>(string url) where T : new()
+        public string CalculateMD5Hash(string input)
+        {
+            MD5 md5 = System.Security.Cryptography.MD5.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = md5.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+        public string CalculateSHA1Hash(string input)
+        {
+            SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = sha1.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+        public string CalculateSHA256Hash(string input)
+        {
+            SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = sha256.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+        public string CalculateSHA512Hash(string input)
+        {
+            SHA512 sha512 = System.Security.Cryptography.SHA512.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = sha512.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+        private static T DownloadSiteJSON<T>(string url) where T : new()
 		{
 			using (var w = new WebClient())
 			{
