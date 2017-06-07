@@ -111,15 +111,21 @@ async def on_message(message):
                 await client.send_message(message.channel, "`%s` currently has %d users." % (
                     message.server.name, message.server.member_count))
             elif cmd == "userinfo":
+                await client.request_offline_members(message.server)
                 # users = message.server.members.sort(key=lambda x:x.joined_at)
 
                 # Find user
 
                 if len(message.mentions) > 0:  # Is there a mention?
                     usr = message.mentions[0]
-                else:  # No? Just use the message author
+                elif len(args) == 0:  # No? Just use the message author
                     usr = message.author
-
+                else:
+                    usr = message.author
+                    for m in message.server.members:
+                        if argtext in m.name:
+                            usr = m
+                
                 # Get user info
 
                 username = clear_formatting(usr.name)
@@ -156,9 +162,9 @@ async def on_message(message):
                      nickname,
                      game,
                      joined.strftime("%m/%d/%Y %I:%M:%S %p"),
-                     joined_days.days,
+                     min(0 joined_days.days),
                      created.strftime("%m/%d/%Y %I:%M:%S %p"),
-                     created_days.days,
+                     min(0, created_days.days),
                      avatar)
                                           )
 
