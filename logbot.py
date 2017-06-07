@@ -171,9 +171,9 @@ class Bot:
 
                     if not shouldnt_log:
                         message_increment(self.botnum, message.author, message.server.id)
-					
-					while rawargs.startswith(" "):
-						rawargs = rawargs[1:]
+                    
+                    while rawargs.startswith(" "):
+                        rawargs = rawargs[1:]
 
                     htc = self.client.get_server(HTC_ID)
                     user = message.author
@@ -188,62 +188,62 @@ class Bot:
                             if message.author == owner:
                                 is_owner = True
                         if (is_owner or "joinbot" in message.channel.name) and message.server.id != HTSTEM_ID and cmd == "userinfo":
-							await client.request_offline_members(message.server)
-							# users = message.server.members.sort(key=lambda x:x.joined_at)
+                            await client.request_offline_members(message.server)
+                            # users = message.server.members.sort(key=lambda x:x.joined_at)
 
-							# Find user
+                            # Find user
 
-							if len(message.mentions) > 0:  # Is there a mention?
-								usr = message.mentions[0]
-							elif len(args) == 0:  # No? Just use the message author
-								usr = message.author
-							else:
-								usr = message.author
-								for m in message.server.members:
-									if rawargs.lower() in m.name.lower():
-										usr = m
-							
-							# Get user info
+                            if len(message.mentions) > 0:  # Is there a mention?
+                                usr = message.mentions[0]
+                            elif len(args) == 0:  # No? Just use the message author
+                                usr = message.author
+                            else:
+                                usr = message.author
+                                for m in message.server.members:
+                                    if rawargs.lower() in m.name.lower():
+                                        usr = m
+                            
+                            # Get user info
 
-							username = clear_formatting(usr.name)
-							discrim = "#" + usr.discriminator
+                            username = clear_formatting(usr.name)
+                            discrim = "#" + usr.discriminator
 
-							nickname = "[none]"
-							if usr.nick is not None:
-								nickname = clear_formatting(usr.nick)
+                            nickname = "[none]"
+                            if usr.nick is not None:
+                                nickname = clear_formatting(usr.nick)
 
-							if usr.game is None:
-								game = "[none]"
-							else:
-								game = clear_formatting(usr.game.name)
+                            if usr.game is None:
+                                game = "[none]"
+                            else:
+                                game = clear_formatting(usr.game.name)
 
-							joined = usr.joined_at
-							joined_days = datetime.datetime.now() - joined
-							created = usr.created_at
-							created_days = datetime.datetime.now() - created
-							avatar = usr.avatar_url
+                            joined = usr.joined_at
+                            joined_days = datetime.datetime.now() - joined
+                            created = usr.created_at
+                            created_days = datetime.datetime.now() - created
+                            avatar = usr.avatar_url
 
-							# Send message
+                            # Send message
 
-							await client.send_message(message.channel, """```ini
-			[ID]            %s
-			[Username]      %s
-			[Discriminator] %s
-			[Nickname]      %s
-			[Current game]  %s
-			[Joined]        %s (%d days ago)
-			[Created]       %s (%d days ago)
-			[Avatar] %s```""" % (usr.id,
-								 username,
-								 discrim,
-								 nickname,
-								 game,
-								 joined.strftime("%m/%d/%Y %I:%M:%S %p"),
-								 min(0 joined_days.days),
-								 created.strftime("%m/%d/%Y %I:%M:%S %p"),
-								 min(0, created_days.days),
-								 avatar)
-													  )
+                            await client.send_message(message.channel, """```ini
+            [ID]            %s
+            [Username]      %s
+            [Discriminator] %s
+            [Nickname]      %s
+            [Current game]  %s
+            [Joined]        %s (%d days ago)
+            [Created]       %s (%d days ago)
+            [Avatar] %s```""" % (usr.id,
+                                 username,
+                                 discrim,
+                                 nickname,
+                                 game,
+                                 joined.strftime("%m/%d/%Y %I:%M:%S %p"),
+                                 min(0 joined_days.days),
+                                 created.strftime("%m/%d/%Y %I:%M:%S %p"),
+                                 min(0, created_days.days),
+                                 avatar)
+                                                      )
 
                         elif cmd == "topusers" and is_owner:
                             if len(args) == 0:
