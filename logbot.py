@@ -340,7 +340,7 @@ class Bot:
 
             msg = "✅ %s (`%s#%s` User #%s) user joined the server." % (
                 member.mention, member.name, discrim, member.server.member_count)
-            if member.avatar_url.isspace():
+            if not member.avatar_url:
                 msg += "\n😶 User doesn't have an avatar."
 
             try:
