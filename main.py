@@ -95,11 +95,11 @@ async def on_message(message):
                 cat = "`%scat` - gimme some o' dem cute cat pix" % PREFIX
                 dog = "`%sdog` - gimme dem cute dogs" % PREFIX
                 randomuser = "`%srandomuser` - selects a random user on the server" % PREFIX
-                creduts - "`%scredits` - lists the users who have worked on the bot" % PREFIX
+                credits = "`%scredits` - lists the users who have worked on the bot" % PREFIX
 
                 yt = "`%syt [on/off]` - turn YT video notifications on/off" % PREFIX
 
-                cmds = "\n".join([help, usercount, userinfo, serverinfo, roll, randomuser, cat, dog])
+                cmds = "\n".join([help, usercount, userinfo, serverinfo, roll, randomuser, cat, dog, credits])
                 greet = "Hi! I'm the STEM part of the HTC-Bote, a super-exclusive part only for the HTwins STEM server. "
                 avacmds = "I have a couple commands you can try out, which include: \n%s\nI also have some commands for use in private messages: \n%s" % (
                     cmds, yt)
@@ -325,9 +325,9 @@ async def on_message(message):
                 await client.send_message(message.channel,
                                           "You have been removed from the YouTube notification role on HTwins STEM.")
             else:
-                await client.send_message(message.channel, "Proper usage: `{p}yt [on/off]`")
+                await client.send_message(message.channel, "Proper usage: `%syt [on/off]`" % PREFIX)
         else:
-            await client.send_message(message.channel, "Proper usage: `{p}yt [on/off]`")
+            await client.send_message(message.channel, "Proper usage: `yt [on/off]`" % PREFIX)
 
 
 @client.event
