@@ -141,9 +141,9 @@ async def on_message(message):
                     game = clear_formatting(usr.game.name)
 
                 joined = usr.joined_at
-                joined_days = datetime.datetime.now() - joined
+                joined_days = datetime.datetime.utcnow() - joined
                 created = usr.created_at
-                created_days = datetime.datetime.now() - created
+                created_days = datetime.datetime.utcnow() - created
                 avatar = usr.avatar_url
 
                 # Send message
@@ -172,7 +172,7 @@ async def on_message(message):
                 roles = [role.name for role in message.server.roles]
 
                 created = message.server.created_at
-                created_days = datetime.datetime.now() - created
+                created_days = datetime.datetime.utcnow() - created
                 roles_string = ", ".join(roles)
                 region = message.server.region.name
 

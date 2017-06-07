@@ -35,7 +35,7 @@ def clear_formatting(inp):
 
 def message_increment(botnum, user, sid):
     botstring = "bot-" + str(botnum)
-    path = os.path.join(os.getcwd(), botstring, str(sid), str(datetime.datetime.now().month))
+    path = os.path.join(os.getcwd(), botstring, str(sid), str(datetime.datetime.utcnow().month))
     datafile = os.path.join(path, str(user.id) + ".txt")
 
     if not os.path.exists(path):
@@ -67,7 +67,7 @@ def message_increment(botnum, user, sid):
 
 def message_decrement(botnum, user, sid):
     botstring = "bot-" + str(botnum)
-    path = os.path.join(os.getcwd(), botstring, str(sid), str(datetime.datetime.now().month))
+    path = os.path.join(os.getcwd(), botstring, str(sid), str(datetime.datetime.utcnow().month))
     datafile = os.path.join(path, str(user.id) + ".txt")
 
     if not os.path.exists(path):
@@ -99,7 +99,7 @@ def message_decrement(botnum, user, sid):
 
 def message_top(botnum, sid, number_of_users):
     botstring = "bot-" + str(botnum)
-    path = os.path.join(os.getcwd(), botstring, str(sid), str(datetime.datetime.now().month))
+    path = os.path.join(os.getcwd(), botstring, str(sid), str(datetime.datetime.utcnow().month))
 
     if not os.path.exists(path):
         os.makedirs(path)
@@ -218,9 +218,9 @@ class Bot:
                                 game = clear_formatting(usr.game.name)
 
                             joined = usr.joined_at
-                            joined_days = datetime.datetime.now() - joined
+                            joined_days = datetime.datetime.utcnow() - joined
                             created = usr.created_at
-                            created_days = datetime.datetime.now() - created
+                            created_days = datetime.datetime.utcnow() - created
                             avatar = usr.avatar_url
 
                             # Send message
@@ -316,7 +316,7 @@ class Bot:
             if member.server.id == HTC_ID:
                 self.client.change_presence(game=discord.Game(name="for %d users" % member.server.member_count))
 
-            time_now = datetime.datetime.now()
+            time_now = datetime.datetime.utcnow()
 
             print("[%s - Bot #%d] A user joined %s: %s#%s (%s)" % (
                 time_now.strftime("%m/%d - %H:%M:%S"), self.botnum, member.server.name, member.name,
@@ -385,7 +385,7 @@ class Bot:
             is_banned = member.id == self.banneduser
 
             if not is_banned:
-                time_now = datetime.datetime.now()
+                time_now = datetime.datetime.utcnow()
                 print("[%s - Bot #%d] A user left %s: %s#%s (%s)" % (
                     time_now.strftime("%m/%d - %H:%M:%S"), self.botnum, member.server.name, member.name,
                     member.discriminator, member.id))
@@ -433,7 +433,7 @@ class Bot:
         async def on_member_ban(member):
             self.banneduser = member.id
 
-            time_now = datetime.datetime.now()
+            time_now = datetime.datetime.utcnow()
             print("[%s - Bot #%d]  A user was banned from %s: %s#%s (%s)" % (
                 time_now.strftime("%m/%d - %H:%M:%S"), self.botnum, member.server.name, member.name,
                 member.discriminator, member.id))
@@ -479,7 +479,7 @@ class Bot:
 
         @self.client.event
         async def on_member_unban(server, member):
-            time_now = datetime.datetime.now()
+            time_now = datetime.datetime.utcnow()
             print("[%s - Bot #%d]  A user was unbanned from %s: %s#%s (%s)" % (
                 time_now.strftime("%m/%d - %H:%M:%S"), self.botnum, server.name, member.name,
                 member.discriminator, member.id))
@@ -526,7 +526,7 @@ class Bot:
         @self.client.event
         async def on_member_update(before, after):
             if before.name != after.name:
-                time_now = datetime.datetime.now()
+                time_now = datetime.datetime.utcnow()
                 print("[%s - Bot #%d] A user (%s) changed their name from %s#%s to %s#%s" % (
                     time_now.strftime("%m/%d - %H:%M:%S"), self.botnum, before.id, before.name,
                     before.discriminator, after.name, after.discriminator))
@@ -578,7 +578,7 @@ class Bot:
                     traceback.print_exc()
             elif (before.avatar_url != after.avatar_url) and (
                     before.server.id == HTC_ID or before.server.id == HTSTEM_ID):
-                time_now = datetime.datetime.now()
+                time_now = datetime.datetime.utcnow()
                 print("[%s - Bot #%d] %s#%s (%s) changed their avatar from %s to %s" % (
                     time_now.strftime("%m/%d - %H:%M:%S"), self.botnum, after.name, after.discriminator,
                     after.id, before.avatar_url, after.avatar_url))
