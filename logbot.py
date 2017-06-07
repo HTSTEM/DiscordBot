@@ -200,7 +200,7 @@ class Bot:
 							else:
 								usr = message.author
 								for m in message.server.members:
-									if rawargs in m.name:
+									if rawargs.lower() in m.name.lower():
 										usr = m
 							
 							# Get user info

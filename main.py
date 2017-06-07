@@ -123,7 +123,7 @@ async def on_message(message):
                 else:
                     usr = message.author
                     for m in message.server.members:
-                        if argtext in m.name:
+                        if argtext.lower() in m.name.lower():
                             usr = m
                 
                 # Get user info
