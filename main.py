@@ -186,9 +186,9 @@ async def on_message(message):
                      nickname,
                      game,
                      joined.strftime("%m/%d/%Y %I:%M:%S %p"),
-                     min(0, joined_days.days),
+                     max(0, joined_days.days),
                      created.strftime("%m/%d/%Y %I:%M:%S %p"),
-                     min(0, created_days.days),
+                     max(0, created_days.days),
                      avatar)
                                           )
 
