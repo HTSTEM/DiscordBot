@@ -209,7 +209,7 @@ class Bot:
                             if message.author == owner:
                                 is_owner = True
                         if (is_owner or "joinbot" in message.channel.name) and message.server.id != HTSTEM_ID and cmd == "userinfo":
-                            await client.request_offline_members(message.server)
+                            await self.client.request_offline_members(message.server)
                             # users = message.server.members.sort(key=lambda x:x.joined_at)
 
                             # Find user
@@ -249,7 +249,7 @@ class Bot:
 
                             # Send message
 
-                            await client.send_message(message.channel, """```ini
+                            await self.client.send_message(message.channel, """```ini
             [ID]            %s
             [Username]      %s
             [Discriminator] %s
