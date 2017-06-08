@@ -357,7 +357,7 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, "Proper usage: `%syt [on/off]`" % PREFIX)
         else:
-            await client.send_message(message.channel, "Proper usage: `yt [on/off]`" % PREFIX)
+            await client.send_message(message.channel, "Proper usage: `%syt [on/off]`" % PREFIX)
 
 
 @client.event
