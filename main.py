@@ -368,15 +368,5 @@ async def on_ready():
     print("======")
 
 
-@client.event
-async def on_member_join(member):
-   pass
-
-
-@client.event
-async def on_member_remove(member):
-    pass
-
-
 client.loop.create_task(cary_video_checker())
 client.run(open("bot-token.txt").read().split("\n")[0])

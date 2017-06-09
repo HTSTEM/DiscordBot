@@ -222,8 +222,8 @@ class Bot:
                                 usr = message.author
                                 closest = -1
                                 for m in message.server.members:
-                                    d = levenshtein(argtext.lower(), m.name.lower())
-                                    if argtext.lower() in m.name.lower() and (closest == -1 or d < closest):
+                                    d = levenshtein(rawargs.lower(), m.name.lower())
+                                    if rawargs.lower() in m.name.lower() and (closest == -1 or d < closest):
                                         closest = d
                                         usr = m
                             
