@@ -1,4 +1,4 @@
-TESTING = True  # Use this to toggle between production IDs and testing IDs
+TESTING = False  # Use this to toggle between production IDs and testing IDs
 
 TOKEN_FILE = "bot-token.txt"
 HTSTEM_BOTE_TOKEN_NUMBER = 0
