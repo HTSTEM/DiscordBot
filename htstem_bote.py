@@ -29,8 +29,8 @@ class HTSTEM_Bote:
             if message.content.startswith(PREFIX) and not message.content.startswith(PREFIX * 2):
                 is_command = True
 
-			htstem_server = client.get_server(HTSTEM_ID)
-				
+            htstem_server = self.client.get_server(HTSTEM_ID)
+                
             command = message.content[len(PREFIX):].split(" ")[0]
             raw_arguments = " ".join(message.content[len(PREFIX):].split(" ")[1:])
             is_developer = message.author.id in DEVELOPERS
@@ -330,7 +330,7 @@ I have a couple commands you can try out, which include:
                 await self.client.send_message(channel,
                                                "The bot borked at {0}:\nCommand:\n```\n{1}```\nUser: {2}\nError:\n```py\n{3}```".format(datetime.datetime.now(),
                                                                                                          message.content,
-																										 message.author.mention,
+                                                                                                         message.author.mention,
                                                                                                          clear_formatting(
                                                                                                          trace_back)))
             print("Error message DMs sent!")
