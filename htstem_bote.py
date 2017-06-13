@@ -29,6 +29,8 @@ class HTSTEM_Bote:
             if message.content.startswith(PREFIX) and not message.content.startswith(PREFIX * 2):
                 is_command = True
 
+			htstem_server = client.get_server(HTSTEM_ID)
+				
             command = message.content[len(PREFIX):].split(" ")[0]
             raw_arguments = " ".join(message.content[len(PREFIX):].split(" ")[1:])
             is_developer = message.author.id in DEVELOPERS
@@ -76,10 +78,10 @@ I have a couple commands you can try out, which include:
                                     help_message.append("`{0}{1}`: Command not found".format(PREFIX, cmd))
                                 done.append(cmd)
                         await self.client.send_message(message.channel, "\n".join(help_message))
-                elif command == "usercount":
+                elif command == "usercount" and not message.channel.is_private:
                     await self.client.send_message(message.channel, "`{0}` currently has {1} users.".format(
                         message.server.name, message.server.member_count))
-                elif command == "userinfo":
+                elif command == "userinfo" and not message.channel.is_private:
                     await self.client.request_offline_members(message.server)
 
                     if len(message.mentions) > 0:
@@ -135,7 +137,7 @@ I have a couple commands you can try out, which include:
                      created.strftime("%m/%d/%Y %I:%M:%S %p"),
                      max(0, created_days.days),
                      avatar))
-                elif command == "serverinfo":
+                elif command == "serverinfo" and not message.channel.is_private:
                     roles = [role.name for role in message.server.roles]
 
                     created = message.server.created_at
@@ -213,7 +215,7 @@ I have a couple commands you can try out, which include:
                                         output = "Satan rolled a nice %d for you." % random.randint(1, sides)
                                     elif sides == 1337:
                                         output = "Th3 %d-51d3d d13 r0ll3d 4 %d." % (sides, random.randint(1, sides))
-                                    elif sides == message.server.member_count:
+                                    elif not message.channel.is_private and sides == message.server.member_count:
                                         await self.client.request_offline_members(message.server)
 
                                         members = list(message.server.members)
@@ -225,7 +227,7 @@ I have a couple commands you can try out, which include:
                                             sides, rnd_number + 1, rnd_user.name)
 
                         await self.client.send_message(message.channel, output)
-                elif command == "randomuser":
+                elif command == "randomuser" and not message.channel.is_private:
                     await self.client.request_offline_members(message.server)
 
                     members = list(message.server.members)
@@ -326,8 +328,9 @@ I have a couple commands you can try out, which include:
             for user in DEVELOPERS_ERROR_PINGS:
                 channel = await self.client.get_user_info(user)
                 await self.client.send_message(channel,
-                                               "The bot borked at {0}:\nCommand:\n```\n{1}```\nError:\n```py\n{2}```".format(datetime.datetime.now(),
+                                               "The bot borked at {0}:\nCommand:\n```\n{1}```\nUser: {2}\nError:\n```py\n{3}```".format(datetime.datetime.now(),
                                                                                                          message.content,
+																										 message.author.mention,
                                                                                                          clear_formatting(
                                                                                                          trace_back)))
             print("Error message DMs sent!")
