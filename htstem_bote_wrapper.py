@@ -20,6 +20,7 @@ def reload_bot():
 if __name__ == "__main__":
     client = discord.Client()
     bot = htstem_bote.HTSTEM_Bote(client, reload_bot)
+    client.loop.create_task(bot.cary_video_checker())
     bots.append(bot)
 
     @client.event

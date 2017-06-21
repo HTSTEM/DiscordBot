@@ -363,28 +363,30 @@ I have a couple commands you can try out, which include:
             return data
 
     async def cary_video_checker(self):
-        await asyncio.sleep(10)
+        await self.client.wait_until_ready()
+        while not self.client.is_closed:
+            if not os.path.exists("videoURLS.txt"):
+                open("videoURLS.txt", "w").close()
 
-        if not os.path.exists("videoURLS.txt"):
-            open("videoURLS.txt", "w").close()
+            feed = feedparser.parse(CARY_YT_URL)
+            videos = feed["entries"]
 
-        feed = feedparser.parse(CARY_YT_URL)
-        videos = feed["entries"]
+            urls = open("videoURLS.txt").read().split("\n")
 
-        urls = open("videoURLS.txt").read().split("\n")
+            for v in videos:
+                href = v["link"]
+                if href not in urls:
+                    title = v["title"]
+                    print("New video: %s - %s" % (title, href))
+                    channel = self.client.get_channel(VIDEO_ANNOUNCE_CHANNEL)
+                    await self.client.send_message(channel,
+                                                   "@here `carykh` has uploaded a new YouTube video!\n\"%s\" - %s" % (
+                                                       title, href))
+                    urls.append(href)
 
-        for v in videos:
-            href = v["link"]
-            if href not in urls:
-                title = v["title"]
-                print("New video: %s - %s" % (title, href))
-                channel = self.client.get_channel(VIDEO_ANNOUNCE_CHANNEL)
-                await self.client.send_message(channel,
-                                               "@here `carykh` has uploaded a new YouTube video!\n\"%s\" - %s" % (
-                                                   title, href))
-                urls.append(href)
-
-        f = open("videoURLS.txt", "w")
-        f.write("\n".join(urls))
-        f.close()
+            f = open("videoURLS.txt", "w")
+            f.write("\n".join(urls))
+            f.close()
+            
+            await asyncio.sleep(10)
 
