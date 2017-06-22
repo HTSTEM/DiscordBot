@@ -5,6 +5,8 @@ import os
 import random
 import traceback
 import urllib.request
+import urllib.parse
+import requests
 
 import discord
 import feedparser
@@ -50,11 +52,19 @@ class HTSTEM_Bote:
                         "dog": "`%sdog` - gimme dem cute dogs" % PREFIX,
                         "randomuser": "`%srandomuser` - selects a random user on the server" % PREFIX,
                         "credits": "`%scredits` - lists the users who have worked on the bot" % PREFIX,
-
+                        "google": "`{}google <query>` - search using Google".format(PREFIX),
+                        "lucky": "`{}lucky <query>` - search using `I'm feeling lucky`".format(PREFIX),
+                        "woolfram": "`{}woolfram <query>` - search using Woolfram Alpha".format(PREFIX),
+                        
                         "yt": "`%syt [on/off]` - turn YT video notifications on/off" % PREFIX,
                     }
                     aliases = {
-                        "adam": "dog"
+                        "adam": "dog",
+                        "b1nzy": "cat",
+                        "g": "google",
+                        "wa" : "woolfram",
+                        "woolfram_alpha" : "woolfram",
+                        "alpha": "woolfram",
                     }
 
                     if len(arguments) == 0:
@@ -78,6 +88,15 @@ I have a couple commands you can try out, which include:
                                     help_message.append("`{0}{1}`: Command not found".format(PREFIX, cmd))
                                 done.append(cmd)
                         await self.client.send_message(message.channel, "\n".join(help_message))
+                elif command in ["google", "g"]:
+                    op = urllib.parse.urlencode({"q": raw_arguments})
+                    await self.client.send_message(message.channel, "https://google.com/search?{}".format(op))
+                elif command in ["woolfram", "wa", "woolfram_alpha", "alpha"]:
+                    op = urllib.parse.urlencode({"i": raw_arguments})
+                    await self.client.send_message(message.channel, "https://www.wolframalpha.com/input/?{}".format(op))
+                elif command == "lucky":
+                    op = urllib.parse.urlencode({"q": raw_arguments})
+                    await self.client.send_message(message.channel, requests.get("https://google.com/search?{}&&btnI".format(op)).url)
                 elif command == "usercount" and not message.channel.is_private:
                     await self.client.send_message(message.channel, "`{0}` currently has {1} users.".format(
                         message.server.name, message.server.member_count))
@@ -262,7 +281,7 @@ I have a couple commands you can try out, which include:
                                                            "Something happened while trying to grab information about user #%d." % rnd_number)
                             raise error
 
-                elif command == "cat":
+                elif command in ["cat", "b1nzy"]:
                     cat = self.get_json("http://random.cat/meow")
                     while cat["file"].split(".")[-1].lower() not in IMAGE_FORMATS:
                         cat = self.get_json("http://random.cat/meow")

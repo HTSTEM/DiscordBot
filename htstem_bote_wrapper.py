@@ -9,10 +9,10 @@ bots = []
 
 def reload_bot():
     print("Reloading bot ", end="")
-    bots.remove(bots[0])
     importlib.reload(globals)
     importlib.reload(htstem_bote)
     bot = htstem_bote.HTSTEM_Bote(client, reload_bot)
+    bots.remove(bots[0])
     bots.append(bot)
     print("[DONE]")
 
