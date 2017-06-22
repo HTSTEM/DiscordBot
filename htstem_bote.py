@@ -40,7 +40,7 @@ class HTSTEM_Bote:
             while "" in arguments:
                 arguments.remove("")
 
-            if is_command:
+            if is_command and (message.channel.is_private or message.server.id == HTSTEM_ID):
                 if command == "help":
                     commands = {
                         "help": "`%shelp` - lists the bot commands" % PREFIX,
