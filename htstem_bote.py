@@ -55,6 +55,7 @@ class HTSTEM_Bote:
                         "google": "`{}google <query>` - search using Google".format(PREFIX),
                         "lucky": "`{}lucky <query>` - search using `I'm feeling lucky`".format(PREFIX),
                         "woolfram": "`{}woolfram <query>` - search using Woolfram Alpha".format(PREFIX),
+                        "moderators": "`{}moderators` - list all the server moderators".format(PREFIX),
                         
                         "yt": "`%syt [on/off]` - turn YT video notifications on/off" % PREFIX,
                     }
@@ -65,6 +66,9 @@ class HTSTEM_Bote:
                         "wa" : "woolfram",
                         "woolfram_alpha" : "woolfram",
                         "alpha": "woolfram",
+                        "mods": "moderators",
+                        "listmods": "moderators",
+                        "list_mods": "moderators",
                     }
 
                     if len(arguments) == 0:
@@ -280,7 +284,40 @@ I have a couple commands you can try out, which include:
                             await self.client.send_message(message.channel,
                                                            "Something happened while trying to grab information about user #%d." % rnd_number)
                             raise error
+                elif command in ["mods", "moderators", "listmods", "list_mods"]:
+                    await self.client.request_offline_members(self.client.get_server(HTSTEM_ID))
+                    htstem = self.client.get_server(HTSTEM_ID)
+                    role =  discord.utils.get(htstem.roles, id=MODERATOR_ROLE_ID_STEM)
 
+                    offline_mods = []
+                    idle_mods = []
+                    online_mods = []
+                    
+                    for m in htstem.members:
+                        if role in m.roles:
+                            if m.status == discord.Status.online:
+                                online_mods.append(m)
+                            elif m.status == discord.Status.idle:
+                                idle_mods.append(m)
+                            else:
+                                offline_mods.append(m)
+                    
+                    out_message = ""
+                    if online_mods:
+                        out_message += ":green_heart: **Online Moderators:**\n"
+                        for i in online_mods:
+                            out_message += "{} #{}\n".format(i.name, i.discriminator)
+                    if idle_mods:
+                        out_message += ":large_orange_diamond: **Idle Moderators:**\n"
+                        for i in idle_mods:
+                            out_message += "{} #{}\n".format(i.name, i.discriminator)
+                    if offline_mods:
+                        out_message += ":red_circle: **Offline or DND Moderators:**\n"
+                        for i in offline_mods:
+                            out_message += "{} #{}\n".format(i.name, i.discriminator)
+                    
+                    await self.client.send_message(message.channel, out_message)
+                            
                 elif command in ["cat", "b1nzy"]:
                     cat = self.get_json("http://random.cat/meow")
                     while cat["file"].split(".")[-1].lower() not in IMAGE_FORMATS:
