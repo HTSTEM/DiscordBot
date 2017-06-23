@@ -2,3 +2,5 @@
 bot-token.txt
 bot-*/*
 videoURLS.txt
+__pycache__/*
+*.pyc

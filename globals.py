@@ -1,4 +1,8 @@
-TESTING = True  # Use this to toggle between production IDs and testing IDs
+import sys
+if "--testing" in sys.argv or "-t" in sys.argv:
+    TESTING = True
+else:
+    TESTING = False
 
 TOKEN_FILE = "bot-token.txt"
 HTSTEM_BOTE_TOKEN_NUMBER = 0

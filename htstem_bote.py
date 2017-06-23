@@ -6,8 +6,8 @@ import random
 import traceback
 import urllib.request
 import urllib.parse
-import requests
 
+import requests
 import discord
 import feedparser
 
