@@ -94,13 +94,13 @@ I have a couple commands you can try out, which include:
                         await self.client.send_message(message.channel, "\n".join(help_message))
                 elif command in ["google", "g"]:
                     op = urllib.parse.urlencode({"q": raw_arguments})
-                    await self.client.send_message(message.channel, "https://google.com/search?{}".format(op))
+                    await self.client.send_message(message.channel, "https://google.com/search?{}&safe=active".format(op))
                 elif command in ["woolfram", "wa", "woolfram_alpha", "alpha"]:
                     op = urllib.parse.urlencode({"i": raw_arguments})
                     await self.client.send_message(message.channel, "https://www.wolframalpha.com/input/?{}".format(op))
                 elif command == "lucky":
                     op = urllib.parse.urlencode({"q": raw_arguments})
-                    await self.client.send_message(message.channel, requests.get("https://google.com/search?{}&&btnI".format(op)).url)
+                    await self.client.send_message(message.channel, requests.get("https://google.com/search?{}&safe=active&&btnI".format(op)).url)
                 elif command == "usercount" and not message.channel.is_private:
                     await self.client.send_message(message.channel, "`{0}` currently has {1} users.".format(
                         message.server.name, message.server.member_count))
