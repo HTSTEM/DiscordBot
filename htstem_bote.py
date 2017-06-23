@@ -54,7 +54,7 @@ class HTSTEM_Bote:
                         "credits": "`%scredits` - lists the users who have worked on the bot" % PREFIX,
                         "google": "`{}google <query>` - search using Google".format(PREFIX),
                         "lucky": "`{}lucky <query>` - search using `I'm feeling lucky`".format(PREFIX),
-                        "woolfram": "`{}woolfram <query>` - search using Woolfram Alpha".format(PREFIX),
+                        "wolfram": "`{}wolfram <query>` - search using wolfram Alpha".format(PREFIX),
                         "moderators": "`{}moderators` - list all the server moderators".format(PREFIX),
                         
                         "yt": "`%syt [on/off]` - turn YT video notifications on/off" % PREFIX,
@@ -63,9 +63,9 @@ class HTSTEM_Bote:
                         "adam": "dog",
                         "b1nzy": "cat",
                         "g": "google",
-                        "wa" : "woolfram",
-                        "woolfram_alpha" : "woolfram",
-                        "alpha": "woolfram",
+                        "wa" : "wolfram",
+                        "wolfram_alpha" : "wolfram",
+                        "alpha": "wolfram",
                         "mods": "moderators",
                         "listmods": "moderators",
                         "list_mods": "moderators",
@@ -95,7 +95,7 @@ I have a couple commands you can try out, which include:
                 elif command in ["google", "g"]:
                     op = urllib.parse.urlencode({"q": raw_arguments})
                     await self.client.send_message(message.channel, "https://google.com/search?{}&safe=active".format(op))
-                elif command in ["woolfram", "wa", "woolfram_alpha", "alpha"]:
+                elif command in ["wolfram", "wa", "wolfram_alpha", "alpha"]:
                     op = urllib.parse.urlencode({"i": raw_arguments})
                     await self.client.send_message(message.channel, "https://www.wolframalpha.com/input/?{}".format(op))
                 elif command == "lucky":
