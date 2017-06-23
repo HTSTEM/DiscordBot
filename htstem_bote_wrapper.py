@@ -1,6 +1,7 @@
 import importlib
 import discord
 import globals
+import aiohttp
 
 import htstem_bote
 
@@ -11,7 +12,7 @@ def reload_bot():
     print("Reloading bot ", end="")
     importlib.reload(globals)
     importlib.reload(htstem_bote)
-    bot = htstem_bote.HTSTEM_Bote(client, reload_bot)
+    bot = htstem_bote.HTSTEM_Bote(client, session, reload_bot)
     bots.remove(bots[0])
     bots.append(bot)
     print("[DONE]")
@@ -19,9 +20,12 @@ def reload_bot():
 
 if __name__ == "__main__":
     client = discord.Client()
-    bot = htstem_bote.HTSTEM_Bote(client, reload_bot)
+    session = aiohttp.ClientSession(loop=client.loop)
+    bot = htstem_bote.HTSTEM_Bote(client, session, reload_bot)
     client.loop.create_task(bot.cary_video_checker())
+
     bots.append(bot)
+    
 
     @client.event
     async def on_message(message):

@@ -7,7 +7,7 @@ import traceback
 import urllib.request
 import urllib.parse
 
-import requests
+import aiohttp
 import discord
 import feedparser
 
@@ -15,9 +15,10 @@ from globals import *
 
 
 class HTSTEM_Bote:
-    def __init__(self, client, reload_func):
+    def __init__(self, client, session, reload_func):
         self.client = client
         self.reload_func = reload_func
+        self.session = session
 
     async def on_ready(self):
         print("Logged in as:")
@@ -36,6 +37,7 @@ class HTSTEM_Bote:
             command = message.content[len(PREFIX):].split(" ")[0]
             raw_arguments = " ".join(message.content[len(PREFIX):].split(" ")[1:])
             is_developer = message.author.id in DEVELOPERS
+            is_owner = message.author.id == OWNER_ID
             arguments = raw_arguments.split(" ")
             while "" in arguments:
                 arguments.remove("")
@@ -100,7 +102,8 @@ I have a couple commands you can try out, which include:
                     await self.client.send_message(message.channel, "https://www.wolframalpha.com/input/?{}".format(op))
                 elif command == "lucky":
                     op = urllib.parse.urlencode({"q": raw_arguments})
-                    await self.client.send_message(message.channel, requests.get("https://google.com/search?{}&safe=active&&btnI".format(op)).url)
+                    async with self.session.get("https://google.com/search?{}&safe=active&&btnI".format(op)) as resp:
+                        await self.client.send_message(message.channel, resp.url)
                 elif command == "usercount" and not message.channel.is_private:
                     await self.client.send_message(message.channel, "`{0}` currently has {1} users.".format(
                         message.server.name, message.server.member_count))
@@ -344,7 +347,22 @@ I have a couple commands you can try out, which include:
                     rolestring = "Sever roles: "
                     rolestring += " | ".join([role.name for role in roles])
                     print(rolestring)
-
+                elif command == "eval" and is_owner:
+                    try:
+                        res = str(eval(raw_arguments))
+                        colour = 0x00FF00
+                    except:
+                        res = traceback.format_exc()
+                        colour = 0xFF0000
+                        
+                    embed = discord.Embed(colour = colour,
+                                          title = raw_arguments,
+                                          description = "```py\n{}```".format(res.replace("```", "`` `"))
+                                         )
+                    embed.set_author(name=message.author.display_name,
+                                     icon_url=message.author.avatar_url or message.author.default_avatar_url)
+                    await self.client.send_message(message.channel, embed=embed)
+                    
             is_HSTEM = False
             if message.server is not None:
                 if message.server.id == HTSTEM_ID:
