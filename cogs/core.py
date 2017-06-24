@@ -1,39 +1,32 @@
 import asyncio
 import inspect
 
-from discord.utils import oauth_url
+import discord
 from discord.ext import commands
 import psutil
 import git
 
 
 class Core:
-    '''
-    Core commands
-    '''
+    '''Core commands'''
 
     @commands.command()
     async def about(self, ctx):
         '''Info about the bot'''
-        # TODO Embeds?
+        def format_commit(commit):
+            sha = commit.hexsha[0:6]
+            repo = 'https://github.com/HTSTEM/discord-bot/commit/{}'
+            return '[`{}`]({}) {}'.format(sha, repo.format(commit.hexsha), commit.message.splitlines()[0])
         repo = git.Repo()
         branch = repo.active_branch
         commits = list(repo.iter_commits(branch, max_count=3))
+        log = '\n'.join(map(format_commit, commits))
+        memory_usage = round(psutil.Process().memory_full_info().uss / 1024 ** 2, 2)
 
-        memory = psutil.Process().memory_full_info().uss / 1024 ** 2
+        embed = discord.Embed(title='About HTStem Bote', description=log)
+        embed.add_field(name='Memory Usage', value='{} MB'.format(memory_usage))
 
-        log = ''
-
-        for commit in commits:
-            log += '[{0}] {1}\n'.format(commit.hexsha[0:6], commit.message.splitlines()[0])
-
-        app_info = await ctx.bot.application_info()
-        invite = oauth_url(app_info.id)
-
-        fmt = ('Latest commits:\n{}\n'
-               'Memory Usage:\n{}\n'
-               'Bot Invite:\n{}')
-        await ctx.send(fmt.format(log, memory, invite))
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['quit'])
     @commands.is_owner()
