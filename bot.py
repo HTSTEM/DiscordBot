@@ -1,6 +1,9 @@
+import datetime
 import sys
 import logging
+import traceback
 
+import discord
 from discord.ext import commands
 import ruamel.yaml as yaml
 
@@ -13,13 +16,44 @@ class HTSTEMBote(commands.Bot):
         self.cfg = {}
         self.debug = False
 
-    def on_command_error(self, context, exception):
-        # TODO: notify devs
-        pass
+    async def notify_devs(self, exception_details, msg: discord.Message = None):
+        # form embed
+        embed = discord.Embed(colour=0xFF0000, title='The bot borked \N{FROWNING FACE WITH OPEN MOUTH}')
+        if msg:
+            embed.add_field(name='Command', value='```\n{}\n```'.format(msg.content), inline=False)
+            embed.set_author(name=msg.author, icon_url=msg.author.avatar_url_as(format='png'))
+        embed.set_footer(text='{} UTC'.format(datetime.datetime.utcnow()))
+        embed.add_field(name='Error', value='```py\n{}\n```'.format(exception_details), inline=False)
 
-    def on_error(self, event_method, *args, **kwargs):
-        # TODO: notify devs
-        pass
+        # loop through all developers, send the embed
+        for dev in self.cfg['developers']:
+            dev = self.get_user(dev)
+            if not dev:
+                log.warning('Could not get developer with an ID of %d, skipping.')
+                continue
+            try:
+                await dev.send(embed=embed)
+            except discord.Forbidden:
+                log.warning('Couldn\'t send error embed to developer %d.', dev.id)
+
+    async def on_message(self, message: discord.Message):
+        if message.content == 'hey error pls':
+            raise RuntimeError('lol u broke it')
+        await self.process_commands(message)
+
+    async def on_command_error(self, ctx: commands.Context, exception: Exception):
+        if isinstance(exception, commands.CommandNotFound) or isinstance(exception, commands.CheckFailure):
+            # ignore command not found or check failure errors
+            pass
+        else:
+            # unwrap
+            exception = exception.original if isinstance(exception, commands.CommandInvokeError) else exception
+            info = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+            await self.notify_devs(info, ctx.message)
+
+    async def on_error(self, event_method, *args, **kwargs):
+        info = sys.exc_info()
+        await self.notify_devs(''.join(traceback.format_exception(*info)))
 
 cogs = (
     'cogs.core',
