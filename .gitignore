@@ -1,5 +1,11 @@
+# python
 __pycache__/
 *.pyc
 venv/
+.idea
+
+# config
 *.yml
+
+# state
 youtube_ids.txt
