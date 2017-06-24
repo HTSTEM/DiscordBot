@@ -39,16 +39,18 @@ class HTSTEM_Bote:
             raw_arguments = " ".join(message.content[len(PREFIX):].split(" ")[1:])
             is_developer = message.author.id in DEVELOPERS
             is_owner = message.author.id == OWNER_ID
-            is_staff = False
-            if isinstance(message.author, discord.Member):
-                for i in message.author.roles:
-                    if i.id == MODERATOR_ROLE_ID_STEM:
-                        is_staff = True
+            
             arguments = raw_arguments.split(" ")
             while "" in arguments:
                 arguments.remove("")
 
             if is_command and (message.channel.is_private or (message.server.id == HTSTEM_ID and message.channel.id in BOTE_SPAM)):
+                is_staff = False
+                if isinstance(message.author, discord.Member):
+                    for i in message.author.roles:
+                        if i.id == MODERATOR_ROLE_ID_STEM:
+                            is_staff = True
+                
                 if command == "help":
                     commands = {
                         "help": "`%shelp` - lists the bot commands" % PREFIX,
