@@ -13,7 +13,8 @@ cogs = [
     'cogs.misc',
     'cogs.internet',
     'cogs.information',
-    'cogs.youtube'
+    'cogs.youtube',
+    'cogs.hashing',
 ]
 
 
