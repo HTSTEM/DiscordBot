@@ -45,7 +45,15 @@ class Internet:
         op = urllib.parse.urlencode({"q": query})
         async with self.session.get("https://google.com/search?{}&safe=active&&btnI".format(op)) as resp:
             await ctx.send(resp.url)
-
+    
+    @commands.command(aliases=['haste', 'paste'])
+    async def hastebin(self, ctx, *, data: str):
+        '''Upload data to https://hastebin.com and return the URL'''
+        
+        async with self.session.post("https://hastebin.com/documents", data=data.encode("utf-8"), headers={'content-type': 'application/json'}) as resp:
+            await ctx.send("<@{}> https://hastebin.com/{}".format(ctx.message.author.id, (await resp.json())["key"]))
+            await ctx.message.delete()
+            
 
 def setup(bot):
     bot.add_cog(Internet(bot))

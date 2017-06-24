@@ -20,16 +20,9 @@ class Information:
     Commands that tell useful information about miscellaneous things
     '''
 
-    @commands.group(invoke_without_command=True)
-    async def info(self, ctx):
-        '''Tells you how to use the info command'''
-        formatted = await ctx.bot.formatter.format_help_for(ctx, ctx.command)
-
-        for page in formatted:
-            await ctx.send(page)
-
-    @info.command(aliases=['guild'])
-    async def server(self, ctx):
+    @commands.command(aliases=['guildinfo'])
+    @commands.guild_only()
+    async def serverinfo(self, ctx):
         '''Info about the server'''
         guild = ctx.guild
         fields = [
@@ -49,8 +42,9 @@ class Information:
 
         await ctx.send(format_fields(fields))
 
-    @info.command()
-    async def member(self, ctx, member: discord.Member = None):
+    @commands.command()
+    @commands.guild_only()
+    async def userinfo(self, ctx, member: discord.Member = None):
         '''Info about yourself or a specific member'''
         member = member or ctx.author
         fields = [
@@ -69,29 +63,57 @@ class Information:
 
         await ctx.send(format_fields(fields))
 
-    @commands.command(aliases=['mods', 'admins', 'moderators'])
-    async def administrators(self, ctx):
+    @commands.command(aliases=['mods', 'list_mods', 'listmods'])
+    @commands.guild_only()
+    async def moderators(self, ctx):
         '''Lists all the moderators of the server'''
-        # This is disgusting
-        emotes = OrderedDict()
-        emotes[discord.Status.online] = '<:online:328162997128134669>',
-        emotes[discord.Status.idle] = '<:idle:328162996218232832>',
-        emotes[discord.Status.dnd] = '<:dnd:328162995526041609>',
-        emotes[discord.Status.offline] = '<:offline:328162996494794754>'
-        members = sorted([m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_messages],
-                         key=lambda m: list(emotes).index(m.status))
+        
+        members = sorted([m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels],
+                         key=lambda m: m.display_name)
 
-        bot_emoji = '<:bot:328162994746032129>'
-        fmt = '{0}{1} {bot}\n'
-
-        await ctx.send(''.join(fmt.format(m, emotes[m.status][0], bot=bot_emoji if m.bot else '') for m in members))
-
+        offline_mods = []
+        idle_mods = []
+        dnd_mods = []
+        online_mods = []
+        
+        for m in members:
+            if m.status == discord.Status.online:
+                online_mods.append(m)
+            elif m.status == discord.Status.idle:
+                idle_mods.append(m)
+            elif m.status == discord.Status.dnd:
+                dnd_mods.append(m)
+            else:
+                offline_mods.append(m)
+        
+        out_message = ""
+        if online_mods:
+            out_message += ":green_heart: **Online Moderators:**\n"
+            for i in online_mods:
+                out_message += "{} ({}#{})\n".format(i.display_name, i.name, i.discriminator)
+        if idle_mods:
+            out_message += ":large_orange_diamond: **Idle Moderators:**\n"
+            for i in idle_mods:
+                out_message += "{} ({}#{})\n".format(i.display_name, i.name, i.discriminator)
+        if dnd_mods:
+            out_message += ":large_orange_diamond: **DND Moderators:**\n"
+            for i in dnd_mods:
+                out_message += "{} ({}#{})\n".format(i.display_name, i.name, i.discriminator)
+        if offline_mods:
+            out_message += ":red_circle: **Offline Moderators:**\n"
+            for i in offline_mods:
+                out_message += "{} ({}#{})\n".format(i.display_name, i.name, i.discriminator)
+        
+        await ctx.send(out_message)
+        
     @commands.command()
+    @commands.guild_only()
     async def usercount(self, ctx):
         '''Tells you how many users a server has'''
         await ctx.send('{0.name} has {0.member_count} members.'.format(ctx.guild))
 
     @commands.command()
+    @commands.guild_only()
     async def randomuser(self, ctx):
         '''Chooses a random user from the server'''
         members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
@@ -100,9 +122,9 @@ class Information:
         joined = list(members).index(chosen)
 
         def ordinal(n):
-            return str(n) + 'tsnrhtdd'[(n / 10 % 10 != 1) * (n % 10 < 4) * n % 10::4]
+            return str(n) + 'ᵗˢⁿʳʰᵗᵈᵈ'[(n / 10 % 10 != 1) * (n % 10 < 4) * n % 10::4]
 
-        await ctx.send('Randomly chose {} who is the {} member to join the server'.format(chosen, ordinal(joined + 1)))
+        await ctx.send('Your random user of the day is {} who was the {} member to join the server.'.format(chosen, ordinal(joined + 1)))
 
 
 def setup(bot):
