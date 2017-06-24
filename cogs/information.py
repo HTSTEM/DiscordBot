@@ -84,7 +84,7 @@ class Information:
         bot_emoji = '<:bot:328162994746032129>'
         fmt = '{0}{1} {bot}\n'
 
-        await ctx.send(''.join(fmt.format(str(m), emotes[m.status][0], bot=bot_emoji if m.bot else '') for m in members))
+        await ctx.send(''.join(fmt.format(m, emotes[m.status][0], bot=bot_emoji if m.bot else '') for m in members))
 
     @commands.command()
     async def usercount(self, ctx):
