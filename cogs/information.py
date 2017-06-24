@@ -21,6 +21,7 @@ class Information:
     '''
 
     @commands.command(aliases=['guildinfo'])
+    @commands.guild_only()
     async def serverinfo(self, ctx):
         '''Info about the server'''
         guild = ctx.guild
@@ -42,6 +43,7 @@ class Information:
         await ctx.send(format_fields(fields))
 
     @commands.command()
+    @commands.guild_only()
     async def userinfo(self, ctx, member: discord.Member = None):
         '''Info about yourself or a specific member'''
         member = member or ctx.author
@@ -62,6 +64,7 @@ class Information:
         await ctx.send(format_fields(fields))
 
     @commands.command(aliases=['mods', 'list_mods', 'listmods'])
+    @commands.guild_only()
     async def moderators(self, ctx):
         '''Lists all the moderators of the server'''
         
@@ -104,11 +107,13 @@ class Information:
         await ctx.send(out_message)
         
     @commands.command()
+    @commands.guild_only()
     async def usercount(self, ctx):
         '''Tells you how many users a server has'''
         await ctx.send('{0.name} has {0.member_count} members.'.format(ctx.guild))
 
     @commands.command()
+    @commands.guild_only()
     async def randomuser(self, ctx):
         '''Chooses a random user from the server'''
         members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
