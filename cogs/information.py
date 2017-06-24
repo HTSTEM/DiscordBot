@@ -12,6 +12,7 @@ class Information:
 
     @commands.group(invoke_without_command=True)
     async def info(self, ctx):
+        '''Tells you how to use the info command'''
         formatted = await ctx.bot.formatter.format_help_for(ctx, ctx.command)
 
         for page in formatted:

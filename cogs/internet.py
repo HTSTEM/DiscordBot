@@ -11,12 +11,14 @@ class Internet:
 
     @commands.command(aliases=['adam'])
     async def dog(self, ctx):
+        '''Sends a picture of a random dog'''
         async with self.session.get('http://random.dog/woof.json') as resp:
             json = await resp.json()
             await ctx.send(json['url'])
 
     @commands.command(aliases=['b1nzy'])
     async def cat(self, ctx):
+        '''Sends a picture of a random cat'''
         async with self.session.get('http://random.cat/meow') as resp:
             json = await resp.json()
             await ctx.send(json['file'])

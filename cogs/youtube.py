@@ -40,6 +40,7 @@ class YouTube:
 
     @commands.group(aliases=['yt'])
     async def youtube(self, ctx):
+        '''Info about how to get the YouTube role'''
         formatted = await ctx.bot.formatter.format_help_for(ctx, ctx.command)
 
         for page in formatted:
@@ -47,11 +48,13 @@ class YouTube:
 
     @youtube.command()
     async def on(self, ctx):
+        '''Add the YouTube role'''
         role = discord.utils.find(lambda r: r.id == 289942717419749377 or r.name == 'YouTube', ctx.guild.roles)
         ctx.author.add_role(role)
 
     @youtube.command()
     async def off(self, ctx):
+        '''Remove the YouTube role'''
         role = discord.utils.find(lambda r: r.id == 289942717419749377 or r.name == 'YouTube', ctx.guild.roles)
         ctx.author.remove_role(role)
 

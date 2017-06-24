@@ -38,9 +38,7 @@ class Core:
     @commands.command(aliases=['quit'])
     @commands.is_owner()
     async def kill(self, ctx):
-        '''
-        Disconnects the bot from Discord
-        '''
+        '''Disconnects the bot from Discord'''
         await ctx.send('Logging out...')
 
         await ctx.bot.logout()
@@ -48,9 +46,7 @@ class Core:
     @commands.command()
     @commands.is_owner()
     async def load(self, ctx, *, cog: str):
-        '''
-        Loads an extension
-        '''
+        '''Loads an extension'''
         try:
             ctx.bot.load_extension(cog)
         except Exception as e:
@@ -61,9 +57,7 @@ class Core:
     @commands.command()
     @commands.is_owner()
     async def unload(self, ctx, *, cog: str):
-        '''
-        Unloads an extension
-        '''
+        '''Unloads an extension'''
         try:
             ctx.bot.unload_extension(cog)
         except Exception as e:
@@ -74,9 +68,7 @@ class Core:
     @commands.group(invoke_without_command=True)
     @commands.is_owner()
     async def reload(self, ctx, *, cog: str):
-        '''
-        Reloads an extension
-        '''
+        '''Reloads an extension'''
         try:
             ctx.bot.unload_extension(cog)
             ctx.bot.load_extension(cog)
@@ -88,9 +80,7 @@ class Core:
     @reload.command(name='all')
     @commands.is_owner()
     async def _all(self, ctx):
-        '''
-        Reloads all extensions
-        '''
+        '''Reloads all extensions'''
         for extension in ctx.bot.extensions.copy():
             ctx.bot.unload_extension(extension)
             try:
@@ -105,9 +95,7 @@ class Core:
     @commands.command()
     @commands.is_owner()
     async def update(self, ctx):
-        '''
-        Updates the bot from git
-        '''
+        '''Updates the bot from git'''
         await ctx.send('Pulling updates from Git...')
 
         process = await asyncio.create_subprocess_exec('git', 'pull',
