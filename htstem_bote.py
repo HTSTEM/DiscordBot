@@ -355,7 +355,11 @@ I have a couple commands you can try out, which include:
                     print(rolestring)
                 elif command == "eval" and is_owner:
                     try:
-                        res = str(eval(raw_arguments))
+                        if raw_arguments.startswith("await "):
+                            res = str(await eval(raw_arguments[6:]))
+                        else:
+                            res = str(eval(raw_arguments))
+                        
                         colour = 0x00FF00
                     except:
                         res = traceback.format_exc()
