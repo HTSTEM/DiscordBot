@@ -8,9 +8,10 @@ bot = commands.Bot('sb?')
 
 cogs = [
     'cogs.core',
-    'cogs.misc'
+    'cogs.misc',
     'cogs.internet',
     'cogs.information',
+    'cogs.youtube'
 ]
 
 
