@@ -5,6 +5,16 @@ from discord.ext import commands
 import discord
 
 
+def format_fields(fields):
+    string = '```ini\n'
+    longest_field_name = max(len(t[0]) for t in fields) + 2 # [ ]
+    for name, value in fields:
+        name = '[{}]'.format(name.title())
+        string += '{0: <{max}} {1}\n'.format(name, value, max=longest_field_name)
+    string += '```'
+    return string
+
+
 class Information:
     '''
     Commands that tell useful information about miscellaneous things
@@ -37,13 +47,7 @@ class Information:
             ('icon', guild.icon_url)
         ]
 
-        string = '```md\n'
-        for name, value in fields:
-            print(name, value)
-            string += '[{0:^15}]({1:^20})\n'.format(name.title(), str(value))
-        string += '```'
-
-        await ctx.send(string)
+        await ctx.send(format_fields(fields))
 
     @info.command()
     async def member(self, ctx, member: discord.Member = None):
@@ -62,12 +66,8 @@ class Information:
             ('highest role', member.top_role.name),
             ('avatar', member.avatar_url),
         ]
-        string = '```md\n'
-        for name, value in fields:
-            string += '[{0:^15}]({1:^20})\n'.format(name.title(), str(value))
-        string += '```'
 
-        await ctx.send(string)
+        await ctx.send(format_fields(fields))
 
     @commands.command(aliases=['mods', 'admins', 'moderators'])
     async def administrators(self, ctx):
