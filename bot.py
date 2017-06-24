@@ -38,16 +38,21 @@ def load_config():
 
 if __name__ == '__main__':
     bot = HTSTEMBote()
+
+    # load configuration
     cfg = load_config()
     bot.cfg = cfg
-    debug = any('debug' in arg.lower() for arg in sys.argv) or cfg.get('debug', False)
+
+    # debug?
+    debug = any('debug' in arg.lower() for arg in sys.argv) or cfg.get('debug_mode', False)
+    if debug:
+        log.info('Debugging mode activated.')
+        # use the subconfiguration inside of debug
+        bot.cfg = cfg['debug']
+        bot.command_prefix = '..'
     bot.debug = debug
 
-    if debug:
-        bot.command_prefix = '..'
-        token = cfg.get('debug_token') or cfg['token']
-    else:
-        token = cfg['token']
+    token = bot.cfg['token']
 
     for cog in cfg.get('cogs', cogs):
         try:
