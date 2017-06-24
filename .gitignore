@@ -1,6 +1,4 @@
-.idea/*
-bot-token.txt
-bot-*/*
-videoURLS.txt
-__pycache__/*
+__pycache__/
 *.pyc
+venv/
+*.yml
