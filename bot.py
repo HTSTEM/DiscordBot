@@ -7,7 +7,10 @@ import ruamel.yaml as yaml
 bot = commands.Bot('sb?')
 
 cogs = [
-    'cogs.core'
+    'cogs.core',
+    'cogs.misc'
+    'cogs.internet',
+    'cogs.information',
 ]
 
 

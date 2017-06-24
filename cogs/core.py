@@ -11,8 +11,9 @@ class Core:
     '''
     Core commands
     '''
+
     @commands.command()
-    async def info(self, ctx):
+    async def about(self, ctx):
         '''Info about the bot'''
         # TODO Embeds?
         repo = git.Repo()
@@ -34,7 +35,7 @@ class Core:
                'Bot Invite:\n{}')
         await ctx.send(fmt.format(log, memory, invite))
 
-    @commands.command()
+    @commands.command(aliases=['quit'])
     @commands.is_owner()
     async def kill(self, ctx):
         '''
