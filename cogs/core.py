@@ -84,7 +84,7 @@ class Core:
 
         await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
-    @commands.command()
+    @commands.command(aliases=['update'])
     @commands.is_owner()
     async def update(self, ctx):
         '''Updates the bot from git'''
