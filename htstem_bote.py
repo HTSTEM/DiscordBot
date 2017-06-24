@@ -7,6 +7,7 @@ import traceback
 import urllib.request
 import urllib.parse
 import subprocess
+import hashlib
 
 import aiohttp
 import discord
@@ -39,18 +40,17 @@ class HTSTEM_Bote:
             raw_arguments = " ".join(message.content[len(PREFIX):].split(" ")[1:])
             is_developer = message.author.id in DEVELOPERS
             is_owner = message.author.id == OWNER_ID
+            is_staff = False
+            if isinstance(message.author, discord.Member):
+                for i in message.author.roles:
+                    if i.id == MODERATOR_ROLE_ID_STEM:
+                        is_staff = True
             
             arguments = raw_arguments.split(" ")
             while "" in arguments:
                 arguments.remove("")
 
             if is_command and (message.channel.is_private or (message.server.id == HTSTEM_ID and message.channel.id in BOTE_SPAM)):
-                is_staff = False
-                if isinstance(message.author, discord.Member):
-                    for i in message.author.roles:
-                        if i.id == MODERATOR_ROLE_ID_STEM:
-                            is_staff = True
-                
                 if command == "help":
                     commands = {
                         "help": "`%shelp` - lists the bot commands" % PREFIX,
@@ -66,6 +66,10 @@ class HTSTEM_Bote:
                         "lucky": "`{}lucky <query>` - search using `I'm feeling lucky`".format(PREFIX),
                         "wolfram": "`{}wolfram <query>` - search using wolfram Alpha".format(PREFIX),
                         "moderators": "`{}moderators` - list all the server moderators".format(PREFIX),
+                        "md5": "`{}md5 <string>` - compute the MD5 for a given string".format(PREFIX),
+                        "sha1": "`{}sha1 <string>` - compute the SHA1 for a given string".format(PREFIX),
+                        "sha256": "`{}sha256 <string>` - compute the SHA256 for a given string".format(PREFIX),
+                        "sha512": "`{}sha512 <string>` - compute the SHA512 for a given string".format(PREFIX),
                         
                         "yt": "`%syt [on/off]` - turn YT video notifications on/off" % PREFIX,
                     }
@@ -79,6 +83,7 @@ class HTSTEM_Bote:
                         "mods": "moderators",
                         "listmods": "moderators",
                         "list_mods": "moderators",
+                        "hash": "md5",
                     }
 
                     if len(arguments) == 0:
@@ -343,6 +348,32 @@ I have a couple commands you can try out, which include:
                 elif command in ["credits", "contributers"]:
                     await self.client.send_message(message.channel, "Original C# dev: Noahkiq#2928 \nPorted bot to python: Bottersnike#3605 (🍷) \nAlso trying to make Noah use python: hanss314#0128")
 
+                elif command in ["hash", "md5"]:
+                    embed = discord.Embed(colour = 0xAAFF00,
+                                          title = "MD5 Hash of `{}`:".format(raw_arguments),
+                                          description = "```\n{}```".format(hashlib.md5(raw_arguments.encode("utf-8")).hexdigest())
+                                         )
+                    await self.client.send_message(message.channel, embed=embed)
+                
+                elif command == "sha1":
+                    embed = discord.Embed(colour = 0xAAFF00,
+                                          title = "SHA1 Hash of `{}`:".format(raw_arguments),
+                                          description = "```\n{}```".format(hashlib.sha1(raw_arguments.encode("utf-8")).hexdigest())
+                                         )
+                    await self.client.send_message(message.channel, embed=embed)
+                elif command == "sha256":
+                    embed = discord.Embed(colour = 0xAAFF00,
+                                          title = "SHA256 Hash of `{}`:".format(raw_arguments),
+                                          description = "```\n{}```".format(hashlib.sha256(raw_arguments.encode("utf-8")).hexdigest())
+                                         )
+                    await self.client.send_message(message.channel, embed=embed)
+                elif command == "sha512":
+                    embed = discord.Embed(colour = 0xAAFF00,
+                                          title = "SHA512 Hash of `{}`:".format(raw_arguments),
+                                          description = "```\n{}```".format(hashlib.sha512(raw_arguments.encode("utf-8")).hexdigest())
+                                         )
+                    await self.client.send_message(message.channel, embed=embed)
+                    
                 # Debugging and development commands:
                 elif command == "die" and is_developer:
                     raise ValueError("Test error.")
