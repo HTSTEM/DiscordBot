@@ -353,7 +353,7 @@ I have a couple commands you can try out, which include:
 
                 elif command in ["haste", "paste", "hastebin"]:
                     async with self.session.post("https://hastebin.com/documents", data=raw_arguments.encode("utf-8"), headers={'content-type': 'application/json'}) as resp:
-                        await self.client.send_message(message.channel, "https://hastebin.com/{}".format((await resp.json())["key"]))
+                        await self.client.send_message(message.channel, "<@{}> https://hastebin.com/{}".format(message.author.id,(await resp.json())["key"]))
                         await self.client.delete_message(message)
                                         
                 elif command in ["hash", "md5"]:
