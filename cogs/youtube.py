@@ -36,7 +36,7 @@ class YouTube:
             f.writelines(self.youtube_ids)
 
     def __global_check(self, ctx):
-        return ctx.guild.id == 282219466589208576
+        return ctx.guild.id == 282219466589208576 if not ctx.bot.debug else True
 
     @commands.group(aliases=['yt'])
     async def youtube(self, ctx):

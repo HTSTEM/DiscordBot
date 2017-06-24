@@ -17,25 +17,27 @@ cogs = [
 ]
 
 
-def load_credentials():
-    with open('credentials.yml') as f:
+def load_config():
+    with open('config.yml') as f:
         return yaml.load(f, Loader=yaml.Loader)
 
 
 if __name__ == '__main__':
-    debug = any('debug' in arg.lower() for arg in sys.argv)
-    credentials = load_credentials()
+    cfg = load_config()
+    bot.cfg = cfg
+    debug = any('debug' in arg.lower() for arg in sys.argv) or cfg.get('debug', False)
+    bot.debug = debug
 
     if debug:
         bot.command_prefix = '..'
-        token = credentials.get('debug_token', credentials['token'])
+        token = cfg.get('debug_token') or cfg['token']
     else:
-        token = credentials['token']
+        token = cfg['token']
 
-    for cog in cogs:
+    for cog in cfg.get('cogs', cogs):
         try:
             bot.load_extension(cog)
         except Exception as e:
-            print(e)  # TODO logging
+            log.exception('Failed to load cog %s', cog)
 
     bot.run(token)
