@@ -6,7 +6,7 @@ from discord.ext import commands
 
 class Hashing:
     @commands.command(aliases=['hash'])
-    async def md5(self, ctx, to_hash: str):
+    async def md5(self, ctx, *, to_hash: str):
         '''Compute the MD5 hash of a string'''
 
         embed = discord.Embed(colour = 0xAAFF00,
@@ -16,7 +16,7 @@ class Hashing:
         await ctx.send(embed=embed)
     
     @commands.command()
-    async def sha1(self, ctx, to_hash: str):
+    async def sha1(self, ctx, *, to_hash: str):
         '''Compute the SHA1 hash of a string'''
 
         embed = discord.Embed(colour = 0xAAFF00,
@@ -26,7 +26,7 @@ class Hashing:
         await ctx.send(embed=embed)
     
     @commands.command()
-    async def sha256(self, ctx, to_hash: str):
+    async def sha256(self, ctx, *, to_hash: str):
         '''Compute the SHA256 hash of a string'''
 
         embed = discord.Embed(colour = 0xAAFF00,
@@ -36,7 +36,7 @@ class Hashing:
         await ctx.send(embed=embed)
     
     @commands.command()
-    async def sha512(self, ctx, to_hash: str):
+    async def sha512(self, ctx, *, to_hash: str):
         '''Compute the SHA512 hash of a string'''
 
         embed = discord.Embed(colour = 0xAAFF00,
