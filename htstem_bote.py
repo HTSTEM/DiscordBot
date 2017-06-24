@@ -375,11 +375,10 @@ I have a couple commands you can try out, which include:
                                      icon_url=message.author.avatar_url or message.author.default_avatar_url)
                     await self.client.send_message(message.channel, embed=embed)
                 elif command == "git_pull" and is_staff:
-                    print("GIT PULL!")
                     await self.client.send_message(message.channel, ":warning: Warning! The bot will not respond to messaes for up to a minute!")
                     res = subprocess.run("git pull", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
                     await self.client.send_message(message.channel, "`Git` response: ```{}```".format(res))
-                    await self.client.send_message(message.channel, ":white_check_mark: Crisis averted. I live again")
+                    self.reload_func()
                     
             is_HSTEM = False
             if message.server is not None:
