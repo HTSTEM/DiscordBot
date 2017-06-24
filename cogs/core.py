@@ -73,22 +73,21 @@ class Core:
             ctx.bot.unload_extension(cog)
             ctx.bot.load_extension(cog)
         except Exception as e:
-            await ctx.send(e)
+            await ctx.send('Failed to load: `{}`\n```py\n{}\n```'.format(cog, e))
         else:
             await ctx.send('\N{OK HAND SIGN} Reloaded cog {} successfully'.format(cog))
 
     @reload.command(name='all')
     @commands.is_owner()
-    async def _all(self, ctx):
+    async def reload_all(self, ctx):
         '''Reloads all extensions'''
         for extension in ctx.bot.extensions.copy():
             ctx.bot.unload_extension(extension)
             try:
                 ctx.bot.load_extension(extension)
             except Exception as e:
-                pass  # TODO logging
-            else:
-                pass  # TODO logging
+                await ctx.send('Failed to load `{}`:\n```py\n{}\n```'.format(extension, e))
+                return
 
         await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
