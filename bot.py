@@ -6,16 +6,29 @@ import ruamel.yaml as yaml
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
-bot = commands.Bot('sb?')
 
-cogs = [
+class HTSTEMBote(commands.Bot):
+    def __init__(self):
+        super().__init__(command_prefix='sb?')
+        self.cfg = {}
+        self.debug = False
+
+    def on_command_error(self, context, exception):
+        # TODO: notify devs
+        pass
+
+    def on_error(self, event_method, *args, **kwargs):
+        # TODO: notify devs
+        pass
+
+cogs = (
     'cogs.core',
     'cogs.misc',
     'cogs.internet',
     'cogs.information',
     'cogs.youtube',
     'cogs.hashing',
-]
+)
 
 
 def load_config():
@@ -24,6 +37,7 @@ def load_config():
 
 
 if __name__ == '__main__':
+    bot = HTSTEMBote()
     cfg = load_config()
     bot.cfg = cfg
     debug = any('debug' in arg.lower() for arg in sys.argv) or cfg.get('debug', False)
