@@ -417,12 +417,17 @@ I have a couple commands you can try out, which include:
             print(trace_back)
             for user in DEVELOPERS_ERROR_PINGS:
                 channel = await self.client.get_user_info(user)
-                await self.client.send_message(channel,
-                                               "The bot borked at {0}:\nCommand:\n```\n{1}```\nUser: {2}\nError:\n```py\n{3}```".format(datetime.datetime.now(),
-                                                                                                         message.content,
-                                                                                                         message.author.mention,
-                                                                                                         clear_formatting(
-                                                                                                         trace_back)))
+                
+                embed = discord.Embed(colour = 0xFF0000,
+                                      title = "The bot borked :frowning:",
+                                      timestamp = message.timestamp,
+                                     )
+                embed.add_field(name="Command", value="```\n{}```".format(message.content))
+                embed.add_field(name="Error", value="```py\n{}```".format(clear_formatting(trace_back)))
+                embed.set_author(name=message.author.display_name + " (" + message.author.name + "#" + str(message.author.discriminator) + ")",
+                                 icon_url=message.author.avatar_url or message.author.default_avatar_url)
+                await self.client.send_message(channel, embed=embed)
+                
             print("Error message DMs sent!")
 
     def levenshtein(self, s1, s2):
