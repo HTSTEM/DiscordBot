@@ -70,6 +70,7 @@ class HTSTEM_Bote:
                         "sha1": "`{}sha1 <string>` - compute the SHA1 for a given string".format(PREFIX),
                         "sha256": "`{}sha256 <string>` - compute the SHA256 for a given string".format(PREFIX),
                         "sha512": "`{}sha512 <string>` - compute the SHA512 for a given string".format(PREFIX),
+                        "hastebin": "`{}hastebin <data>` - upload `data` to https://hastebin.com and return the URL".format(PREFIX),
                         
                         "yt": "`%syt [on/off]` - turn YT video notifications on/off" % PREFIX,
                     }
@@ -84,6 +85,8 @@ class HTSTEM_Bote:
                         "listmods": "moderators",
                         "list_mods": "moderators",
                         "hash": "md5",
+                        "haste": "hastebin",
+                        "paste": "hastebin",
                     }
 
                     if len(arguments) == 0:
@@ -348,6 +351,10 @@ I have a couple commands you can try out, which include:
                 elif command in ["credits", "contributers"]:
                     await self.client.send_message(message.channel, "Original C# dev: Noahkiq#2928 \nPorted bot to python: Bottersnike#3605 (🍷) \nAlso trying to make Noah use python: hanss314#0128")
 
+                elif command in ["haste", "paste", "hastebin"]:
+                    async with self.session.post("https://hastebin.com/documents", data=raw_arguments.encode("utf-8"), headers={'content-type': 'application/json'}) as resp:
+                        await self.client.send_message(message.channel, "https://hastebin.com/{}".format((await resp.json())["key"]))
+                                        
                 elif command in ["hash", "md5"]:
                     embed = discord.Embed(colour = 0xAAFF00,
                                           title = "MD5 Hash of `{}`:".format(raw_arguments),
