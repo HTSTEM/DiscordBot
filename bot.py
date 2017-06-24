@@ -1,9 +1,11 @@
 import sys
+import logging
 
 from discord.ext import commands
 import ruamel.yaml as yaml
 
-
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 bot = commands.Bot('sb?')
 
 cogs = [
