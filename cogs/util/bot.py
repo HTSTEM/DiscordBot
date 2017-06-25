@@ -53,7 +53,14 @@ class HTSTEMBote(commands.AutoShardedBot):
         embed = discord.Embed(colour=0xFF0000, title='Error occurred \N{FROWNING FACE WITH OPEN MOUTH}')
 
         if message is not None:
-            embed.add_field(name='Command', value='```\n{}\n```'.format(message.content), inline=False)
+            if len(message.content) > 400:
+                async with aiohttp.ClientSession() as sess:
+                    async with sess.post('https://hastebin.com/documents', data=message.content.encode(),
+                                         headers={'content-type': 'application/json'}) as resp:
+                        json = await resp.json()
+                        embed.add_field(name='Command', value='https://hastebin.com/{}.py'.format(json['key']), inline=False)
+            else:
+                embed.add_field(name='Command', value='```\n{}\n```'.format(message.content), inline=False)
             embed.set_author(name=message.author, icon_url=message.author.avatar_url_as(format='png'))
 
         embed.set_footer(text='{} UTC'.format(datetime.datetime.utcnow()))
