@@ -1,7 +1,9 @@
 import urllib.parse
 import time
+import os
 
 from discord.ext import commands
+import discord
 import aiohttp
 
 
@@ -51,6 +53,37 @@ class Internet:
         async with self.session.post('https://hastebin.com/documents', data=data.encode(), headers={'content-type': 'application/json'}) as resp:
             await ctx.send('{0.mention} https://hastebin.com/{}'.format(ctx.author, (await resp.json())["key"]))
             await ctx.message.delete()
+
+    @commands.group(invoke_without_command=True)
+    async def xkcd(self, ctx, *, comic_number: str):
+        url = 'https://xkcd.com/{}/info.0.json'
+    
+        try:
+            comic_number = int(comic_number)
+        except ValueError:
+            await ctx.send('Does that look like a number to you? Ehh?')
+            return
+        
+        async with self.session.get(url.format('')) as resp:
+            latest = await resp.json()
+            
+        if comic_number > latest['num']:
+            await ctx.send('Woah! Steady there! There are only {} xkcds avaliable. :cry:'.format(latest['num']))
+            return
+        
+        if not os.path.exists('xkcd'):
+            os.mkdir('xkcd')
+        
+        async with self.session.get(url.format(comic_number)) as resp:
+            target = await resp.json()
+        
+        if not '{}.png'.format(comic_number) in os.listdir('xkcd'):
+            async with self.session.get(target['img']) as resp:
+                img = await resp.read()
+                with open('xkcd/{}.png'.format(comic_number), 'wb') as img_file:
+                    img_file.write(img)
+
+        await ctx.send("**{}:**".format(target['safe_title']), file=discord.File('xkcd/{}.png'.format(comic_number)))
 
     @commands.command(aliases=['latency'])
     async def ping(self, ctx):
