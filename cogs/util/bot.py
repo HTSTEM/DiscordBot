@@ -91,7 +91,7 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.logger.info('Connected to Discord')
         self.logger.info('Guilds  : {}'.format(len(self.guilds)))
         self.logger.info('Users   : {}'.format(len(set(self.get_all_members()))))
-        self.logger.info('Channels: {}'.format(len(self.get_all_channels())))
+        self.logger.info('Channels: {}'.format(len(list(self.get_all_channels()))))
 
     def run(self):
         debug = any('debug' in arg.lower() for arg in sys.argv) or self.config.get('debug', False)
