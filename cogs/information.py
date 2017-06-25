@@ -170,7 +170,7 @@ class Information:
             for i in online_mods:
                 out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
         if idle_mods:
-            out_message += ':large_orange_diamond: **Idle Moderators:**\n'
+            out_message += '<:idle:328670650220806144>**Idle Moderators:**\n'
             for i in idle_mods:
                 out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
         if dnd_mods:
