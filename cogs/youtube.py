@@ -26,13 +26,17 @@ class YouTube:
         self.task.cancel()
         self.session.close()
 
-    def __global_check(self, ctx):
+    def __local_check(self, ctx):
         guild_id = ctx.bot.config.get('hstem_guild_id', 1)
         return ctx.guild.id == guild_id if not ctx.bot.debug else True
 
-    @commands.group(aliases=['yt'])
+    @commands.group(aliases=['yt'], invoke_without_command=True)
     async def youtube(self, ctx):
         '''Commands related to the YouTube feed.'''
+        formatted = await ctx.bot.formatter.format_help_for(ctx, ctx.command)
+
+        for page in formatted:
+            await ctx.send(page)
 
     @youtube.command()
     async def on(self, ctx):
