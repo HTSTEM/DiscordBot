@@ -36,7 +36,7 @@ class YouTube:
             f.writelines(self.youtube_ids)
 
     def __global_check(self, ctx):
-        return ctx.guild.id == 282219466589208576 if not ctx.bot.debug else True
+        return ctx.guild.id == ctx.bot.cfg['hstem_guild_id'] if not ctx.bot.debug else True
 
     @commands.group(aliases=['yt'])
     async def youtube(self, ctx):
@@ -49,28 +49,31 @@ class YouTube:
     @youtube.command()
     async def on(self, ctx):
         '''Add the YouTube role'''
-        role = discord.utils.find(lambda r: r.id == 289942717419749377 or r.name == 'YouTube', ctx.guild.roles)
+        role = discord.utils.find(lambda r: r.id == ctx.bot.cfg['youtube_role_id'] or r.name == 'YouTube',
+                                  ctx.guild.roles)
         ctx.author.add_role(role)
 
     @youtube.command()
     async def off(self, ctx):
         '''Remove the YouTube role'''
-        role = discord.utils.find(lambda r: r.id == 289942717419749377 or r.name == 'YouTube', ctx.guild.roles)
+        role = discord.utils.find(lambda r: r.id == ctx.bot.cfg['youtube']['role_id'] or r.name == 'YouTube',
+                                  ctx.guild.roles)
         ctx.author.remove_role(role)
 
     async def youtube_feed(self):
         await self.bot.wait_until_ready()
 
-        channel = discord.utils.find(lambda c: c.id == 282236775215267860 or c.name == 'announcements',
-                                     self.bot.get_all_channels())
+        channel = discord.utils.find(lambda c: c.id == self.bot.cfg['youtube']['announcement_channel'] or c.name ==
+                                     'announcements', self.bot.get_all_channels())
 
         if channel is None:
             return
 
-        role = discord.utils.find(lambda r: r.id == 289942717419749377 or r.name == 'YouTube', channel.guild.roles)
+        role = discord.utils.find(lambda r: r.id == self.bot.cfg['youtube']['role_id'] or r.name == 'YouTube',
+                                  channel.guild.roles)
 
         while True:
-            async with self.session.get('https://youtube.com/feeds/videos.xml?user=carykh') as resp:
+            async with self.session.get(self.bot.cfg['youtube']['feed_url']) as resp:
                 data = feedparser.parse(await resp.read())
             videos = data['entries']
 
