@@ -86,11 +86,45 @@ class Information:
 
         await ctx.send(format_fields(fields))
 
-    @commands.command()
+    @commands.command(aliases=['whois'])
     @commands.guild_only()
-    async def userinfo(self, ctx, member: discord.Member = None):
+    async def userinfo(self, ctx, member: str):
         '''Info about yourself or a specific member'''
-        member = member or ctx.author
+        def levenshtein(s1, s2):
+            if len(s1) < len(s2):
+                return levenshtein(s2, s1)
+
+            # len(s1) >= len(s2)
+            if len(s2) == 0:
+                return len(s1)
+
+            previous_row = range(len(s2) + 1)
+            for i, c1 in enumerate(s1):
+                current_row = [i + 1]
+                for j, c2 in enumerate(s2):
+                    insertions = previous_row[
+                                     j + 1] + 1
+                    deletions = current_row[j] + 1
+                    substitutions = previous_row[j] + (c1 != c2)
+                    current_row.append(min(insertions, deletions, substitutions))
+                previous_row = current_row
+
+            return previous_row[-1]
+
+        if len(ctx.message.mentions) > 0:
+            member = ctx.message.mentions[0]
+        elif len(member) == 0:
+            member = ctx.author
+        else:
+            usr = ctx.author
+            closest = -1
+            for m in ctx.guild.members:
+                d = levenshtein(member.lower(), m.name.lower())
+                if member.lower() in m.name.lower() and (closest == -1 or d < closest):
+                    closest = d
+                    usr = m
+            member = usr
+
         fields = [
             ('name', member.name),
             ('discriminator', member.discriminator),
@@ -132,7 +166,7 @@ class Information:
         
         out_message = ''
         if online_mods:
-            out_message += ':green_heart: **Online Moderators:**\n'
+            out_message += '<:online:328659633147215884>**Online Moderators:**\n'
             for i in online_mods:
                 out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
         if idle_mods:
@@ -140,11 +174,11 @@ class Information:
             for i in idle_mods:
                 out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
         if dnd_mods:
-            out_message += ':large_orange_diamond: **DND Moderators:**\n'
+            out_message += '<:dnd:328659633109598208>**DND Moderators:**\n'
             for i in dnd_mods:
                 out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
         if offline_mods:
-            out_message += ':red_circle: **Offline Moderators:**\n'
+            out_message += '<:offline:328659633214324757>**Offline Moderators:**\n'
             for i in offline_mods:
                 out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
         
