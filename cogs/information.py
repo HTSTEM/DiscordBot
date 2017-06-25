@@ -71,39 +71,27 @@ class Information:
         members = sorted([m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels],
                          key=lambda m: m.display_name)
 
-        offline_mods = []
-        idle_mods = []
-        dnd_mods = []
-        online_mods = []
-        
-        for m in members:
-            if m.status == discord.Status.online:
-                online_mods.append(m)
-            elif m.status == discord.Status.idle:
-                idle_mods.append(m)
-            elif m.status == discord.Status.dnd:
-                dnd_mods.append(m)
-            else:
-                offline_mods.append(m)
-        
-        out_message = ""
-        if online_mods:
-            out_message += ":green_heart: **Online Moderators:**\n"
-            for i in online_mods:
-                out_message += "{} ({}#{})\n".format(i.display_name, i.name, i.discriminator)
-        if idle_mods:
-            out_message += ":large_orange_diamond: **Idle Moderators:**\n"
-            for i in idle_mods:
-                out_message += "{} ({}#{})\n".format(i.display_name, i.name, i.discriminator)
-        if dnd_mods:
-            out_message += ":large_orange_diamond: **DND Moderators:**\n"
-            for i in dnd_mods:
-                out_message += "{} ({}#{})\n".format(i.display_name, i.name, i.discriminator)
-        if offline_mods:
-            out_message += ":red_circle: **Offline Moderators:**\n"
-            for i in offline_mods:
-                out_message += "{} ({}#{})\n".format(i.display_name, i.name, i.discriminator)
-        
+        offline_mods = [m for m in members if m.status == discord.Status.offline]
+        idle_mods = [m for m in members if m.status == discord.Status.idle]
+        dnd_mods = [m for m in members if m.status == discord.Status.dnd]
+        online_mods = [m for m in members if m.status == discord.Status.online]
+
+        out_message = ''
+
+        def format(mod_list, emoji, descriptor):
+            nonlocal out_message
+            if not mod_list:
+                return
+            out_message += '{} **{} Moderators:**\n'.format(emoji, descriptor)
+            for mod in mod_list:
+                out_message += '\N{BULLET} {} ({})\n'.format(mod.display_name, mod)
+            out_message += '\n'
+
+        format(online_mods, '\N{GREEN HEART}', 'Online')
+        format(idle_mods, '\N{LARGE ORANGE DIAMOND}', 'Idle')
+        format(dnd_mods, '\N{BLACK DIAMOND SUIT}', 'DND')
+        format(offline_mods, '\N{LARGE RED CIRCLE}', 'Offline')
+
         await ctx.send(out_message)
         
     @commands.command()

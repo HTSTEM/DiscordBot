@@ -9,6 +9,8 @@ from discord.ext import commands
 import psutil
 import git
 
+from cogs.util import checks
+
 
 class Core:
     '''Core commands'''
@@ -31,12 +33,11 @@ class Core:
 
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['quit'])
-    @commands.is_owner()
-    async def kill(self, ctx):
-        '''Disconnects the bot from Discord'''
+    @commands.command(aliases=['quit', 'kill'])
+    @checks.is_developer()
+    async def die(self, ctx):
+        '''Disconnects the bot from Discord.'''
         await ctx.send('Logging out...')
-
         await ctx.bot.logout()
 
     @commands.command()
@@ -74,7 +75,7 @@ class Core:
             await ctx.send('\N{OK HAND SIGN} Reloaded cog {} successfully'.format(cog))
 
     @reload.command(name='all')
-    @commands.is_owner()
+    @checks.is_developer()
     async def reload_all(self, ctx):
         '''Reloads all extensions'''
         for extension in ctx.bot.extensions.copy():
@@ -88,7 +89,7 @@ class Core:
         await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
     @commands.command(aliases=['git_pull'])
-    @commands.is_owner()
+    @checks.is_staff()
     async def update(self, ctx):
         '''Updates the bot from git'''
         

@@ -83,7 +83,16 @@ if __name__ == '__main__':
     if debug:
         log.info('Debugging mode activated.')
         # use the subconfiguration inside of debug
-        bot.cfg = cfg['debug']
+        new_config = cfg['debug']
+        new_config.update(bot.cfg)
+        try:
+            # delete things that shouldn't be in the new configuration
+            del new_config['debug']
+            del new_config['debug_mode']
+        except (KeyError, AttributeError):
+            pass
+        print(new_config)
+        bot.cfg = new_config
         bot.command_prefix = '..'
     bot.debug = debug
 
