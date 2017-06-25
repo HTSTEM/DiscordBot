@@ -5,13 +5,24 @@ token:
 youtube:
   feed_url:
     http://youtube.com/feeds/videos.xml?user=carykh
+
   role_id:
     1234
+
   announcements_channel:
     5678
 
 ids:
   developers:
-    [1994]
+    - 1994
+
   developer_role_id:
     01189998819991197253
+
+cogs:
+  - cogs.core
+  - cogs.misc
+  - cogs.youtube
+  - cogs.hashing
+  - cogs.internet
+  - cogs.information

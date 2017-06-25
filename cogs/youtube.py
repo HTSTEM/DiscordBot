@@ -20,13 +20,14 @@ class YouTube:
         self.bot = bot
         self.session = aiohttp.ClientSession(loop=self.bot.loop)
         self.task = self.bot.loop.create_task(self.youtube_feed())
+        self.config = self.bot.config.get('youtube', {})
 
     def __unload(self):
         self.task.cancel()
         self.session.close()
 
     def __global_check(self, ctx):
-        guild_id = ctx.bot.cfg.get('hstem_guild_id', None) or ctx.bot.cfg['debug_channel_id']
+        guild_id = ctx.bot.config.get('hstem_guild_id', 1)
         return ctx.guild.id == guild_id if not ctx.bot.debug else True
 
     @commands.group(aliases=['yt'])
@@ -36,41 +37,59 @@ class YouTube:
     @youtube.command()
     async def on(self, ctx):
         '''Add the YouTube role'''
-        role = discord.utils.find(lambda r: r.id == ctx.bot.cfg['youtube']['role_id'] or r.name == 'YouTube',
-                                  ctx.guild.roles)
+        role_id = self.config.get('role_id', 0)
+        role = discord.utils.find(lambda r: r.id == role_id or r.name == 'YouTube', ctx.guild.roles)
         await ctx.author.add_roles(role)
 
     @youtube.command()
     async def off(self, ctx):
         '''Remove the YouTube role'''
-        role = discord.utils.find(lambda r: r.id == ctx.bot.cfg['youtube']['role_id'] or r.name == 'YouTube',
-                                  ctx.guild.roles)
+        role_id = self.config.get('role_id', 0)
+        role = discord.utils.find(lambda r: r.id == role_id or r.name == 'YouTube', ctx.guild.roles)
         await ctx.author.remove_roles(role)
 
     async def youtube_feed(self):
+        # File managment could be improved
+        # *cough* *cough* botterwhydidyouchangeit *cough*
         await self.bot.wait_until_ready()
 
-        # Fix this
+        if not os.path.exists('videoURLS.txt'):
+            os.mknod('videoURLS.txt')
+
+        feed_url = self.config.get('feed_url', None)
+
+        if feed_url is None:
+            return
+
+        with open('videoURLS.txt') as f:
+            urls = f.readlines()
+
         while True:
-            if not os.path.exists("videoURLS.txt"):
-                open("videoURLS.txt", "w").close()
+            async with self.session.get(feed_url) as resp:
+                feed = feedparser.parse(resp.read())
 
-            feed = feedparser.parse(self.bot.cfg['youtube']['feed_url'])
-            videos = feed["entries"]
+            videos = feed['entries']
 
-            with open("videoURLS.txt") as f:
-                urls = f.read().split("\n")
-
-            for v in videos:
-                href = v["link"]
+            for video in videos:
+                href = video['link']
                 if href not in urls:
-                    title = v["title"]
-                    print("New video: %s - %s" % (title, href))
-                    channel = self.bot.get_channel(self.bot.cfg['youtube']['announcement_channel'])
-                    await channel.send("@here `carykh` has uploaded a new YouTube video!\n\"{}\" - {}".format(title, href))
                     urls.append(href)
 
-            with open("videoURLS.txt", "w") as f:
+                    title = video['title']
+                    self.bot.logger.info('New video: {} - {}'.format(title, href))
+
+                    channel_id = self.config.get('announcement_channel', 0)
+                    channel = self.bot.get_channel(channel_id)
+                    role = discord.utils.get(channel.guild.roles, id=self.config.get('role_id', 0))
+
+                    if None in (channel, role):
+                        continue
+
+                    await channel.send('{0.mention} `{1}` has uploaded a new YouTube video!\n"{2}" - {3}'
+                                       .format(role, ' '.join(map(lambda x: x['name'], video['authors'])),
+                                               title, href))
+
+            with open('videoURLS.txt', 'w') as f:
                 f.writelines(urls)
 
             await asyncio.sleep(15)
