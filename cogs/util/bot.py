@@ -79,11 +79,23 @@ class HTSTEMBote(commands.AutoShardedBot):
 
     async def on_command_error(self, ctx: commands.Context, exception: Exception):
         if isinstance(exception, commands.CommandInvokeError):
-            lines = traceback.format_exception(type(exception),
-                                               exception.__cause__,
-                                               exception.__cause__.__traceback__)
+            # all exceptions are wrapped in CommandInvokeError if they are not a subclass of CommandError
+            # you can access the original exception with .original
+            exception = exception.original
+
+            if isinstance(exception, discord.Forbidden):
+                # permissions error
+                try:
+                    await ctx.send('Permissions error: `{}`'.format(exception))
+                except discord.Forbidden:
+                    # we can't send messages in that channel
+                    return
+
+            # print to log, then notify developers
+            lines = traceback.format_exception(type(exception), exception.__cause__, exception.__cause__.__traceback__)
             self.logger.error(''.join(lines))
             await self.notify_devs(lines, ctx.message)
+
             return
 
         if isinstance(exception, commands.CheckFailure):
@@ -92,14 +104,6 @@ class HTSTEMBote(commands.AutoShardedBot):
             pass
         elif isinstance(exception, commands.UserInputError):
             await ctx.send('Error: {}'.format(' '.join(exception.args)))
-        elif isinstance(exception, commands.CommandInvokeError):
-            # all exceptions are wrapped in CommandInvokeError if they are not a subclass of CommandError
-            exception = exception.original
-            if isinstance(exception, discord.Forbidden):
-                try:
-                    await ctx.send('Error: {}'.format(' '.join(exception.args)))
-                except:
-                    pass
         else:
             info = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
             self.logger.error('Unhandled command exception - {}'.format(''.join(info)))
