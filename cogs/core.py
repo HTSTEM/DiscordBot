@@ -101,10 +101,10 @@ class Core:
         else:
             process = await asyncio.create_subprocess_exec('git', 'pull', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = await process.communicate()
-        stdout = stdout.decode('utf-8').split("\n")
-        stdout = "\n".join(["+" + i for i in stdout])
-        stderr = stderr.decode('utf-8').split("\n")
-        stderr = "\n".join(["-" + i for i in stderr])
+        stdout = stdout.decode('utf-8').split("\n")[:-1]
+        stdout = "\n".join(["+ " + i for i in stdout])
+        stderr = stderr.decode('utf-8').split("\n")[:-1]
+        stderr = "\n".join(["- " + i for i in stderr])
         
         await ctx.send("`Git` response: ```diff\n{}\n{}```\n**Reloading the bot..**".format(stdout, stderr))
         for extension in ctx.bot.extensions.copy():
