@@ -10,7 +10,7 @@ class Internet:
     def __unload(self):
         self.session.close()
 
-    @commands.command(aliases=['adam'])
+    @commands.command(aliases=['adam','slice','jake'])
     async def dog(self, ctx):
         '''Sends a picture of a random dog'''
         async with self.session.get('http://random.dog/woof.json') as resp:
