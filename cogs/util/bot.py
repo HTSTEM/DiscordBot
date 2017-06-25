@@ -88,6 +88,8 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         if isinstance(exception, commands.CheckFailure):
             await ctx.send('You can\'t do that.')
+        elif isinstance(exception, commands.CommandNotFound):
+            pass
         elif isinstance(exception, commands.UserInputError):
             await ctx.send('Error: {}'.format(' '.join(exception.args)))
         elif isinstance(exception, commands.CommandInvokeError):
