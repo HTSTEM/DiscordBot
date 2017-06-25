@@ -41,9 +41,20 @@ class HTSTEMBote(commands.Bot):
         await self.process_commands(message)
 
     async def on_command_error(self, ctx: commands.Context, exception: Exception):
+        if ctx.command:
+            help = 'Run `{}help {}` for help.'.format(ctx.prefix, ctx.command.qualified_name)
+
         if isinstance(exception, commands.CommandNotFound) or isinstance(exception, commands.CheckFailure):
             # ignore command not found or check failure errors
             pass
+        elif isinstance(exception, commands.TooManyArguments):
+            await ctx.send('Too many arguments! {}'.format(help))
+        elif isinstance(exception, commands.MissingRequiredArgument):
+            await ctx.send('You are missing an argument! {} {}'.format(exception, help))
+        elif isinstance(exception, commands.DisabledCommand):
+            await ctx.send('That command has been disabled.')
+        elif isinstance(exception, commands.BadArgument) or isinstance(exception, commands.UserInputError):
+            await ctx.send('You got something wrong! {} {}'.format(exception, help))
         else:
             # unwrap
             exception = exception.original if isinstance(exception, commands.CommandInvokeError) else exception
