@@ -132,6 +132,7 @@ class Internet:
         
     @commands.command(aliases=['latency'])
     async def ping(self, ctx):
+        '''Views websocket and message send latency.'''
         # Websocket latency
         results = []
         for shard in ctx.bot.shards.values():
