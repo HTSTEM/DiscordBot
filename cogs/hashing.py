@@ -5,45 +5,33 @@ from discord.ext import commands
 
 
 class Hashing:
+    async def hash(self, data: str, hashlib_method: str, pretty_type: str):
+        def hash_func():
+            func = getattr(hashlib, hashlib_method)
+            return func(data.encode('utf-8')).hexdigest()
+        embed = discord.Embed(colour=0xAAFF00, title='{} of `{}`'.format(pretty_type, data),
+                              description='```\n{}\n```'.format(hash_func()))
+        return embed
+
     @commands.command(aliases=['hash'])
     async def md5(self, ctx, *, to_hash: str):
         '''Compute the MD5 hash of a string'''
-
-        embed = discord.Embed(colour = 0xAAFF00,
-                              title = "MD5 Hash of `{}`:".format(to_hash),
-                              description = "```\n{}```".format(hashlib.md5(to_hash.encode("utf-8")).hexdigest())
-                             )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=await self.hash(to_hash, 'md5', 'MD5 hash'))
     
     @commands.command()
     async def sha1(self, ctx, *, to_hash: str):
         '''Compute the SHA1 hash of a string'''
-
-        embed = discord.Embed(colour = 0xAAFF00,
-                              title = "SHA1 Hash of `{}`:".format(to_hash),
-                              description = "```\n{}```".format(hashlib.sha1(to_hash.encode("utf-8")).hexdigest())
-                             )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=await self.hash(to_hash, 'sha1', 'SHA1 hash'))
     
     @commands.command()
     async def sha256(self, ctx, *, to_hash: str):
         '''Compute the SHA256 hash of a string'''
-
-        embed = discord.Embed(colour = 0xAAFF00,
-                              title = "SHA256 Hash of `{}`:".format(to_hash),
-                              description = "```\n{}```".format(hashlib.sha256(to_hash.encode("utf-8")).hexdigest())
-                             )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=await self.hash(to_hash, 'sha256', 'SHA256 hash'))
     
     @commands.command()
     async def sha512(self, ctx, *, to_hash: str):
         '''Compute the SHA512 hash of a string'''
-
-        embed = discord.Embed(colour = 0xAAFF00,
-                              title = "SHA512 Hash of `{}`:".format(to_hash),
-                              description = "```\n{}```".format(hashlib.sha512(to_hash.encode("utf-8")).hexdigest())
-                             )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=await self.hash(to_hash, 'sha512', 'SHA512 hash'))
 
 
 def setup(bot):
