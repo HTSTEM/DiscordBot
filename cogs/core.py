@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+import traceback
 
 import discord
 from discord.ext import commands
@@ -104,9 +105,7 @@ class Core:
     @commands.is_owner()
     async def debug(self, ctx, *, code: str):
         '''Evaluates code'''
-        fmt = '```py\n{}\n```'
-        result = None
-
+        
         env = {
             'ctx': ctx,
             'bot': ctx.bot,
@@ -115,18 +114,26 @@ class Core:
             'message': ctx.message,
             'channel': ctx.channel
         }
-
         env.update(globals())
-
+        
         try:
-            result = eval(code, env)
-
-            if inspect.isawaitable(result):
-                result = await result
-        except Exception as e:
-            await ctx.send(fmt.format(type(e).__name__ + ': ' + str(e)))
-        else:
-            await ctx.send(fmt.format(result))
+            if code.startswith("await "):
+                res = str(await eval(code[6:], env))
+            else:
+                res = str(eval(code, env))
+            
+            colour = 0x00FF00
+        except:
+            res = traceback.format_exc()
+            colour = 0xFF0000
+            
+        embed = discord.Embed(colour = colour,
+                              title = code,
+                              description = "```py\n{}```".format(res.replace("```", "`` `"))
+                             )
+        embed.set_author(name=ctx.message.author.display_name,
+                         icon_url=ctx.message.author.avatar_url or ctx.message.author.default_avatar_url)
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
