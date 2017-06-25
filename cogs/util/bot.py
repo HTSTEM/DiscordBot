@@ -87,19 +87,17 @@ class HTSTEMBote(commands.AutoShardedBot):
             return
 
         if isinstance(exception, commands.CheckFailure):
-            await ctx.send('Check failed: {}'.format(' '.join(exception.args)))
-
-        elif isinstance(exception, commands.MissingRequiredArgument):
-            await ctx.send('Error: {}'.format(' '.join(exception.args)))
-
+            await ctx.send('You can\'t do that.')
         elif isinstance(exception, commands.UserInputError):
             await ctx.send('Error: {}'.format(' '.join(exception.args)))
-
-        elif isinstance(exception, discord.Forbidden):
-            try:
-                await ctx.send('Error: {}'.format(' '.join(exception.args)))
-            except:
-                pass
+        elif isinstance(exception, commands.CommandInvokeError):
+            # all exceptions are wrapped in CommandInvokeError if they are not a subclass of CommandError
+            exception = exception.original
+            if isinstance(exception, discord.Forbidden):
+                try:
+                    await ctx.send('Error: {}'.format(' '.join(exception.args)))
+                except:
+                    pass
         else:
             info = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
             self.logger.error('Unhandled command exception - {}'.format(''.join(info)))
