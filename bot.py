@@ -2,6 +2,7 @@ import datetime
 import sys
 import logging
 import traceback
+import aiohttp
 
 import discord
 from discord.ext import commands
@@ -15,6 +16,10 @@ class HTSTEMBote(commands.Bot):
         super().__init__(command_prefix='sb?')
         self.cfg = {}
         self.debug = False
+        self.session = aiohttp.ClientSession(loop=self.loop)
+
+    def __unload(self):
+        self.session.close()
 
     async def notify_devs(self, exception_details, msg: discord.Message = None):
         # form embed
@@ -23,7 +28,11 @@ class HTSTEMBote(commands.Bot):
             embed.add_field(name='Command', value='```\n{}\n```'.format(msg.content), inline=False)
             embed.set_author(name=msg.author, icon_url=msg.author.avatar_url_as(format='png'))
         embed.set_footer(text='{} UTC'.format(datetime.datetime.utcnow()))
-        embed.add_field(name='Error', value='```py\n{}\n```'.format(exception_details), inline=False)
+        if len(exception_details) > 1000:
+            async with self.session.post("https://hastebin.com/documents", data=exception_details.encode("utf-8"), headers={'content-type': 'application/json'}) as resp:
+                embed.add_field(name='Traceback', value='https://hastebin.com/{}'.format((await resp.json())["key"]), inline=False)
+        else:
+            embed.add_field(name='Traceback', value='```py\n{}\n```'.format(exception_details), inline=False)
 
         # loop through all developers, send the embed
         for dev in self.cfg['developers']:
