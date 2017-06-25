@@ -6,12 +6,7 @@ import sys
 from discord.ext import commands
 import ruamel.yaml as yaml
 import discord
-import logbook
 import aiohttp
-
-
-# Make compatible with logging
-logbook.compat.redirect_logging()
 
 
 class HTSTEMBote(commands.AutoShardedBot):
@@ -22,14 +17,8 @@ class HTSTEMBote(commands.AutoShardedBot):
         with open('config.yml', 'r') as f:
             self.config = yaml.load(f, Loader=yaml.Loader)
 
-        self.logger = logbook.Logger('HTSTEMBote', level=logbook.INFO)
-
-        self.logger.handlers.append(logbook.StreamHandler(sys.stderr, level=self.logger.level))
-
-        if log_file is not None:
-            self.logger.handlers.append(logbook.FileHandler(log_file, level=self.logger.level, bubble=True))
-
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO, format='[%(name)s %(levelname)s] %(message)s')
+        self.logger = logging.getLogger('bot')
 
         super().__init__(command_prefix='sb?', *args, **kwargs)
 
