@@ -40,7 +40,7 @@ class HTSTEMBote(commands.AutoShardedBot):
         blocked = channel_ids.get('blocked_channels', [])
 
         if allowed is not None:
-            if message.channel.id not in channel_ids:
+            if message.channel.id not in allowed:
                 return
 
         if message.channel.id in blocked:
