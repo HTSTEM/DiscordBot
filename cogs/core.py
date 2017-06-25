@@ -1,61 +1,16 @@
 import asyncio
-import inspect
 import traceback
 import subprocess
 import sys
 
-import collections
 import discord
 from discord.ext import commands
-import psutil
-import git
 
 from cogs.util import checks
 
 
 class Core:
     '''Core commands'''
-
-    @commands.command()
-    async def about(self, ctx):
-        '''Info about the bot'''
-        def format_commit(commit):
-            sha = commit.hexsha[0:6]
-            repo = 'https://github.com/HTSTEM/discord-bot/commit/{}'
-            return '[`{}`]({}) {}'.format(sha, repo.format(commit.hexsha), commit.message.splitlines()[0])
-        repo = git.Repo()
-        commits = list(repo.iter_commits(repo.active_branch, max_count=3))
-        log = '\n'.join(map(format_commit, commits))
-        memory_usage = round(psutil.Process().memory_full_info().uss / 1024 ** 2, 2)
-
-        embed = discord.Embed(title='About HTStem Bote', description=log)
-        embed.add_field(name='Memory Usage', value='{} MB'.format(memory_usage))
-
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['contributors'])
-    async def credits(self, ctx):
-        '''Views credits!'''
-        contributors = []
-
-        repo = git.Repo()
-
-        for commit in repo.iter_commits(repo.active_branch):
-            contributors.append(commit.author.name.replace(' <>', ''))
-
-        contributors = collections.Counter(contributors).most_common(500)
-
-        embed = discord.Embed(title='Contributors to HSTEM-Bote')
-        for contributor, commits in contributors:
-            embed.add_field(name=contributor, value='{} contribution(s)'.format(commits))
-
-        # fill rest with blank fields
-        leftover = len(contributors) % round(len(contributors) / 3)
-        for _ in range(leftover):
-            embed.add_field(name='\u200b', value='\u200b')
-
-        await ctx.send(embed=embed)
-
     @commands.command(aliases=['quit', 'kill'])
     @checks.is_developer()
     async def die(self, ctx):
