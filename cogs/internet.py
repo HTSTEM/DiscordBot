@@ -56,41 +56,38 @@ class Internet:
             await ctx.message.delete()
 
     @commands.group(invoke_without_command=True)
-    async def xkcd(self, ctx, *, comic_number: str):
+    async def xkcd(self, ctx, *, comic_number: int):
+        ''' Shows an XKCD comic by comic number. '''
         url = 'https://xkcd.com/{}/info.0.json'
-    
-        try:
-            comic_number = int(comic_number)
-        except ValueError:
-            await ctx.send('Does that look like a number to you? Ehh?')
-            return
-        
+
         async with self.session.get(url.format('')) as resp:
             latest = await resp.json()
-            
+
         if comic_number > latest['num']:
             await ctx.send('Woah! Steady there tiger! There are only {} xkcds avaliable. :cry:'.format(latest['num']))
             return
         if comic_number < 1:
             await ctx.send('"Get strip number {}," they said, "It\'ll be easy."'.format(comic_number))
             return
-        
+
         if not os.path.exists('xkcd'):
             os.mkdir('xkcd')
-        
+
         async with self.session.get(url.format(comic_number)) as resp:
             target = await resp.json()
-        
+
         if not '{}.png'.format(comic_number) in os.listdir('xkcd'):
             async with self.session.get(target['img']) as resp:
                 img = await resp.read()
                 with open('xkcd/{}.png'.format(comic_number), 'wb') as img_file:
                     img_file.write(img)
 
-        await ctx.send("**{}:**\n*{}*".format(target['safe_title'], target['alt']), file=discord.File('xkcd/{}.png'.format(comic_number)))
+        await ctx.send("**{}:**\n*{}*".format(target['safe_title'], target['alt']),
+                       file=discord.File('xkcd/{}.png'.format(comic_number)))
 
     @xkcd.command()
     async def latest(self, ctx):
+        ''' Shows the latest XKCD comic. '''
         url = 'https://xkcd.com/{}/info.0.json'
         
         async with self.session.get(url.format('')) as resp:
@@ -105,7 +102,8 @@ class Internet:
                 with open('xkcd/{}.png'.format(latest['num']), 'wb') as img_file:
                     img_file.write(img)
 
-        await ctx.send("**{}:**\n*{}*".format(latest['safe_title'], latest['alt']), file=discord.File('xkcd/{}.png'.format(latest['num'])))
+        await ctx.send("**{}:**\n*{}*".format(latest['safe_title'], latest['alt']),
+                       file=discord.File('xkcd/{}.png'.format(latest['num'])))
 
     @xkcd.command()
     async def random(self, ctx):
