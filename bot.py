@@ -38,8 +38,6 @@ class HTSTEMBote(commands.Bot):
                 log.warning('Couldn\'t send error embed to developer %d.', dev.id)
 
     async def on_message(self, message: discord.Message):
-        if message.content == 'hey error pls':
-            raise RuntimeError('lol u broke it')
         await self.process_commands(message)
 
     async def on_command_error(self, ctx: commands.Context, exception: Exception):
