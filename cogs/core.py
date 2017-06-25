@@ -111,10 +111,10 @@ class Core:
 
             colour = 0x00FF00
         except Exception as e:
-            res = type(e).__name__ + ': ' + str(e)
+            result = type(e).__name__ + ': ' + str(e)
             colour = 0xFF0000
 
-        embed = discord.Embed(colour=colour, title=code, description="```py\n{}```".format(res))
+        embed = discord.Embed(colour=colour, title=code, description="```py\n{}```".format(result))
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
