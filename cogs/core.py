@@ -1,10 +1,11 @@
-import asyncio
-import traceback
 import subprocess
+import traceback
+import asyncio
+import inspect
 import sys
 
-import discord
 from discord.ext import commands
+import discord
 
 from cogs.util import checks
 
@@ -70,9 +71,9 @@ class Core:
     @checks.is_staff()
     async def update(self, ctx):
         '''Updates the bot from git'''
-        
+
         await ctx.send(":warning: Warning! Pulling from git!")
-        
+
         if sys.platform == "win32":
             process = subprocess.run("git pull", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = process.stdout, process.stderr
@@ -83,7 +84,7 @@ class Core:
         stdout = "\n".join(["+ " + i for i in stdout])
         stderr = stderr.decode('utf-8').split("\n")[:-1]
         stderr = "\n".join(["- " + i for i in stderr])
-        
+
         await ctx.send("`Git` response: ```diff\n{}\n{}```\n**Reloading the bot..**".format(stdout, stderr))
         for extension in ctx.bot.extensions.copy():
             ctx.bot.unload_extension(extension)
@@ -99,7 +100,9 @@ class Core:
     @commands.is_owner()
     async def debug(self, ctx, *, code: str):
         '''Evaluates code'''
-        
+
+        result = None
+
         env = {
             'ctx': ctx,
             'bot': ctx.bot,
@@ -109,22 +112,20 @@ class Core:
             'channel': ctx.channel
         }
         env.update(globals())
-        
+
         try:
-            if code.startswith("await "):
-                res = str(await eval(code[6:], env))
-            else:
-                res = str(eval(code, env))
-            
+            result = eval(code, env)
+
+            if inspect.isawaitable(result):
+                result = await result
+
             colour = 0x00FF00
-        except:
-            res = traceback.format_exc()
+        except Exception as e:
+            res = type(e).__name__ + ': ' + str(e)
             colour = 0xFF0000
-            
-        embed = discord.Embed(colour = colour, title = code,
-                              description = "```py\n{}```".format(res.replace("```", "`` `")))
-        embed.set_author(name=ctx.message.author.display_name,
-                         icon_url=ctx.message.author.avatar_url or ctx.message.author.default_avatar_url)
+
+        embed = discord.Embed(colour=colour, title=code, description="```py\n{}```".format(res))
+        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
 

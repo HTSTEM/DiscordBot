@@ -5,7 +5,7 @@ venv/
 .idea
 
 # config
-*.yml
+config.yml
 
 # state
 videoURLS.txt

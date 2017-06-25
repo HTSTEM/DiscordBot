@@ -1,18 +1,19 @@
+import collections
+import itertools
 import random
 
-import collections
-import git
-import psutil
 from discord.ext import commands
 import discord
+import psutil
+import git
 
 
 def format_fields(fields):
     string = '```ini\n'
-    longest_field_name = max(len(t[0]) for t in fields) + 2 # [ ]
+    longest_field_name = max(len(t[0]) for t in fields) + 2
     for name, value in fields:
         name = '[{}]'.format(name.title())
-        string += '{0: <{max}} {1}\n'.format(name, value, max=longest_field_name)
+        string += '{0:<{max}} {1}\n'.format(name, value, max=longest_field_name)
     string += '```'
     return string
 
@@ -53,7 +54,6 @@ class Information:
 
         embed = discord.Embed(title='Contributors to HTSTEM-Bote')
         for contributor, commits in contributors:
-            print(commits)
             plural = '' if commits == 1 else 's'
             embed.add_field(name=contributor, value='{} contribution{}'.format(commits, plural))
 
@@ -63,7 +63,6 @@ class Information:
             embed.add_field(name='\u200b', value='\u200b')
 
         await ctx.send(embed=embed)
-
 
     @commands.command(aliases=['guildinfo'])
     @commands.guild_only()
@@ -112,33 +111,30 @@ class Information:
     @commands.guild_only()
     async def moderators(self, ctx):
         '''Lists all the moderators of the server'''
-        
+
+        # I'm sure there's a better way to do this
+        status_hierarchy = [
+            discord.Status.online,
+            discord.Status.idle,
+            discord.Status.dnd,
+            discord.Status.offline,
+            '\N{GREEN HEART}',
+            '\N{LARGE ORANGE DIAMOND}',
+            '\N{BLACK DIAMOND SUIT}',
+            '\N{LARGE RED CIRCLE}'
+        ]
+
         members = sorted([m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels],
-                         key=lambda m: m.display_name)
+                         key=lambda m: (status_hierarchy.index(m.status), m.display_name))
 
-        offline_mods = [m for m in members if m.status == discord.Status.offline]
-        idle_mods = [m for m in members if m.status == discord.Status.idle]
-        dnd_mods = [m for m in members if m.status == discord.Status.dnd]
-        online_mods = [m for m in members if m.status == discord.Status.online]
+        for k, g in itertools.groupby(members, key=lambda m: m.status):
+            string = '{} **{} Moderators**\n'.format(status_hierarchy[status_hierarchy.index(k) + 4], k)
 
-        out_message = ''
+            for mod in g:
+                string += '\N{BULLET} {0.display_name} ({0})\n'.format(mod)
 
-        def format(mod_list, emoji, descriptor):
-            nonlocal out_message
-            if not mod_list:
-                return
-            out_message += '{} **{} Moderators:**\n'.format(emoji, descriptor)
-            for mod in mod_list:
-                out_message += '\N{BULLET} {} ({})\n'.format(mod.display_name, mod)
-            out_message += '\n'
+        await ctx.send(string.replace('@', '@\u200b'))
 
-        format(online_mods, '\N{GREEN HEART}', 'Online')
-        format(idle_mods, '\N{LARGE ORANGE DIAMOND}', 'Idle')
-        format(dnd_mods, '\N{BLACK DIAMOND SUIT}', 'DND')
-        format(offline_mods, '\N{LARGE RED CIRCLE}', 'Offline')
-
-        await ctx.send(out_message)
-        
     @commands.command()
     @commands.guild_only()
     async def usercount(self, ctx):

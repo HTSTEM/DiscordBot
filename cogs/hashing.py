@@ -1,7 +1,7 @@
 import hashlib
 
-import discord
 from discord.ext import commands
+import discord
 
 
 class Hashing:
@@ -17,17 +17,17 @@ class Hashing:
     async def md5(self, ctx, *, to_hash: str):
         '''Compute the MD5 hash of a string'''
         await ctx.send(embed=await self.hash(to_hash, 'md5', 'MD5 hash'))
-    
+
     @commands.command()
     async def sha1(self, ctx, *, to_hash: str):
         '''Compute the SHA1 hash of a string'''
         await ctx.send(embed=await self.hash(to_hash, 'sha1', 'SHA1 hash'))
-    
+
     @commands.command()
     async def sha256(self, ctx, *, to_hash: str):
         '''Compute the SHA256 hash of a string'''
         await ctx.send(embed=await self.hash(to_hash, 'sha256', 'SHA256 hash'))
-    
+
     @commands.command()
     async def sha512(self, ctx, *, to_hash: str):
         '''Compute the SHA512 hash of a string'''

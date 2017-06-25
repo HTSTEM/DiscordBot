@@ -5,7 +5,6 @@ You have been warned
 '''
 import asyncio
 import os
-import traceback
 
 from discord.ext import commands
 import feedparser
@@ -27,7 +26,7 @@ class YouTube:
         self.session.close()
 
     def __global_check(self, ctx):
-        guild_id = ctx.bot.cfg.get('hstem_guild_id', None) or ctx.bot.cfg['htstem_guild_id']
+        guild_id = ctx.bot.cfg.get('hstem_guild_id', None) or ctx.bot.cfg['debug_channel_id']
         return ctx.guild.id == guild_id if not ctx.bot.debug else True
 
     @commands.group(aliases=['yt'])
@@ -50,6 +49,8 @@ class YouTube:
 
     async def youtube_feed(self):
         await self.bot.wait_until_ready()
+
+        # Fix this
         while True:
             if not os.path.exists("videoURLS.txt"):
                 open("videoURLS.txt", "w").close()
@@ -70,9 +71,10 @@ class YouTube:
                     urls.append(href)
 
             with open("videoURLS.txt", "w") as f:
-                f.write("\n".join(urls))
-            
+                f.writelines(urls)
+
             await asyncio.sleep(15)
+
 
 def setup(bot):
     bot.add_cog(YouTube(bot))

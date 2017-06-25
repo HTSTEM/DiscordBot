@@ -1,16 +1,19 @@
-import datetime
-import sys
-import logging
 import traceback
+import datetime
+import logging
+import sys
 
-import discord
 from discord.ext import commands
 import ruamel.yaml as yaml
+import discord
+
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
+
 class HTSTEMBote(commands.Bot):
+    # Move subclass to different file
     def __init__(self):
         super().__init__(command_prefix='sb?')
         self.cfg = {}
@@ -23,7 +26,7 @@ class HTSTEMBote(commands.Bot):
             embed.add_field(name='Command', value='```\n{}\n```'.format(msg.content), inline=False)
             embed.set_author(name=msg.author, icon_url=msg.author.avatar_url_as(format='png'))
         embed.set_footer(text='{} UTC'.format(datetime.datetime.utcnow()))
-        embed.add_field(name='Error', value='```py\n{}\n```'.format(exception_details), inline=False)
+        embed.add_field(name='Error', value='```py\n{}\n```'.format(exception_details[-1000:]), inline=False)
 
         # loop through all developers, send the embed
         for dev in self.cfg['developers']:
@@ -38,7 +41,7 @@ class HTSTEMBote(commands.Bot):
 
     async def on_command_error(self, ctx: commands.Context, exception: Exception):
         if ctx.command:
-            help = 'Run `{}help {}` for help.'.format(ctx.prefix, ctx.command.qualified_name)
+            help = 'Run `{0.prefix}help {0.command.qualified_name}` for help.'.format(ctx)
 
         if isinstance(exception, commands.CommandNotFound) or isinstance(exception, commands.CheckFailure):
             # ignore command not found or check failure errors
@@ -71,6 +74,7 @@ class HTSTEMBote(commands.Bot):
         info = sys.exc_info()
         await self.notify_devs(''.join(traceback.format_exception(*info)))
 
+
 cogs = (
     'cogs.core',
     'cogs.misc',
@@ -89,12 +93,14 @@ def load_config():
 if __name__ == '__main__':
     bot = HTSTEMBote()
 
+    # ---- Move this all to the subclass ----
+    # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
     # load configuration
-    cfg = load_config()
-    bot.cfg = cfg
+    bot.cfg = load_config()
 
     # debug?
-    debug = any('debug' in arg.lower() for arg in sys.argv) or cfg.get('debug_mode', False)
+    debug = any('debug' in arg.lower() for arg in sys.argv) or bot.cfg.get('debug_mode', False)
     if debug:
         # enable debug logging
         logging.getLogger('__main__').setLevel(logging.DEBUG)
@@ -102,7 +108,7 @@ if __name__ == '__main__':
 
         log.info('Debugging mode activated.')
         # use the subconfiguration inside of debug
-        new_config = cfg['debug']
+        new_config = bot.cfg['debug']
         new_config.update(bot.cfg)
         try:
             # delete things that shouldn't be in the new configuration
@@ -117,7 +123,7 @@ if __name__ == '__main__':
 
     token = bot.cfg['token']
 
-    for cog in cfg.get('cogs', cogs):
+    for cog in bot.cfg.get('cogs', cogs):
         try:
             bot.load_extension(cog)
         except Exception as e:
