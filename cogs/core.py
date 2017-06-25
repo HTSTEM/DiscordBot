@@ -121,10 +121,8 @@ class Core:
             res = traceback.format_exc()
             colour = 0xFF0000
             
-        embed = discord.Embed(colour = colour,
-                              title = code,
-                              description = "```py\n{}```".format(res.replace("```", "`` `"))
-                             )
+        embed = discord.Embed(colour = colour, title = code,
+                              description = "```py\n{}```".format(res.replace("```", "`` `")))
         embed.set_author(name=ctx.message.author.display_name,
                          icon_url=ctx.message.author.avatar_url or ctx.message.author.default_avatar_url)
         await ctx.send(embed=embed)

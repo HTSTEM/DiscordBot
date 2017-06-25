@@ -51,7 +51,7 @@ class Information:
         # max fields in an embed is 25
         contributors = collections.Counter(contributors).most_common(25)
 
-        embed = discord.Embed(title='Contributors to HSTEM-Bote')
+        embed = discord.Embed(title='Contributors to HTSTEM-Bote')
         for contributor, commits in contributors:
             print(commits)
             plural = '' if commits == 1 else 's'
