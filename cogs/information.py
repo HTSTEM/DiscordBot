@@ -112,28 +112,43 @@ class Information:
     async def moderators(self, ctx):
         '''Lists all the moderators of the server'''
 
-        # I'm sure there's a better way to do this
-        status_hierarchy = [
-            discord.Status.online,
-            discord.Status.idle,
-            discord.Status.dnd,
-            discord.Status.offline,
-            '\N{GREEN HEART}',
-            '\N{LARGE ORANGE DIAMOND}',
-            '\N{BLACK DIAMOND SUIT}',
-            '\N{LARGE RED CIRCLE}'
-        ]
-
         members = sorted([m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels],
-                         key=lambda m: (status_hierarchy.index(m.status), m.display_name))
+                         key=lambda m: m.display_name)
 
-        for k, g in itertools.groupby(members, key=lambda m: m.status):
-            string = '{} **{} Moderators**\n'.format(status_hierarchy[status_hierarchy.index(k) + 4], k)
-
-            for mod in g:
-                string += '\N{BULLET} {0.display_name} ({0})\n'.format(mod)
-
-        await ctx.send(string.replace('@', '@\u200b'))
+        offline_mods = []
+        idle_mods = []
+        dnd_mods = []
+        online_mods = []
+        
+        for m in members:
+            if m.status == discord.Status.online:
+                online_mods.append(m)
+            elif m.status == discord.Status.idle:
+                idle_mods.append(m)
+            elif m.status == discord.Status.dnd:
+                dnd_mods.append(m)
+            else:
+                offline_mods.append(m)
+        
+        out_message = ''
+        if online_mods:
+            out_message += ':green_heart: **Online Moderators:**\n'
+            for i in online_mods:
+                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
+        if idle_mods:
+            out_message += ':large_orange_diamond: **Idle Moderators:**\n'
+            for i in idle_mods:
+                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
+        if dnd_mods:
+            out_message += ':large_orange_diamond: **DND Moderators:**\n'
+            for i in dnd_mods:
+                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
+        if offline_mods:
+            out_message += ':red_circle: **Offline Moderators:**\n'
+            for i in offline_mods:
+                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
+        
+        await ctx.send(out_message)
 
     @commands.command()
     @commands.guild_only()
