@@ -84,7 +84,7 @@ class Core:
         stderr = stderr.decode().splitlines()
         stderr = '\n'.join('- ' + i for i in stderr)
 
-        await ctx.send("`Git` response: ```diff\n{}\n{}```\n**Reloading the bot..**".format(stdout, stderr))
+        await ctx.send('`Git` response: ```diff\n{}\n{}```'.format(stdout, stderr))
 
     @commands.command(aliases=['eval'])
     @commands.is_owner()
