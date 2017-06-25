@@ -1,0 +1,17 @@
+# This argument is required
+token:
+  mfa.2m2tsh89qc2hmt89xm4hg89cmh.alehf248g98b
+
+youtube:
+  feed_url:
+    http://youtube.com/feeds/videos.xml?user=carykh
+  role_id:
+    1234
+  announcements_channel:
+    5678
+
+ids:
+  developers:
+    [1994]
+  developer_role_id:
+    01189998819991197253
