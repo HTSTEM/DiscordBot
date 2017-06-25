@@ -77,7 +77,7 @@ class Core:
             process = subprocess.run("git pull", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = process.stdout, process.stderr
         else:
-            process = await asyncio.create_subprocess_exec('git', 'pull', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = await asyncio.create_subprocess_exec('git', 'pull', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = await process.communicate()
         stdout = stdout.decode('utf-8').split("\n")[:-1]
         stdout = "\n".join(["+ " + i for i in stdout])
