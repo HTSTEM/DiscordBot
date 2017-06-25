@@ -4,6 +4,8 @@ This whole file is garbage
 You have been warned
 '''
 import asyncio
+import os
+import traceback
 
 from discord.ext import commands
 import feedparser
@@ -20,20 +22,9 @@ class YouTube:
         self.session = aiohttp.ClientSession(loop=self.bot.loop)
         self.task = self.bot.loop.create_task(self.youtube_feed())
 
-        # Fake context
-        try:
-            with open('youtube_ids.txt', 'r') as f:
-                self.youtube_ids = f.read().splitlines()
-        except IOError:
-            # File will be created later
-            self.youtube_ids = []
-
     def __unload(self):
         self.task.cancel()
         self.session.close()
-
-        with open('youtube_ids.txt', 'w') as f:
-            f.writelines(self.youtube_ids)
 
     def __global_check(self, ctx):
         guild_id = ctx.bot.cfg.get('hstem_guild_id', ctx.bot.cfg['htstem_guild_id'])
@@ -59,30 +50,29 @@ class YouTube:
 
     async def youtube_feed(self):
         await self.bot.wait_until_ready()
-
-        channel = discord.utils.find(lambda c: c.id == self.bot.cfg['youtube']['announcement_channel'] or c.name ==
-                                     'announcements', self.bot.get_all_channels())
-
-        if channel is None:
-            return
-
-        role = discord.utils.find(lambda r: r.id == self.bot.cfg['youtube']['role_id'] or r.name == 'YouTube',
-                                  channel.guild.roles)
-
         while True:
-            async with self.session.get(self.bot.cfg['youtube']['feed_url']) as resp:
-                data = feedparser.parse(await resp.read())
-            videos = data['entries']
+            if not os.path.exists("videoURLS.txt"):
+                open("videoURLS.txt", "w").close()
 
-            for video in videos:
-                href = video['link']
+            feed = feedparser.parse(self.bot.cfg['youtube']['feed_url'])
+            videos = feed["entries"]
 
-                if href not in self.youtube_ids:
-                    self.youtube_ids.append(href)
-                    await channel.send('{0.mention} {1} {2}'.format(role, video['title'], href))
+            with open("videoURLS.txt") as f:
+                urls = f.read().split("\n")
 
-            await asyncio.sleep(60)
+            for v in videos:
+                href = v["link"]
+                if href not in urls:
+                    title = v["title"]
+                    print("New video: %s - %s" % (title, href))
+                    channel = self.bot.get_channel(self.bot.cfg['youtube']['announcement_channel'])
+                    await channel.send("@here `carykh` has uploaded a new YouTube video!\n\"{}\" - {}".format(title, href))
+                    urls.append(href)
 
+            with open("videoURLS.txt", "w") as f:
+                f.write("\n".join(urls))
+            
+            await asyncio.sleep(15)
 
 def setup(bot):
     bot.add_cog(YouTube(bot))
