@@ -69,10 +69,10 @@ class Internet:
             latest = await resp.json()
             
         if comic_number > latest['num']:
-            await ctx.send('Woah! Steady there! There are only {} xkcds avaliable. :cry:'.format(latest['num']))
+            await ctx.send('Woah! Steady there tiger! There are only {} xkcds avaliable. :cry:'.format(latest['num']))
             return
         if comic_number < 1:
-            await ctx.send('"Get strip number {}. It\'ll be easy," they said.'.format(comic_number))
+            await ctx.send('"Get strip number {}," they said, "It\'ll be easy."'.format(comic_number))
             return
         
         if not os.path.exists('xkcd'):
