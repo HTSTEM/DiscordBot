@@ -48,11 +48,14 @@ class Information:
         for commit in repo.iter_commits(repo.active_branch):
             contributors.append(commit.author.name.replace(' <>', ''))
 
-        contributors = collections.Counter(contributors).most_common(500)
+        # max fields in an embed is 25
+        contributors = collections.Counter(contributors).most_common(25)
 
         embed = discord.Embed(title='Contributors to HSTEM-Bote')
         for contributor, commits in contributors:
-            embed.add_field(name=contributor, value='{} contribution(s)'.format(commits))
+            print(commits)
+            plural = '' if commits == 1 else 's'
+            embed.add_field(name=contributor, value='{} contribution{}'.format(commits, plural))
 
         # fill rest with blank fields
         leftover = len(contributors) % round(len(contributors) / 3)

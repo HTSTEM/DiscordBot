@@ -27,7 +27,7 @@ class YouTube:
         self.session.close()
 
     def __global_check(self, ctx):
-        guild_id = ctx.bot.cfg.get('hstem_guild_id', ctx.bot.cfg['htstem_guild_id'])
+        guild_id = ctx.bot.cfg.get('hstem_guild_id', None) or ctx.bot.cfg['htstem_guild_id']
         return ctx.guild.id == guild_id if not ctx.bot.debug else True
 
     @commands.group(aliases=['yt'])
