@@ -1,38 +1,16 @@
 import asyncio
-import inspect
 import traceback
 import subprocess
 import sys
 
 import discord
 from discord.ext import commands
-import psutil
-import git
 
 from cogs.util import checks
 
 
 class Core:
     '''Core commands'''
-
-    @commands.command()
-    async def about(self, ctx):
-        '''Info about the bot'''
-        def format_commit(commit):
-            sha = commit.hexsha[0:6]
-            repo = 'https://github.com/HTSTEM/discord-bot/commit/{}'
-            return '[`{}`]({}) {}'.format(sha, repo.format(commit.hexsha), commit.message.splitlines()[0])
-        repo = git.Repo()
-        branch = repo.active_branch
-        commits = list(repo.iter_commits(branch, max_count=3))
-        log = '\n'.join(map(format_commit, commits))
-        memory_usage = round(psutil.Process().memory_full_info().uss / 1024 ** 2, 2)
-
-        embed = discord.Embed(title='About HTStem Bote', description=log)
-        embed.add_field(name='Memory Usage', value='{} MB'.format(memory_usage))
-
-        await ctx.send(embed=embed)
-
     @commands.command(aliases=['quit', 'kill'])
     @checks.is_developer()
     async def die(self, ctx):
