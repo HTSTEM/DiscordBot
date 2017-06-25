@@ -111,6 +111,8 @@ class HTSTEMBote(commands.AutoShardedBot):
                 await ctx.send('Error: {}'.format(' '.join(exception.args)))
             except:
                 pass
+        elif isinstance(exception, discord.CommandNotFound):
+            pass
         else:
             info = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
             self.logger.error('Unhandled command exception - {}'.format(''.join(info)))
