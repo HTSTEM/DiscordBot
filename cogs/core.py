@@ -41,7 +41,7 @@ class Core:
             await ctx.send('\N{OK HAND SIGN} Unloaded cog {} successfully!'.format(cog))
 
     @commands.group(invoke_without_command=True)
-    @commands.is_owner()
+    @checks.is_developer()
     async def reload(self, ctx, *, cog: str):
         '''Reloads an extension'''
         try:
