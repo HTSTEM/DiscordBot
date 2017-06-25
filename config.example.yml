@@ -19,6 +19,9 @@ ids:
   developer_role_id:
     01189998819991197253
 
+  htstem_id:
+    1234567890
+
 cogs:
   - cogs.core
   - cogs.misc
