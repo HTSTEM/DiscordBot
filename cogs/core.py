@@ -1,6 +1,8 @@
 import asyncio
 import inspect
 import traceback
+import subprocess
+import sys
 
 import discord
 from discord.ext import commands
@@ -85,21 +87,34 @@ class Core:
 
         await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
-    @commands.command()
+    @commands.command(aliases=['git_pull'])
     @commands.is_owner()
     async def update(self, ctx):
         '''Updates the bot from git'''
-        await ctx.send('Pulling updates from Git...')
+        
+        await ctx.send(":warning: Warning! Pulling from git!")
+        
+        if sys.platform == "win32":
+            process = subprocess.run("git pull", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.stdout, process.stderr
+        else:
+            process = await asyncio.create_subprocess_exec('git', 'pull', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = await process.communicate()
+        stdout = stdout.decode('utf-8').split("\n")
+        stdout = "\n".join(["+" + i for i in stdout])
+        stderr = stderr.decode('utf-8').split("\n")
+        stderr = "\n".join(["-" + i for i in stderr])
+        
+        await ctx.send("`Git` response: ```diff\n{}\n{}```\n**Reloading the bot..**".format(stdout, stderr))
+        for extension in ctx.bot.extensions.copy():
+            ctx.bot.unload_extension(extension)
+            try:
+                ctx.bot.load_extension(extension)
+            except Exception as e:
+                await ctx.send('Failed to load `{}`:\n```py\n{}\n```'.format(extension, e))
+                return
 
-        process = await asyncio.create_subprocess_exec('git', 'pull',
-                                                       stdout=asyncio.subprocess.PIPE,
-                                                       stderr=asyncio.subprocess.PIPE)
-        stdout, stderr = await process.communicate()
-
-        if stdout:
-            await ctx.send('**stdout**\n```\n{}\n```'.format(stdout.decode()))
-        if stderr:
-            await ctx.send('**stderr**\n```\n{}\n```'.format(stderr.decode()))
+        await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
     @commands.command(aliases=['eval'])
     @commands.is_owner()
