@@ -7,6 +7,7 @@ from discord.ext import commands
 import ruamel.yaml as yaml
 import discord
 import logbook
+import aiohttp
 
 
 # Make compatible with logging
@@ -28,7 +29,7 @@ class HTSTEMBote(commands.AutoShardedBot):
         if log_file is not None:
             self.logger.handlers.append(logbook.FileHandler(log_file, level=self.logger.level, bubble=True))
 
-        logging.root.setLevel(logging.INFO)
+        logging.basicConfig(level=logging.INFO)
 
         super().__init__(command_prefix='sb?', *args, **kwargs)
 
@@ -41,10 +42,19 @@ class HTSTEMBote(commands.AutoShardedBot):
             embed.set_author(name=message.author, icon_url=message.author.avatar_url_as(format='png'))
 
         embed.set_footer(text='{} UTC'.format(datetime.datetime.utcnow()))
-        embed.add_field(name='Error', value='```py\n{}\n```'.format(''.join(lines)), inline=False)
+
+        error_message = ''.join(lines)
+        if len(error_message) > 1000:
+            async with aiohttp.ClientSession() as sess:
+                async with sess.post('https://hastebin.com/documents', data=error_message.encode(),
+                                     headers={'content-type': 'application/json'}) as resp:
+                    json = await resp.json()
+                    embed.add_field(name='Error', value='https://hastebin.com/{}.py'.format(json['key']), inline=False)
+        else:
+            embed.add_field(name='Error', value='```py\n{}\n```'.format(''.join(lines), inline=False))
 
         # loop through all developers, send the embed
-        for dev in self.config.get('developers', []):
+        for dev in self.config.get('ids', {}).get('developers', []):
             dev = self.get_user(dev)
 
             if dev is None:
@@ -52,8 +62,9 @@ class HTSTEMBote(commands.AutoShardedBot):
                 continue
             try:
                 await dev.send(embed=embed)
-            except discord.Forbidden:
-                self.logger.warning('Couldn\'t send error embed to developer {0.id}.'.format(dev))
+            except Exception as e:
+                self.logger.error('Couldn\'t send error embed to developer {0.id}. {1}'
+                                  .format(dev, type(e).__name__ + ': ' + str(e)))
 
     async def on_command_error(self, ctx: commands.Context, exception: Exception):
         if isinstance(exception, commands.CommandInvokeError):
@@ -79,13 +90,13 @@ class HTSTEMBote(commands.AutoShardedBot):
             except:
                 pass
         else:
-            info = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
-            self.logger.error('Unhandled command exception - %s', info)
+            info = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
+            self.logger.error('Unhandled command exception - {}'.format(''.join(info)))
             await self.notify_devs(info, ctx.message)
 
     async def on_error(self, event_method, *args, **kwargs):
         info = sys.exc_info()
-        await self.notify_devs(traceback.format_exception(*info))
+        await self.notify_devs(traceback.format_exception(*info, chain=False))
 
     async def on_ready(self):
         self.logger.info('Connected to Discord')
