@@ -71,6 +71,9 @@ class Internet:
         if comic_number > latest['num']:
             await ctx.send('Woah! Steady there! There are only {} xkcds avaliable. :cry:'.format(latest['num']))
             return
+        if comic_number < 1:
+            await ctx.send('"Get strip number {}. It\'ll be easy," they said.'.format(latest['num']))
+            return
         
         if not os.path.exists('xkcd'):
             os.mkdir('xkcd')
