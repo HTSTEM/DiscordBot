@@ -4,6 +4,7 @@ import inspect
 import sys
 
 from discord.ext import commands
+import ruamel.yaml as yaml
 import discord
 
 from cogs.util import checks
@@ -117,6 +118,13 @@ class Core:
         embed = discord.Embed(colour=colour, title=code, description='```py\n{}```'.format(result))
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
+
+    @commands.command()
+    @checks.is_developer()
+    async def reloadconfig(self, ctx):
+        with open('config.yml', 'r') as f:
+            ctx.bot.config = yaml.load(f, Loader=yaml.Loader)
+        await ctx.send('Reloaded config file.')
 
 
 def setup(bot):

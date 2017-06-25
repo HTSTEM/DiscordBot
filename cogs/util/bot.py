@@ -33,6 +33,21 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         super().__init__(command_prefix='sb?', *args, **kwargs)
 
+    async def on_message(self, message):
+        channel_ids = self.config.get('ids', {})
+
+        allowed = channel_ids.get('allowed_channels', None)
+        blocked = channel_ids.get('blocked_channels', [])
+
+        if allowed is not None:
+            if message.channel.id not in allowed:
+                return
+
+        if message.channel.id in blocked:
+            return
+
+        await self.process_commands(message)
+
     async def notify_devs(self, lines, message: discord.Message = None):
         # form embed
         embed = discord.Embed(colour=0xFF0000, title='Error occurred \N{FROWNING FACE WITH OPEN MOUTH}')
