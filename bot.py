@@ -7,7 +7,6 @@ import discord
 from discord.ext import commands
 import ruamel.yaml as yaml
 
-
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
@@ -37,9 +36,6 @@ class HTSTEMBote(commands.Bot):
             except discord.Forbidden:
                 log.warning('Couldn\'t send error embed to developer %d.', dev.id)
 
-    async def on_message(self, message: discord.Message):
-        await self.process_commands(message)
-
     async def on_command_error(self, ctx: commands.Context, exception: Exception):
         if ctx.command:
             help = 'Run `{}help {}` for help.'.format(ctx.prefix, ctx.command.qualified_name)
@@ -58,7 +54,17 @@ class HTSTEMBote(commands.Bot):
         else:
             # unwrap
             exception = exception.original if isinstance(exception, commands.CommandInvokeError) else exception
+
+            # handle permission errors
+            if isinstance(exception, discord.Forbidden):
+                try:
+                    await ctx.send('A permissions-related error has occurred.')
+                except discord.Forbidden:
+                    pass
+                return
+
             info = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+            log.error('Unhandled command exception - %s', info)
             await self.notify_devs(info, ctx.message)
 
     async def on_error(self, event_method, *args, **kwargs):
@@ -90,6 +96,10 @@ if __name__ == '__main__':
     # debug?
     debug = any('debug' in arg.lower() for arg in sys.argv) or cfg.get('debug_mode', False)
     if debug:
+        # enable debug logging
+        logging.getLogger('__main__').setLevel(logging.DEBUG)
+        logging.getLogger('cogs').setLevel(logging.DEBUG)
+
         log.info('Debugging mode activated.')
         # use the subconfiguration inside of debug
         new_config = cfg['debug']
