@@ -85,6 +85,24 @@ class Internet:
 
         await ctx.send("**{}:**".format(target['safe_title']), file=discord.File('xkcd/{}.png'.format(comic_number)))
 
+    @xkcd.command()
+    async def latest(self, ctx):
+        url = 'https://xkcd.com/{}/info.0.json'
+        
+        async with self.session.get(url.format('')) as resp:
+            latest = await resp.json()
+        
+        if not os.path.exists('xkcd'):
+            os.mkdir('xkcd')
+        
+        if not '{}.png'.format(latest['num']) in os.listdir('xkcd'):
+            async with self.session.get(latest['img']) as resp:
+                img = await resp.read()
+                with open('xkcd/{}.png'.format(latest['num']), 'wb') as img_file:
+                    img_file.write(img)
+
+        await ctx.send("**{}:**".format(latest['safe_title']), file=discord.File('xkcd/{}.png'.format(latest['num'])))
+        
     @commands.command(aliases=['latency'])
     async def ping(self, ctx):
         # Websocket latency
