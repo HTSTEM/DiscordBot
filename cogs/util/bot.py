@@ -116,16 +116,16 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.logger.info('Channels: {}'.format(len(list(self.get_all_channels()))))
 
     def run(self):
-        debug = any('debug' in arg.lower() for arg in sys.argv) or self.config.get('debug', False)
+        debug = any('debug' in arg.lower() for arg in sys.argv) or self.config.get('debug_mode', False)
 
         if debug:
-            token = self.config.get('debug_token', self.config['token'])
+            # if debugging is enabled, use the debug subconfiguration (if it exists)
+            if 'debug' in self.config:
+                self.config = {**self.config, **self.config['debug']}
             self.logger.info('Debug mode active...')
-            self.logger.level = logbook.debug
             self.debug = True
-        else:
-            token = self.config['token']
 
+        token = self.config['token']
         cogs = self.config.get('cogs', [])
 
         for cog in cogs:
