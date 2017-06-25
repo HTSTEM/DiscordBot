@@ -2,6 +2,7 @@ import collections
 import itertools
 import random
 
+from collections import defaultdict
 from discord.ext import commands
 import discord
 import psutil
@@ -146,43 +147,29 @@ class Information:
     async def moderators(self, ctx):
         '''Lists all the moderators of the server'''
 
-        members = sorted([m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels],
-                         key=lambda m: m.display_name)
+        status_emoji = {
+            discord.Status.online: '<:online:328659633147215884>',
+            discord.Status.idle: '<:idle:328670650220806144>',
+            discord.Status.dnd: '<:dnd:328659633109598208>',
+            discord.Status.offline: '<:offline:328659633214324757>'
+        }
 
-        offline_mods = []
-        idle_mods = []
-        dnd_mods = []
-        online_mods = []
-        
-        for m in members:
-            if m.status == discord.Status.online:
-                online_mods.append(m)
-            elif m.status == discord.Status.idle:
-                idle_mods.append(m)
-            elif m.status == discord.Status.dnd:
-                dnd_mods.append(m)
-            else:
-                offline_mods.append(m)
-        
-        out_message = ''
-        if online_mods:
-            out_message += '<:online:328659633147215884>**Online Moderators:**\n'
-            for i in online_mods:
-                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
-        if idle_mods:
-            out_message += '<:idle:328670650220806144>**Idle Moderators:**\n'
-            for i in idle_mods:
-                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
-        if dnd_mods:
-            out_message += '<:dnd:328659633109598208>**DND Moderators:**\n'
-            for i in dnd_mods:
-                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
-        if offline_mods:
-            out_message += '<:offline:328659633214324757>**Offline Moderators:**\n'
-            for i in offline_mods:
-                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
-        
-        await ctx.send(out_message)
+        mods_by_status = defaultdict(list)
+        mods = (m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels)
+
+        for mod in mods:
+            mods_by_status[mod.status] += [mod]
+
+        message = ''
+        for status, mods in mods_by_status.items():
+            # header
+            title = 'DND' if status is discord.Status.dnd else status.name.title()
+            message += '{} {} moderators:\n'.format(status_emoji[status], title)
+
+            # body
+            message += '\n'.join(['{0.display_name} ({0})'.format(mod) for mod in mods]) + '\n\n'
+
+        await ctx.send(message)
 
     @commands.command()
     @commands.guild_only()
