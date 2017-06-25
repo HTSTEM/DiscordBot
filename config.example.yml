@@ -22,6 +22,9 @@ ids:
   htstem_id:
     1234567890
 
+  allowed_channels:
+    - 404
+
 cogs:
   - cogs.core
   - cogs.misc
