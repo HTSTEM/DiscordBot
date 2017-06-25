@@ -44,6 +44,7 @@ class YouTube:
         role_id = self.config.get('role_id', 0)
         role = discord.utils.find(lambda r: r.id == role_id or r.name == 'YouTube', ctx.guild.roles)
         await ctx.author.add_roles(role)
+        await ctx.send("Sweet! You're all set to get notifications for YouTube videos.")
 
     @youtube.command()
     async def off(self, ctx):
@@ -51,6 +52,7 @@ class YouTube:
         role_id = self.config.get('role_id', 0)
         role = discord.utils.find(lambda r: r.id == role_id or r.name == 'YouTube', ctx.guild.roles)
         await ctx.author.remove_roles(role)
+        await ctx.send("You'll no longer recieve notifications for new videos.")
 
     async def youtube_feed(self):
         # File managment could be improved
