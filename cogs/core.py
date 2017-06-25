@@ -71,10 +71,10 @@ class Core:
     async def update(self, ctx):
         '''Updates the bot from git'''
 
-        await ctx.send(":warning: Warning! Pulling from git!")
+        await ctx.send(':warning: Warning! Pulling from git!')
 
-        if sys.platform == "win32":
-            process = subprocess.run("git pull", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if sys.platform == 'win32':
+            process = subprocess.run('git pull', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = process.stdout, process.stderr
         else:
             process = await asyncio.create_subprocess_exec('git', 'pull', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -114,7 +114,7 @@ class Core:
             result = type(e).__name__ + ': ' + str(e)
             colour = 0xFF0000
 
-        embed = discord.Embed(colour=colour, title=code, description="```py\n{}```".format(result))
+        embed = discord.Embed(colour=colour, title=code, description='```py\n{}```'.format(result))
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
