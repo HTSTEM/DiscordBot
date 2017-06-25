@@ -5,8 +5,9 @@ venv/
 .idea
 
 # config
-*.yml
+config.yml
 
 # state
 videoURLS.txt
 youtube_ids.txt
+xkcd/

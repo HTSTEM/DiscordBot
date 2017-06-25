@@ -1,26 +1,18 @@
 # `discord-bot`
 
 This is the Discord bot for HTSTEM server.
+[![Join the HTSTEM Discord server.](https://discordapp.com/api/guilds/282219466589208576/widget.png)](https://discord.gg/dxCBaYn)
 
 ## Configuring
 
-Create a file named `config.yml`. Put this inside of it:
-
+Copy the contents of the `config.example.yml` file to a file called `config.yml` and replace with correct values.
 ```yml
 token: <token here>
 ```
 
-Debugging the bot? Put this inside, too:
+Debugging the bot?
 
+Either add a value to your `config.yml` file or run the file with a `debug` flag.
 ```yml
-debug_mode: true
-debug:
-  token: <token to your debugging bot>
-token: <token to the real bot>
+debug: on
 ```
-
-As you can see, inside of `debug` is a complete copy of the outer config. It's like a **subconfig**. It's only applied
-when `debug` is true.
-
-When `debug` is true, the bot will work **everywhere**, and the command prefix is changed to `..` instead of the usual
-`sb?`.
