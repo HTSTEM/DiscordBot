@@ -1,4 +1,5 @@
 import urllib.parse
+import time
 
 from discord.ext import commands
 import aiohttp
@@ -50,6 +51,25 @@ class Internet:
         async with self.session.post('https://hastebin.com/documents', data=data.encode(), headers={'content-type': 'application/json'}) as resp:
             await ctx.send('{0.mention} https://hastebin.com/{}'.format(ctx.author, (await resp.json())["key"]))
             await ctx.message.delete()
+
+    @commands.command(aliases=['latency'])
+    async def ping(self, ctx):
+        # Websocket latency
+        results = []
+        for shard in ctx.bot.shards.values():
+            ws_before = time.monotonic()
+            await (await shard.ws.ping())
+            ws_after = time.monotonic()
+            results.append(round((ws_after - ws_before) * 1000))
+
+        # Message send latency
+        rtt_before = time.monotonic()
+        message = await ctx.send('Ping...')
+        rtt_after = time.monotonic()
+
+        rtt_latency = round((rtt_after - rtt_before) * 1000)
+
+        await message.edit(content='WS: **{0} ms**\nRTT: **{1} ms**'.format(', '.join(map(str, results)), rtt_latency))
 
 
 def setup(bot):
