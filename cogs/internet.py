@@ -3,8 +3,9 @@ import time
 import os
 
 from discord.ext import commands
-import discord
 import aiohttp
+import discord
+import random
 
 
 class Internet:
@@ -83,7 +84,7 @@ class Internet:
                 with open('xkcd/{}.png'.format(comic_number), 'wb') as img_file:
                     img_file.write(img)
 
-        await ctx.send("**{}:**".format(target['safe_title']), file=discord.File('xkcd/{}.png'.format(comic_number)))
+        await ctx.send("**{}:**\n*{}*".format(target['safe_title'], target['alt']), file=discord.File('xkcd/{}.png'.format(comic_number)))
 
     @xkcd.command()
     async def latest(self, ctx):
@@ -101,7 +102,30 @@ class Internet:
                 with open('xkcd/{}.png'.format(latest['num']), 'wb') as img_file:
                     img_file.write(img)
 
-        await ctx.send("**{}:**".format(latest['safe_title']), file=discord.File('xkcd/{}.png'.format(latest['num'])))
+        await ctx.send("**{}:**\n*{}*".format(latest['safe_title'], latest['alt']), file=discord.File('xkcd/{}.png'.format(latest['num'])))
+
+    @xkcd.command()
+    async def random(self, ctx):
+        url = 'https://xkcd.com/{}/info.0.json'
+        
+        async with self.session.get(url.format('')) as resp:
+            latest = await resp.json()
+            
+        comic_number = random.randint(1, latest['num'])
+        
+        if not os.path.exists('xkcd'):
+            os.mkdir('xkcd')
+        
+        async with self.session.get(url.format(comic_number)) as resp:
+            target = await resp.json()
+        
+        if not '{}.png'.format(comic_number) in os.listdir('xkcd'):
+            async with self.session.get(target['img']) as resp:
+                img = await resp.read()
+                with open('xkcd/{}.png'.format(comic_number), 'wb') as img_file:
+                    img_file.write(img)
+
+        await ctx.send("**{}:**\n*{}*".format(target['safe_title'], target['alt']), file=discord.File('xkcd/{}.png'.format(comic_number)))
         
     @commands.command(aliases=['latency'])
     async def ping(self, ctx):
