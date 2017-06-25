@@ -34,11 +34,17 @@ class HTSTEMBote(commands.AutoShardedBot):
         super().__init__(command_prefix='sb?', *args, **kwargs)
 
     async def on_message(self, message):
-        channel_ids = self.config.get('ids', {}).get('allowed_channels', None)
+        channel_ids = self.config.get('ids', {})
 
-        if channel_ids is not None:
+        allowed = channel_ids.get('allowed_channels', None)
+        blocked = channel_ids.get('blocked_channels', [])
+
+        if allowed is not None:
             if message.channel.id not in channel_ids:
                 return
+
+        if message.channel.id in blocked:
+            return
 
         await self.process_commands(message)
 

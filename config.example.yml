@@ -25,6 +25,9 @@ ids:
   allowed_channels:
     - 404
 
+  blocked_channels:
+    - 112
+
 cogs:
   - cogs.core
   - cogs.misc
