@@ -57,19 +57,13 @@ class Internet:
             await ctx.send('{0.mention} https://hastebin.com/{}'.format(ctx.author, (await resp.json())["key"]))
             await ctx.message.delete()
 
-    async def cache_comic(self, url: str, comic_number: int):
-        if not os.path.exists('xkcd'):
-            os.mkdir('xkcd')
-
-        if not '{}.png'.format(comic_number) in os.listdir('xkcd'):
-            async with self.session.get(url) as resp:
-                img = await resp.read()
-                with open('xkcd/{}.png'.format(comic_number), 'wb') as img_file:
-                    img_file.write(img)
-
     async def post_comic(self, ctx: commands.Context, metadata: 'Dict[str, Any]', comic_number: int):
-        await ctx.send("`#{0[num]}` **{0[safe_title]}:**\n*{0[alt]}*".format(metadata),
-                       file=discord.File('xkcd/{}.png'.format(comic_number)))
+        embed = discord.Embed(title='#{}'.format(metadata['num']), description=metadata['safe_title'],
+                              url='https://xkcd.com/{}/'.format(metadata['num']), colour=0xFFFFFF)
+        embed.set_image(url=metadata['img'])
+        embed.set_footer(text=metadata['alt'])
+
+        await ctx.send(embed=embed)
 
     async def fetch_comic_data(self, number=None, *, latest=False):
         async with self.session.get(XKCD_ENDPOINT.format(number if not latest else '')) as resp:
@@ -89,14 +83,12 @@ class Internet:
 
         target = await self.fetch_comic_data(comic_number)
 
-        await self.cache_comic(target['img'], comic_number)
         await self.post_comic(ctx, target, comic_number)
 
     @xkcd.command()
     async def latest(self, ctx):
         ''' Shows the latest XKCD comic. '''
         latest = await self.fetch_comic_data(latest=True)
-        await self.cache_comic(latest['img'], latest['num'])
         await self.post_comic(ctx, latest, latest['num'])
 
     @xkcd.command()
@@ -106,7 +98,6 @@ class Internet:
         comic_number = random.randint(1, latest['num'])
         target = await self.fetch_comic_data(comic_number)
 
-        await self.cache_comic(target['img'], comic_number)
         await self.post_comic(ctx, target, comic_number)
 
     @commands.command(aliases=['latency'])
