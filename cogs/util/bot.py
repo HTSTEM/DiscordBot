@@ -27,16 +27,22 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.uploader_client = DataUploader(self)
 
     async def on_message(self, message):
-        channel_ids = self.config.get('ids', {})
+        channel = message.channel
 
+        # Bypass on direct messages
+        if isinstance(channel, discord.DMChannel):
+            await self.process_commands(message)
+            return
+
+        channel_ids = self.config.get('ids', {})
         allowed = channel_ids.get('allowed_channels', None)
         blocked = channel_ids.get('blocked_channels', [])
 
         if allowed is not None:
-            if message.channel.id not in allowed:
+            if channel.id not in allowed:
                 return
 
-        if message.channel.id in blocked:
+        if channel.id in blocked:
             return
 
         await self.process_commands(message)
