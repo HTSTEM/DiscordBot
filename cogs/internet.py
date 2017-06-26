@@ -57,12 +57,18 @@ class Internet:
     async def paste(self, ctx, *, data: str):
         '''Upload data to https://paste.ee and return the URL'''
 
+        if isinstance(ctx.channel, discord.abc.PrivateChannel):
+            title = "{0.display_name}#{0.discriminator}".format(ctx.author)
+        else:
+            title = "{0.display_name}#{0.discriminator} in #{1}".format(ctx.author, ctx.channel.name)
+
         url = await self.uploader_client.upload(
                     data,
-                    "{0.display_name}#{0.discriminator} in #{1}".format(ctx.author, ctx.channel.name)
+                    title
                 )
         await ctx.send('{0.mention} {1}'.format(ctx.author, url))
-        await ctx.message.delete()
+        if not isinstance(ctx.channel, discord.abc.PrivateChannel):
+            await ctx.message.delete()
 
     async def post_comic(self, ctx: commands.Context, metadata: 'Dict[str, Any]', comic_number: int):
         embed = discord.Embed(title='#{}'.format(metadata['num']), description=metadata['safe_title'],
