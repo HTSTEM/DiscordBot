@@ -169,7 +169,8 @@ class Information:
             # body
             message += '\n'.join(['{0.display_name} ({0})'.format(mod) for mod in mods]) + '\n\n'
 
-        await ctx.send(message)
+        # Prevent pings
+        await ctx.send(message.replace('@', '@\u200b'))
 
     @commands.command()
     @commands.guild_only()
