@@ -7,12 +7,15 @@ import aiohttp
 import discord
 import random
 
+from .util.data_uploader import DataUploader
+
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
 
 
 class Internet:
     def __init__(self, bot):
         self.session = aiohttp.ClientSession(loop=bot.loop)
+        self.uploader_client = DataUploader(bot)
 
     def __unload(self):
         self.session.close()
@@ -50,12 +53,16 @@ class Internet:
         async with self.session.get('https://google.com/search?{}&safe=active&&btnI'.format(op)) as resp:
             await ctx.send(resp.url)
 
-    @commands.command(aliases=['haste', 'paste'])
-    async def hastebin(self, ctx, *, data: str):
-        '''Upload data to https://hastebin.com and return the URL'''
-        async with self.session.post('https://hastebin.com/documents', data=data.encode(), headers={'content-type': 'application/json'}) as resp:
-            await ctx.send('{0.mention} https://hastebin.com/{}'.format(ctx.author, (await resp.json())["key"]))
-            await ctx.message.delete()
+    @commands.command(aliases=['paste.ee', 'upload'])
+    async def paste(self, ctx, *, data: str):
+        '''Upload data to https://paste.ee and return the URL'''
+
+        url = await self.uploader_client.upload(
+                    data,
+                    "{0.display_name}#{0.discriminator} in #{1}".format(ctx.author, ctx.channel.name)
+                )
+        await ctx.send('{0.mention} {1}'.format(ctx.author, url))
+        await ctx.message.delete()
 
     async def post_comic(self, ctx: commands.Context, metadata: 'Dict[str, Any]', comic_number: int):
         embed = discord.Embed(title='#{}'.format(metadata['num']), description=metadata['safe_title'],
