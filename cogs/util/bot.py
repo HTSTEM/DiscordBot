@@ -6,7 +6,6 @@ import sys
 from discord.ext import commands
 import ruamel.yaml as yaml
 import discord
-import aiohttp
 
 from .data_uploader import DataUploader
 
