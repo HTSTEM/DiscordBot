@@ -1,8 +1,6 @@
 import collections
-import itertools
 import random
 
-from collections import defaultdict
 from discord.ext import commands
 import discord
 import psutil
@@ -154,22 +152,26 @@ class Information:
             discord.Status.offline: '<:offline:328659633214324757>'
         }
 
-        mods_by_status = defaultdict(list)
+        mods_by_status = collections.defaultdict(list)
         mods = (m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels)
 
         for mod in mods:
             mods_by_status[mod.status] += [mod]
 
-        message = ''
-        for status, mods in mods_by_status.items():
-            mods.sort()
+        # Wow this is such a stupid hack
+        def predicate(item):
+            status = str(item[0])
+            return 'online idle dnd offline'.split().index(status)
 
+        sorted_mods = collections.OrderedDict(sorted(mods_by_status.items(), key=predicate))
+        message = ''
+        for status, mods in sorted_mods.items():
             # header
             title = 'DND' if status is discord.Status.dnd else status.name.title()
             message += '**{} {} moderators:**\n'.format(status_emoji[status], title)
 
             # body
-            message += '\n'.join(['{0.display_name} ({0})'.format(mod) for mod in mods]) + '\n\n'
+            message += '\n'.join(['{0.display_name} ({0})'.format(mod) for mod in sorted(mods, key=lambda m: m.name)]) + '\n\n'
 
         # Prevent pings
         await ctx.send(message.replace('@', '@\u200b'))
