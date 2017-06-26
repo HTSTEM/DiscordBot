@@ -81,8 +81,6 @@ class HTSTEMBote(commands.AutoShardedBot):
         if isinstance(exception, commands.CommandInvokeError):
             # all exceptions are wrapped in CommandInvokeError if they are not a subclass of CommandError
             # you can access the original exception with .original
-            exception = exception.original
-
             if isinstance(exception, discord.Forbidden):
                 # permissions error
                 try:
@@ -91,8 +89,11 @@ class HTSTEMBote(commands.AutoShardedBot):
                     # we can't send messages in that channel
                     return
 
-            # print to log, then notify developers
-            lines = traceback.format_exception(type(exception), exception.__cause__, exception.__traceback__)
+            # Print to log then notify developers
+            lines = traceback.format_exception(type(exception),
+                                               exception.__cause__,
+                                               exception.__cause__.__traceback__)
+
             self.logger.error(''.join(lines))
             await self.notify_devs(lines, ctx.message)
 
