@@ -80,7 +80,7 @@ class HTSTEMBote(commands.AutoShardedBot):
         if isinstance(exception, commands.CommandInvokeError):
             # all exceptions are wrapped in CommandInvokeError if they are not a subclass of CommandError
             # you can access the original exception with .original
-            if isinstance(exception, discord.Forbidden):
+            if isinstance(exception.original, discord.Forbidden):
                 # permissions error
                 try:
                     await ctx.send('Permissions error: `{}`'.format(exception))
