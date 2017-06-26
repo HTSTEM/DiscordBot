@@ -10,7 +10,6 @@ class DataUploader:
         self.session = aiohttp.ClientSession(loop=bot.loop)
         self.config = bot.config.get('paste.ee', {})
         self.api_key = self.config.get('api_key', '')
-        print([self.api_key])
     
     async def upload(self, data, title=None):
         if title is None:
