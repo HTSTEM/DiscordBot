@@ -91,8 +91,8 @@ class HTSTEMBote(commands.AutoShardedBot):
 
             # Print to log then notify developers
             lines = traceback.format_exception(type(exception),
-                                               exception.__cause__,
-                                               exception.__cause__.__traceback__)
+                                               exception,
+                                               exception.__traceback__)
 
             self.logger.error(''.join(lines))
             await self.notify_devs(lines, ctx.message)
