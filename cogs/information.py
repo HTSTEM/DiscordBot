@@ -162,6 +162,8 @@ class Information:
 
         message = ''
         for status, mods in mods_by_status.items():
+            mods.sort()
+
             # header
             title = 'DND' if status is discord.Status.dnd else status.name.title()
             message += '**{} {} moderators:**\n'.format(status_emoji[status], title)
