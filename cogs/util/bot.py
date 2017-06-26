@@ -1,6 +1,7 @@
 import traceback
 import datetime
 import logging
+import aiohttp
 import sys
 
 from discord.ext import commands
@@ -22,6 +23,8 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.logger = logging.getLogger('bot')
 
         super().__init__(command_prefix='sb?', *args, **kwargs)
+
+        self.session = aiohttp.ClientSession(loop=self.loop)
 
         self.uploader_client = DataUploader(self)
 
@@ -123,6 +126,10 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.logger.info('Guilds  : {}'.format(len(self.guilds)))
         self.logger.info('Users   : {}'.format(len(set(self.get_all_members()))))
         self.logger.info('Channels: {}'.format(len(list(self.get_all_channels()))))
+
+    async def close(self):
+        self.session.close()
+        await super().close()
 
     def run(self):
         debug = any('debug' in arg.lower() for arg in sys.argv) or self.config.get('debug_mode', False)

@@ -1,9 +1,7 @@
 import urllib.parse
 import time
-import os
 
 from discord.ext import commands
-import aiohttp
 import discord
 import random
 
@@ -14,23 +12,20 @@ XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
 
 class Internet:
     def __init__(self, bot):
-        self.session = aiohttp.ClientSession(loop=bot.loop)
+        self.bot = bot
         self.uploader_client = DataUploader(bot)
-
-    def __unload(self):
-        self.session.close()
 
     @commands.command(aliases=['adam', 'slice', 'jake'])
     async def dog(self, ctx):
         '''Sends a picture of a random dog'''
-        async with self.session.get('http://random.dog/woof.json') as resp:
+        async with ctx.bot.session.get('http://random.dog/woof.json') as resp:
             json = await resp.json()
             await ctx.send(json['url'])
 
     @commands.command(aliases=['b1nzy'])
     async def cat(self, ctx):
         '''Sends a picture of a random cat'''
-        async with self.session.get('http://random.cat/meow') as resp:
+        async with ctx.bot.session.get('http://random.cat/meow') as resp:
             json = await resp.json()
             await ctx.send(json['file'])
 
@@ -50,7 +45,7 @@ class Internet:
     async def lucky(self, ctx, *, query: str):
         '''I'm feeling lucky. Are you?'''
         op = urllib.parse.urlencode({'q': query})
-        async with self.session.get('https://google.com/search?{}&safe=active&&btnI'.format(op)) as resp:
+        async with ctx.bot.session.get('https://google.com/search?{}&safe=active&&btnI'.format(op)) as resp:
             await ctx.send(resp.url)
 
     @commands.command(aliases=['paste.ee', 'upload'])
@@ -79,7 +74,7 @@ class Internet:
         await ctx.send(embed=embed)
 
     async def fetch_comic_data(self, number=None, *, latest=False):
-        async with self.session.get(XKCD_ENDPOINT.format(number if not latest else '')) as resp:
+        async with self.bot.session.get(XKCD_ENDPOINT.format(number if not latest else '')) as resp:
             return await resp.json()
 
     @commands.group(invoke_without_command=True)
