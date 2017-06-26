@@ -8,6 +8,8 @@ import ruamel.yaml as yaml
 import discord
 import aiohttp
 
+from .data_uploader import DataUploader
+
 
 class HTSTEMBote(commands.AutoShardedBot):
     # Move subclass to different file
@@ -21,6 +23,8 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.logger = logging.getLogger('bot')
 
         super().__init__(command_prefix='sb?', *args, **kwargs)
+
+        self.uploader_client = DataUploader(self)
 
     async def on_message(self, message):
         channel_ids = self.config.get('ids', {})
@@ -39,15 +43,12 @@ class HTSTEMBote(commands.AutoShardedBot):
 
     async def notify_devs(self, lines, message: discord.Message = None):
         # form embed
-        embed = discord.Embed(colour=0xFF0000, title='Error occurred \N{FROWNING FACE WITH OPEN MOUTH}')
+        embed = discord.Embed(colour=0xFF0000, title='An error occurred \N{FROWNING FACE WITH OPEN MOUTH}')
 
         if message is not None:
             if len(message.content) > 400:
-                async with aiohttp.ClientSession() as sess:
-                    async with sess.post('https://hastebin.com/documents', data=message.content.encode(),
-                                         headers={'content-type': 'application/json'}) as resp:
-                        json = await resp.json()
-                        embed.add_field(name='Command', value='https://hastebin.com/{}.py'.format(json['key']), inline=False)
+                url = await self.uploader_client.upload(message.content, 'Message triggering error')
+                embed.add_field(name='Command', value=url, inline=False)
             else:
                 embed.add_field(name='Command', value='```\n{}\n```'.format(message.content), inline=False)
             embed.set_author(name=message.author, icon_url=message.author.avatar_url_as(format='png'))
@@ -56,11 +57,9 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         error_message = ''.join(lines)
         if len(error_message) > 1000:
-            async with aiohttp.ClientSession() as sess:
-                async with sess.post('https://hastebin.com/documents', data=error_message.encode(),
-                                     headers={'content-type': 'application/json'}) as resp:
-                    json = await resp.json()
-                    embed.add_field(name='Error', value='https://hastebin.com/{}.py'.format(json['key']), inline=False)
+            url = await self.uploader_client.upload(error_message, 'Error')
+
+            embed.add_field(name='Error', value=url, inline=False)
         else:
             embed.add_field(name='Error', value='```py\n{}\n```'.format(''.join(lines), inline=False))
 

@@ -32,7 +32,7 @@ class DataUploader:
                                      json=json_data) as resp:
             json_obj = await resp.json()
             if resp.status == 201:
-                url = '<{}>'format(json_obj['link'])
+                url = '<{}>'.format(json_obj['link'])
             else:
                 url = ERROR_MESSAGE.format(resp.status)
                 if 'errors' in json_obj:
