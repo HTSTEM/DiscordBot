@@ -15,7 +15,7 @@ class Internet:
         self.bot = bot
         self.uploader_client = DataUploader(bot)
 
-    @commands.command(aliases=['adam', 'slice', 'jake'])
+    @commands.command(aliases=['adam', 'slice', 'jake', 'sills'])
     async def dog(self, ctx):
         '''Sends a picture of a random dog'''
         async with ctx.bot.session.get('http://random.dog/woof.json') as resp:
