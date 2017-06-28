@@ -1,11 +1,12 @@
 import urllib.parse
+import random
 import time
 
 from discord.ext import commands
 import discord
-import random
 
 from .util.data_uploader import DataUploader
+
 
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
 
