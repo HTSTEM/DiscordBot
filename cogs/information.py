@@ -125,13 +125,15 @@ class Information:
                     usr = m
             member = usr
 
-        joined_days = datetime.datetime.utcnow() - member.joined_at
-        created_days = datetime.datetime.utcnow() - member.created_at
+        now = datetime.datetime.utcnow()
+        joined_days = now - member.joined_at
+        created_days = now - member.created_at
+        avatar = member.avatar_url_as(format='png')
             
         embed = discord.Embed(colour=member.colour)
         embed.add_field(name="Nickname", value=member.display_name)
         embed.add_field(name="User ID", value=member.id)
-        embed.add_field(name="Avatar?", value='[Yes]({})'.format(member.avatar_url_as(format='png')) if member.avatar is not None else 'No')
+        embed.add_field(name="Avatar?", value='[Yes]({})'.format(avatar) if member.avatar is not None else 'No')
         embed.add_field(name="Bot?", value='Yes' if member.bot else 'No')
         
         embed.add_field(name="Created", value=member.created_at.strftime('%x %X') + '\n{} days ago'.format(max(0, joined_days.days)))
@@ -143,7 +145,7 @@ class Information:
         embed.add_field(name="Highest Role", value=member.top_role.name)
         
         
-        embed.set_author(name=member, icon_url=member.avatar_url_as(format='png'))
+        embed.set_author(name=member, icon_url=avatar)
 
         await ctx.send(embed=embed)
         
