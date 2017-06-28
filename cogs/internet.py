@@ -88,6 +88,9 @@ class Internet:
         elif comic_number < 1:
             await ctx.send('"Get strip number {}," they said, "It\'ll be easy."'.format(comic_number))
             return
+        elif comic_number == 404:
+            await ctx.send('`404`.. Really? What were you expecting??')
+            return
 
         target = await self.fetch_comic_data(comic_number)
 
