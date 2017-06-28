@@ -91,20 +91,6 @@ class Information:
     async def serverinfo(self, ctx):
         '''Info about the server'''
         guild = ctx.guild
-        fields = [
-            ('name', guild.name),
-            ('id', guild.id),
-            ('user count', guild.member_count),
-            ('bots', sum(1 for member in guild.members if member.bot)),
-            ('channels', len(guild.channels)),
-            ('voice channels', len(guild.voice_channels)),
-            ('roles', len(guild.roles)),
-            ('owner', str(guild.owner)),
-            ('created', guild.created_at.strftime('%x %X')),
-            ('newest user', str(list(sorted(guild.members, key=lambda m: m.joined_at, reverse=True))[0])),
-            ('emotes', len(guild.emojis)),
-            ('icon', guild.icon_url)
-        ]
         
         now = datetime.datetime.utcnow()
         created_days = now - guild.created_at
