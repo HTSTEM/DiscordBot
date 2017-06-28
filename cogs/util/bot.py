@@ -13,7 +13,6 @@ from .data_uploader import DataUploader
 
 
 class HTSTEMBote(commands.AutoShardedBot):
-    # Move subclass to different file
     def __init__(self, log_file=None, *args, **kwargs):
         self.debug = False
         self.config = {}
