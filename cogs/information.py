@@ -64,6 +64,28 @@ class Information:
 
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=['guildinfo_raw'])
+    @commands.guild_only()
+    async def serverinfo_raw(self, ctx):
+        '''Info about the server'''
+        guild = ctx.guild
+        fields = [
+            ('name', guild.name),
+            ('id', guild.id),
+            ('user count', guild.member_count),
+            ('bots', sum(1 for member in guild.members if member.bot)),
+            ('channels', len(guild.channels)),
+            ('voice channels', len(guild.voice_channels)),
+            ('roles', len(guild.roles)),
+            ('owner', str(guild.owner)),
+            ('created', guild.created_at.strftime('%x %X')),
+            ('newest user', str(list(sorted(guild.members, key=lambda m: m.joined_at, reverse=True))[0])),
+            ('emotes', len(guild.emojis)),
+            ('icon', guild.icon_url)
+        ]
+
+        await ctx.send(format_fields(fields))
+    
     @commands.command(aliases=['guildinfo'])
     @commands.guild_only()
     async def serverinfo(self, ctx):
@@ -83,8 +105,26 @@ class Information:
             ('emotes', len(guild.emojis)),
             ('icon', guild.icon_url)
         ]
+        
+        now = datetime.datetime.utcnow()
+        created_days = now - guild.created_at
+            
+        embed = discord.Embed(colour=0x42f4a4)
+        embed.add_field(name="Name", value=guild.name)
+        embed.add_field(name="Guild ID", value=guild.id)
+        embed.add_field(name="User Count", value=guild.member_count)
+        embed.add_field(name="Bots", value=sum(1 for member in guild.members if member.bot))
+        embed.add_field(name="Channels", value=len(guild.channels))
+        embed.add_field(name="Voice Channels", value=len(guild.voice_channels))
+        embed.add_field(name="Roles", value=len(guild.roles))
+        embed.add_field(name="Owner", value=str(guild.owner))
+        embed.add_field(name="Created", value=guild.created_at.strftime('%x %X') + '\n{} days ago'.format(max(0, created_days.days)))
+        embed.add_field(name="Newest Member", value=str(list(sorted(guild.members, key=lambda m: m.joined_at, reverse=True))[0]))
+        embed.add_field(name="Icon", value='[Yeah]({0})'.format(guild.icon_url))
+        
+        embed.set_footer(text="If this is broken for you, use sb?serverinfo_raw instead")
 
-        await ctx.send(format_fields(fields))
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['whois'])
     @commands.guild_only()
@@ -136,20 +176,21 @@ class Information:
         embed.add_field(name="Avatar?", value='[Yes]({})'.format(avatar) if member.avatar is not None else 'No')
         embed.add_field(name="Bot?", value='Yes' if member.bot else 'No')
         
-        embed.add_field(name="Created", value=member.created_at.strftime('%x %X') + '\n{} days ago'.format(max(0, joined_days.days)))
-        embed.add_field(name="Joined", value=member.joined_at.strftime('%x %X') + '\n{} days ago'.format(max(0, created_days.days)))
+        embed.add_field(name="Created", value=member.created_at.strftime('%x %X') + '\n{} days ago'.format(max(0, created_days.days)))
+        embed.add_field(name="Joined", value=member.joined_at.strftime('%x %X') + '\n{} days ago'.format(max(0, joined_days.days)))
         
         embed.add_field(name="Status", value=member.status)
         embed.add_field(name="Playing", value=member.game.name if member.game else 'Nothing')
         
         embed.add_field(name="Highest Role", value=member.top_role.name)
         
+        embed.set_footer(text="If this is broken for you, use sb?whois_raw instead")
         
         embed.set_author(name=member, icon_url=avatar)
 
         await ctx.send(embed=embed)
         
-    @commands.command()
+    @commands.command(aliases=['whois_raw'])
     @commands.guild_only()
     async def userinfo_raw(self, ctx, member: str=''):
         '''Info about yourself or a specific member (mobile friendly)'''
