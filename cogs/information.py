@@ -12,7 +12,7 @@ def format_fields(fields):
     longest_field_name = max(len(t[0]) for t in fields) + 2
     for name, value in fields:
         name = '[{}]'.format(name.title())
-        string += '{0:<{max}} {1}\n'.format(name, value, max=longest_field_name)
+        string += '{0:<{max}} {1}\n'.format(str(name).replace("`", "'"), str(value).replace("`", "'"), max=longest_field_name)
     string += '```'
     return string
 
