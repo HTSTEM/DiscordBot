@@ -114,7 +114,7 @@ class HTSTEMBote(commands.AutoShardedBot):
         elif isinstance(exception, commands.UserInputError):
             error = ' '.join(exception.args)
             error_data = re.findall('Converting to \"(.*)\" failed for parameter \"(.*)\"\.', error)
-            if len(error_data) == 0:
+            if not error_data:
                 await ctx.send('Error: {}'.format(' '.join(exception.args)))
             else:
                 await ctx.send('Got to say, I *was* expecting `{1}` to be an `{0}`..'.format(*error_data[0]))

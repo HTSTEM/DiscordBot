@@ -87,7 +87,7 @@ class Information:
 
     @commands.command(aliases=['whois'])
     @commands.guild_only()
-    async def userinfo(self, ctx, member: str):
+    async def userinfo(self, ctx, member: str = ''):
         '''Info about yourself or a specific member'''
         def levenshtein(s1, s2):
             if len(s1) < len(s2):
@@ -110,9 +110,9 @@ class Information:
 
             return previous_row[-1]
 
-        if len(ctx.message.mentions) > 0:
+        if ctx.message.mentions:
             member = ctx.message.mentions[0]
-        elif len(member) == 0:
+        elif not member:
             member = ctx.author
         else:
             usr = ctx.author
