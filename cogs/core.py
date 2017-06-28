@@ -18,7 +18,7 @@ class Core:
         '''Disconnects the bot from Discord.'''
         await ctx.send('Logging out...')
         await ctx.bot.logout()
-    
+
     @commands.command()
     @checks.is_developer()
     async def crash(self, ctx):
