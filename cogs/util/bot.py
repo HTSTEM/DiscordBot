@@ -3,6 +3,7 @@ import datetime
 import logging
 import aiohttp
 import sys
+import re
 
 from discord.ext import commands
 import ruamel.yaml as yaml
@@ -111,7 +112,12 @@ class HTSTEMBote(commands.AutoShardedBot):
         elif isinstance(exception, commands.CommandNotFound):
             pass
         elif isinstance(exception, commands.UserInputError):
-            await ctx.send('Error: {}'.format(' '.join(exception.args)))
+            error = ' '.join(exception.args)
+            error_data = re.findall('Converting to \"(.*)\" failed for parameter \"(.*)\"\.', error)
+            if len(error_data) == 0:
+                await ctx.send('Error: {}'.format(' '.join(exception.args)))
+            else:
+                await ctx.send('Got to say, I *was* expecting `{1}` to be an `{0}`..'.format(*error_data[0]))
         else:
             info = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
             self.logger.error('Unhandled command exception - {}'.format(''.join(info)))
