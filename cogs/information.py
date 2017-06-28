@@ -1,4 +1,5 @@
 import collections
+import datetime
 import random
 
 from discord.ext import commands
@@ -87,7 +88,7 @@ class Information:
 
     @commands.command(aliases=['whois'])
     @commands.guild_only()
-    async def userinfo(self, ctx, member: str = ''):
+    async def userinfo(self, ctx, member: str=''):
         '''Info about yourself or a specific member'''
         def levenshtein(s1, s2):
             if len(s1) < len(s2):
@@ -124,8 +125,70 @@ class Information:
                     usr = m
             member = usr
 
+        joined_days = datetime.datetime.utcnow() - member.joined_at
+        created_days = datetime.datetime.utcnow() - member.created_at
+            
+        embed = discord.Embed(colour=member.colour)
+        embed.add_field(name="Nickname", value=member.display_name)
+        embed.add_field(name="User ID", value=member.id)
+        embed.add_field(name="Avatar?", value='[Yes]({})'.format(member.avatar_url_as(format='png')) if member.avatar is not None else 'No')
+        embed.add_field(name="Bot?", value='Yes' if member.bot else 'No')
+        
+        embed.add_field(name="Created", value=member.created_at.strftime('%x %X') + '\n{} days ago'.format(max(0, joined_days.days)))
+        embed.add_field(name="Joined", value=member.joined_at.strftime('%x %X') + '\n{} days ago'.format(max(0, created_days.days)))
+        
+        embed.add_field(name="Status", value=member.status)
+        embed.add_field(name="Playing", value=member.game.name if member.game else 'Nothing')
+        
+        embed.add_field(name="Highest Role", value=member.top_role.name)
+        
+        
+        embed.set_author(name=member, icon_url=member.avatar_url_as(format='png'))
+
+        await ctx.send(embed=embed)
+        
+    @commands.command()
+    @commands.guild_only()
+    async def userinfo_raw(self, ctx, member: str=''):
+        '''Info about yourself or a specific member (mobile friendly)'''
+        def levenshtein(s1, s2):
+            if len(s1) < len(s2):
+                return levenshtein(s2, s1)
+
+            # len(s1) >= len(s2)
+            if len(s2) == 0:
+                return len(s1)
+
+            previous_row = range(len(s2) + 1)
+            for i, c1 in enumerate(s1):
+                current_row = [i + 1]
+                for j, c2 in enumerate(s2):
+                    insertions = previous_row[
+                                     j + 1] + 1
+                    deletions = current_row[j] + 1
+                    substitutions = previous_row[j] + (c1 != c2)
+                    current_row.append(min(insertions, deletions, substitutions))
+                previous_row = current_row
+
+            return previous_row[-1]
+
+        if ctx.message.mentions:
+            member = ctx.message.mentions[0]
+        elif not member:
+            member = ctx.author
+        else:
+            usr = ctx.author
+            closest = -1
+            for m in ctx.guild.members:
+                d = levenshtein(member.lower(), m.name.lower())
+                if member.lower() in m.name.lower() and (closest == -1 or d < closest):
+                    closest = d
+                    usr = m
+            member = usr
+
         fields = [
-            ('name', member.name),
+            ('display name', member.display_name),
+            ('username', member.name),
             ('discriminator', member.discriminator),
             ('id', member.id),
             ('bot', 'Yes' if member.bot else 'No'),
