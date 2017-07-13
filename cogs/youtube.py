@@ -25,7 +25,7 @@ class YouTube:
 
     def __local_check(self, ctx):
         guild_id = ctx.bot.config.get('ids', {}).get('htstem_id', 0)
-        return ctx.guild.id == guild_id if not ctx.bot.debug else True
+        return ctx.guild != None and ctx.guild.id == guild_id if not ctx.bot.debug else True
 
     @commands.group(aliases=['yt'], invoke_without_command=True)
     async def youtube(self, ctx):
