@@ -8,7 +8,6 @@ import os
 
 from discord.ext import commands
 import feedparser
-import aiohttp
 import discord
 
 
@@ -18,13 +17,11 @@ class YouTube:
     '''
     def __init__(self, bot):
         self.bot = bot
-        self.session = aiohttp.ClientSession(loop=self.bot.loop)
         self.task = self.bot.loop.create_task(self.youtube_feed())
         self.config = self.bot.config.get('youtube', {})
 
     def __unload(self):
         self.task.cancel()
-        self.session.close()
 
     def __local_check(self, ctx):
         guild_id = ctx.bot.config.get('ids', {}).get('htstem_id', 0)
@@ -71,7 +68,7 @@ class YouTube:
             urls = f.readlines()
 
         while True:
-            async with self.session.get(feed_url) as resp:
+            async with self.bot.session.get(feed_url) as resp:
                 feed = feedparser.parse(resp.read())
 
             videos = feed['entries']

@@ -12,6 +12,10 @@ youtube:
   announcements_channel:
     5678
 
+paste.ee:
+  api_key:
+    Go to https://paste.ee/account/api DM Bottersnike#3605 for more instructions
+
 ids:
   developers:
     - 1994

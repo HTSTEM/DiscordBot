@@ -1,64 +1,62 @@
 import traceback
 import datetime
 import logging
+import aiohttp
 import sys
+import re
 
 from discord.ext import commands
 import ruamel.yaml as yaml
 import discord
-import logbook
-import aiohttp
 
-
-# Make compatible with logging
-logbook.compat.redirect_logging()
+from .data_uploader import DataUploader
 
 
 class HTSTEMBote(commands.AutoShardedBot):
-    # Move subclass to different file
     def __init__(self, log_file=None, *args, **kwargs):
         self.debug = False
         self.config = {}
         with open('config.yml', 'r') as f:
             self.config = yaml.load(f, Loader=yaml.Loader)
 
-        self.logger = logbook.Logger('HTSTEMBote', level=logbook.INFO)
-
-        self.logger.handlers.append(logbook.StreamHandler(sys.stderr, level=self.logger.level))
-
-        if log_file is not None:
-            self.logger.handlers.append(logbook.FileHandler(log_file, level=self.logger.level, bubble=True))
-
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO, format='[%(name)s %(levelname)s] %(message)s')
+        self.logger = logging.getLogger('bot')
 
         super().__init__(command_prefix='sb?', *args, **kwargs)
 
-    async def on_message(self, message):
-        channel_ids = self.config.get('ids', {})
+        self.session = aiohttp.ClientSession(loop=self.loop)
 
+        self.uploader_client = DataUploader(self)
+
+    async def on_message(self, message):
+        channel = message.channel
+
+        # Bypass on direct messages
+        if isinstance(channel, discord.DMChannel):
+            await self.process_commands(message)
+            return
+
+        channel_ids = self.config.get('ids', {})
         allowed = channel_ids.get('allowed_channels', None)
         blocked = channel_ids.get('blocked_channels', [])
 
         if allowed is not None:
-            if message.channel.id not in allowed:
+            if channel.id not in allowed:
                 return
 
-        if message.channel.id in blocked:
+        if channel.id in blocked:
             return
 
         await self.process_commands(message)
 
     async def notify_devs(self, lines, message: discord.Message = None):
         # form embed
-        embed = discord.Embed(colour=0xFF0000, title='Error occurred \N{FROWNING FACE WITH OPEN MOUTH}')
+        embed = discord.Embed(colour=0xFF0000, title='An error occurred \N{FROWNING FACE WITH OPEN MOUTH}')
 
         if message is not None:
             if len(message.content) > 400:
-                async with aiohttp.ClientSession() as sess:
-                    async with sess.post('https://hastebin.com/documents', data=message.content.encode(),
-                                         headers={'content-type': 'application/json'}) as resp:
-                        json = await resp.json()
-                        embed.add_field(name='Command', value='https://hastebin.com/{}.py'.format(json['key']), inline=False)
+                url = await self.uploader_client.upload(message.content, 'Message triggering error')
+                embed.add_field(name='Command', value=url, inline=False)
             else:
                 embed.add_field(name='Command', value='```\n{}\n```'.format(message.content), inline=False)
             embed.set_author(name=message.author, icon_url=message.author.avatar_url_as(format='png'))
@@ -67,11 +65,9 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         error_message = ''.join(lines)
         if len(error_message) > 1000:
-            async with aiohttp.ClientSession() as sess:
-                async with sess.post('https://hastebin.com/documents', data=error_message.encode(),
-                                     headers={'content-type': 'application/json'}) as resp:
-                    json = await resp.json()
-                    embed.add_field(name='Error', value='https://hastebin.com/{}.py'.format(json['key']), inline=False)
+            url = await self.uploader_client.upload(error_message, 'Error')
+
+            embed.add_field(name='Error', value=url, inline=False)
         else:
             embed.add_field(name='Error', value='```py\n{}\n```'.format(''.join(lines), inline=False))
 
@@ -90,27 +86,37 @@ class HTSTEMBote(commands.AutoShardedBot):
 
     async def on_command_error(self, ctx: commands.Context, exception: Exception):
         if isinstance(exception, commands.CommandInvokeError):
+            # all exceptions are wrapped in CommandInvokeError if they are not a subclass of CommandError
+            # you can access the original exception with .original
+            if isinstance(exception.original, discord.Forbidden):
+                # permissions error
+                try:
+                    await ctx.send('Permissions error: `{}`'.format(exception))
+                except discord.Forbidden:
+                    # we can't send messages in that channel
+                    return
+
+            # Print to log then notify developers
             lines = traceback.format_exception(type(exception),
-                                               exception.__cause__,
-                                               exception.__cause__.__traceback__)
+                                               exception,
+                                               exception.__traceback__)
+
             self.logger.error(''.join(lines))
             await self.notify_devs(lines, ctx.message)
+
             return
 
         if isinstance(exception, commands.CheckFailure):
-            await ctx.send('Check failed: {}'.format(' '.join(exception.args)))
-
-        elif isinstance(exception, commands.MissingRequiredArgument):
-            await ctx.send('Error: {}'.format(' '.join(exception.args)))
-
+            await ctx.send('You can\'t do that.')
+        elif isinstance(exception, commands.CommandNotFound):
+            pass
         elif isinstance(exception, commands.UserInputError):
-            await ctx.send('Error: {}'.format(' '.join(exception.args)))
-
-        elif isinstance(exception, discord.Forbidden):
-            try:
+            error = ' '.join(exception.args)
+            error_data = re.findall('Converting to \"(.*)\" failed for parameter \"(.*)\"\.', error)
+            if not error_data:
                 await ctx.send('Error: {}'.format(' '.join(exception.args)))
-            except:
-                pass
+            else:
+                await ctx.send('Got to say, I *was* expecting `{1}` to be an `{0}`..'.format(*error_data[0]))
         else:
             info = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
             self.logger.error('Unhandled command exception - {}'.format(''.join(info)))
@@ -126,17 +132,21 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.logger.info('Users   : {}'.format(len(set(self.get_all_members()))))
         self.logger.info('Channels: {}'.format(len(list(self.get_all_channels()))))
 
+    async def close(self):
+        self.session.close()
+        await super().close()
+
     def run(self):
-        debug = any('debug' in arg.lower() for arg in sys.argv) or self.config.get('debug', False)
+        debug = any('debug' in arg.lower() for arg in sys.argv) or self.config.get('debug_mode', False)
 
         if debug:
-            token = self.config.get('debug_token', self.config['token'])
+            # if debugging is enabled, use the debug subconfiguration (if it exists)
+            if 'debug' in self.config:
+                self.config = {**self.config, **self.config['debug']}
             self.logger.info('Debug mode active...')
-            self.logger.level = logbook.debug
             self.debug = True
-        else:
-            token = self.config['token']
 
+        token = self.config['token']
         cogs = self.config.get('cogs', [])
 
         for cog in cogs:

@@ -6,7 +6,7 @@ def is_staff():
         # Ignore DMs
         if ctx.guild is None:
             return
-        return ctx.author.permissions_in(ctx.guild.default_channel).manage_messages
+        return ctx.author.permissions_in(ctx.guild.default_channel).manage_channels
     return commands.check(predicate)
 
 

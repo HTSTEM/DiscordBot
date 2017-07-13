@@ -1,31 +1,32 @@
 import urllib.parse
+import random
 import time
-import os
 
 from discord.ext import commands
-import aiohttp
 import discord
-import random
+
+from .util.data_uploader import DataUploader
+
+
+XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
 
 
 class Internet:
     def __init__(self, bot):
-        self.session = aiohttp.ClientSession(loop=bot.loop)
+        self.bot = bot
+        self.uploader_client = DataUploader(bot)
 
-    def __unload(self):
-        self.session.close()
-
-    @commands.command(aliases=['adam', 'slice', 'jake'])
+    @commands.command(aliases=['adam', 'slice', 'jake', 'sills'])
     async def dog(self, ctx):
         '''Sends a picture of a random dog'''
-        async with self.session.get('http://random.dog/woof.json') as resp:
+        async with ctx.bot.session.get('http://random.dog/woof.json') as resp:
             json = await resp.json()
             await ctx.send(json['url'])
 
     @commands.command(aliases=['b1nzy'])
     async def cat(self, ctx):
         '''Sends a picture of a random cat'''
-        async with self.session.get('http://random.cat/meow') as resp:
+        async with ctx.bot.session.get('http://random.cat/meow') as resp:
             json = await resp.json()
             await ctx.send(json['file'])
 
@@ -45,93 +46,75 @@ class Internet:
     async def lucky(self, ctx, *, query: str):
         '''I'm feeling lucky. Are you?'''
         op = urllib.parse.urlencode({'q': query})
-        async with self.session.get('https://google.com/search?{}&safe=active&&btnI'.format(op)) as resp:
+        async with ctx.bot.session.get('https://google.com/search?{}&safe=active&&btnI'.format(op)) as resp:
             await ctx.send(resp.url)
 
-    @commands.command(aliases=['haste', 'paste'])
-    async def hastebin(self, ctx, *, data: str):
-        '''Upload data to https://hastebin.com and return the URL'''
-        async with self.session.post('https://hastebin.com/documents', data=data.encode(), headers={'content-type': 'application/json'}) as resp:
-            await ctx.send('{0.mention} https://hastebin.com/{}'.format(ctx.author, (await resp.json())["key"]))
+    @commands.command(aliases=['paste.ee', 'upload'])
+    async def paste(self, ctx, *, data: str):
+        '''Upload data to https://paste.ee and return the URL'''
+
+        if isinstance(ctx.channel, discord.abc.PrivateChannel):
+            title = "{0.display_name}#{0.discriminator}".format(ctx.author)
+        else:
+            title = "{0.display_name}#{0.discriminator} in #{1}".format(ctx.author, ctx.channel.name)
+
+        url = await self.uploader_client.upload(
+                    data,
+                    title
+                )
+        await ctx.send('{0.mention} {1}'.format(ctx.author, url))
+        if not isinstance(ctx.channel, discord.abc.PrivateChannel):
             await ctx.message.delete()
 
+    async def post_comic(self, ctx: commands.Context, metadata: 'Dict[str, Any]', comic_number: int):
+        embed = discord.Embed(title='#{}'.format(metadata['num']), description=metadata['safe_title'],
+                              url='https://xkcd.com/{}/'.format(metadata['num']), colour=0xFFFFFF)
+        embed.set_image(url=metadata['img'])
+        embed.set_footer(text=metadata['alt'])
+
+        await ctx.send(embed=embed)
+
+    async def fetch_comic_data(self, number=None, *, latest=False):
+        async with self.bot.session.get(XKCD_ENDPOINT.format(number if not latest else '')) as resp:
+            return await resp.json()
+
     @commands.group(invoke_without_command=True)
-    async def xkcd(self, ctx, *, comic_number: str):
-        url = 'https://xkcd.com/{}/info.0.json'
-    
-        try:
-            comic_number = int(comic_number)
-        except ValueError:
-            await ctx.send('Does that look like a number to you? Ehh?')
-            return
-        
-        async with self.session.get(url.format('')) as resp:
-            latest = await resp.json()
-            
+    async def xkcd(self, ctx, *, comic_number: int):
+        ''' Shows an XKCD comic by comic number. '''
+        latest = await self.fetch_comic_data(latest=True)
+
         if comic_number > latest['num']:
-            await ctx.send('Woah! Steady there tiger! There are only {} xkcds avaliable. :cry:'.format(latest['num']))
+            await ctx.send('Woah! Steady there tiger! There are only {} comics available. :cry:'.format(latest['num']))
             return
-        if comic_number < 1:
+        elif comic_number < 1:
             await ctx.send('"Get strip number {}," they said, "It\'ll be easy."'.format(comic_number))
             return
-        
-        if not os.path.exists('xkcd'):
-            os.mkdir('xkcd')
-        
-        async with self.session.get(url.format(comic_number)) as resp:
-            target = await resp.json()
-        
-        if not '{}.png'.format(comic_number) in os.listdir('xkcd'):
-            async with self.session.get(target['img']) as resp:
-                img = await resp.read()
-                with open('xkcd/{}.png'.format(comic_number), 'wb') as img_file:
-                    img_file.write(img)
+        elif comic_number == 404:
+            await ctx.send('`404`.. Really? What were you expecting??')
+            return
 
-        await ctx.send("**{}:**\n*{}*".format(target['safe_title'], target['alt']), file=discord.File('xkcd/{}.png'.format(comic_number)))
+        target = await self.fetch_comic_data(comic_number)
+
+        await self.post_comic(ctx, target, comic_number)
 
     @xkcd.command()
     async def latest(self, ctx):
-        url = 'https://xkcd.com/{}/info.0.json'
-        
-        async with self.session.get(url.format('')) as resp:
-            latest = await resp.json()
-        
-        if not os.path.exists('xkcd'):
-            os.mkdir('xkcd')
-        
-        if not '{}.png'.format(latest['num']) in os.listdir('xkcd'):
-            async with self.session.get(latest['img']) as resp:
-                img = await resp.read()
-                with open('xkcd/{}.png'.format(latest['num']), 'wb') as img_file:
-                    img_file.write(img)
-
-        await ctx.send("**{}:**\n*{}*".format(latest['safe_title'], latest['alt']), file=discord.File('xkcd/{}.png'.format(latest['num'])))
+        ''' Shows the latest XKCD comic. '''
+        latest = await self.fetch_comic_data(latest=True)
+        await self.post_comic(ctx, latest, latest['num'])
 
     @xkcd.command()
     async def random(self, ctx):
-        url = 'https://xkcd.com/{}/info.0.json'
-        
-        async with self.session.get(url.format('')) as resp:
-            latest = await resp.json()
-            
+        ''' Shows a random XKCD comic. '''
+        latest = await self.fetch_comic_data(latest=True)
         comic_number = random.randint(1, latest['num'])
-        
-        if not os.path.exists('xkcd'):
-            os.mkdir('xkcd')
-        
-        async with self.session.get(url.format(comic_number)) as resp:
-            target = await resp.json()
-        
-        if not '{}.png'.format(comic_number) in os.listdir('xkcd'):
-            async with self.session.get(target['img']) as resp:
-                img = await resp.read()
-                with open('xkcd/{}.png'.format(comic_number), 'wb') as img_file:
-                    img_file.write(img)
+        target = await self.fetch_comic_data(comic_number)
 
-        await ctx.send("**{}:**\n*{}*".format(target['safe_title'], target['alt']), file=discord.File('xkcd/{}.png'.format(comic_number)))
-        
+        await self.post_comic(ctx, target, comic_number)
+
     @commands.command(aliases=['latency'])
     async def ping(self, ctx):
+        '''Views websocket and message send latency.'''
         # Websocket latency
         results = []
         for shard in ctx.bot.shards.values():

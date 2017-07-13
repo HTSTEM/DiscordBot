@@ -18,7 +18,7 @@ class Core:
         '''Disconnects the bot from Discord.'''
         await ctx.send('Logging out...')
         await ctx.bot.logout()
-    
+
     @commands.command()
     @checks.is_developer()
     async def crash(self, ctx):
@@ -74,7 +74,7 @@ class Core:
         await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
     @commands.command(aliases=['git_pull'])
-    @checks.is_developer()
+    @checks.is_staff()
     async def update(self, ctx):
         '''Updates the bot from git'''
 

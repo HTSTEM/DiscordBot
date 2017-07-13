@@ -1,5 +1,5 @@
 import collections
-import itertools
+import datetime
 import random
 
 from discord.ext import commands
@@ -7,13 +7,15 @@ import discord
 import psutil
 import git
 
+from .util.converters import FuzzyMember
+
 
 def format_fields(fields):
     string = '```ini\n'
     longest_field_name = max(len(t[0]) for t in fields) + 2
     for name, value in fields:
         name = '[{}]'.format(name.title())
-        string += '{0:<{max}} {1}\n'.format(name, value, max=longest_field_name)
+        string += '{0:<{max}} {1}\n'.format(str(name).replace("`", "'"), str(value).replace("`", "'"), max=longest_field_name)
     string += '```'
     return string
 
@@ -64,9 +66,9 @@ class Information:
 
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['guildinfo'])
+    @commands.command(aliases=['guildinfo_raw'])
     @commands.guild_only()
-    async def serverinfo(self, ctx):
+    async def serverinfo_raw(self, ctx):
         '''Info about the server'''
         guild = ctx.guild
         fields = [
@@ -86,47 +88,71 @@ class Information:
 
         await ctx.send(format_fields(fields))
 
+    @commands.command(aliases=['guildinfo'])
+    @commands.guild_only()
+    async def serverinfo(self, ctx):
+        '''Info about the server'''
+        guild = ctx.guild
+
+        now = datetime.datetime.utcnow()
+        created_days = now - guild.created_at
+
+        embed = discord.Embed(colour=0x42f4a4)
+        embed.add_field(name='Name', value=guild.name)
+        embed.add_field(name='Guild ID', value=guild.id)
+        embed.add_field(name='User Count', value=guild.member_count)
+        embed.add_field(name='Bots', value=sum(1 for member in guild.members if member.bot))
+        embed.add_field(name='Channels', value=len(guild.channels))
+        embed.add_field(name='Voice Channels', value=len(guild.voice_channels))
+        embed.add_field(name='Roles', value=len(guild.roles))
+        embed.add_field(name='Owner', value=str(guild.owner))
+        embed.add_field(name='Created', value=guild.created_at.strftime('%x %X') + '\n{} days ago'.format(max(0, created_days.days)))
+        embed.add_field(name='Newest Member', value=str(list(sorted(guild.members, key=lambda m: m.joined_at, reverse=True))[0]))
+        embed.add_field(name='Icon', value='[Click here to show]({0})'.format(guild.icon_url))
+
+        embed.set_footer(text='If this is broken for you, use sb?serverinfo_raw instead')
+
+        await ctx.send(embed=embed)
+
     @commands.command(aliases=['whois'])
     @commands.guild_only()
-    async def userinfo(self, ctx, member: str):
+    async def userinfo(self, ctx, member: FuzzyMember = None):
         '''Info about yourself or a specific member'''
-        def levenshtein(s1, s2):
-            if len(s1) < len(s2):
-                return levenshtein(s2, s1)
+        member = member or ctx.author
 
-            # len(s1) >= len(s2)
-            if len(s2) == 0:
-                return len(s1)
+        now = datetime.datetime.utcnow()
+        joined_days = now - member.joined_at
+        created_days = now - member.created_at
+        avatar = member.avatar_url
 
-            previous_row = range(len(s2) + 1)
-            for i, c1 in enumerate(s1):
-                current_row = [i + 1]
-                for j, c2 in enumerate(s2):
-                    insertions = previous_row[
-                                     j + 1] + 1
-                    deletions = current_row[j] + 1
-                    substitutions = previous_row[j] + (c1 != c2)
-                    current_row.append(min(insertions, deletions, substitutions))
-                previous_row = current_row
+        embed = discord.Embed(colour=member.colour)
+        embed.add_field(name='Nickname', value=member.display_name)
+        embed.add_field(name='User ID', value=member.id)
+        embed.add_field(name='Avatar', value='[Click here to show]({})'.format(avatar))
+        embed.add_field(name='Bot?', value='Yes' if member.bot else 'No')
 
-            return previous_row[-1]
+        embed.add_field(name='Created', value=member.created_at.strftime('%x %X') + '\n{} days ago'.format(max(0, created_days.days)))
+        embed.add_field(name='Joined', value=member.joined_at.strftime('%x %X') + '\n{} days ago'.format(max(0, joined_days.days)))
 
-        if len(ctx.message.mentions) > 0:
-            member = ctx.message.mentions[0]
-        elif len(member) == 0:
-            member = ctx.author
-        else:
-            usr = ctx.author
-            closest = -1
-            for m in ctx.guild.members:
-                d = levenshtein(member.lower(), m.name.lower())
-                if member.lower() in m.name.lower() and (closest == -1 or d < closest):
-                    closest = d
-                    usr = m
-            member = usr
+        embed.add_field(name='Status', value=member.status)
+        embed.add_field(name='Playing', value=member.game.name if member.game else 'Nothing')
 
+        embed.add_field(name='Highest Role', value=member.top_role.name)
+
+        embed.set_footer(text='If this is broken for you, use sb?whois_raw instead')
+
+        embed.set_author(name=member, icon_url=avatar)
+
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=['whois_raw'])
+    @commands.guild_only()
+    async def userinfo_raw(self, ctx, member: FuzzyMember = None):
+        '''Info about yourself or a specific member (mobile friendly)'''
+        member = member or ctx.author
         fields = [
-            ('name', member.name),
+            ('display name', member.display_name),
+            ('username', member.name),
             ('discriminator', member.discriminator),
             ('id', member.id),
             ('bot', 'Yes' if member.bot else 'No'),
@@ -146,43 +172,36 @@ class Information:
     async def moderators(self, ctx):
         '''Lists all the moderators of the server'''
 
-        members = sorted([m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels],
-                         key=lambda m: m.display_name)
+        status_emoji = {
+            discord.Status.online: '<:online:328659633147215884>',
+            discord.Status.idle: '<:idle:328670650220806144>',
+            discord.Status.dnd: '<:dnd:328659633109598208>',
+            discord.Status.offline: '<:offline:328659633214324757>'
+        }
 
-        offline_mods = []
-        idle_mods = []
-        dnd_mods = []
-        online_mods = []
-        
-        for m in members:
-            if m.status == discord.Status.online:
-                online_mods.append(m)
-            elif m.status == discord.Status.idle:
-                idle_mods.append(m)
-            elif m.status == discord.Status.dnd:
-                dnd_mods.append(m)
-            else:
-                offline_mods.append(m)
-        
-        out_message = ''
-        if online_mods:
-            out_message += '<:online:328659633147215884>**Online Moderators:**\n'
-            for i in online_mods:
-                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
-        if idle_mods:
-            out_message += ':large_orange_diamond: **Idle Moderators:**\n'
-            for i in idle_mods:
-                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
-        if dnd_mods:
-            out_message += '<:dnd:328659633109598208>**DND Moderators:**\n'
-            for i in dnd_mods:
-                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
-        if offline_mods:
-            out_message += '<:offline:328659633214324757>**Offline Moderators:**\n'
-            for i in offline_mods:
-                out_message += '{} ({}#{})\n'.format(i.display_name, i.name, i.discriminator)
-        
-        await ctx.send(out_message)
+        mods_by_status = collections.defaultdict(list)
+        mods = (m for m in ctx.guild.members if ctx.channel.permissions_for(m).manage_channels)
+
+        for mod in mods:
+            mods_by_status[mod.status] += [mod]
+
+        # Wow this is such a stupid hack
+        def predicate(item):
+            status = str(item[0])
+            return 'online idle dnd offline'.split().index(status)
+
+        sorted_mods = collections.OrderedDict(sorted(mods_by_status.items(), key=predicate))
+        message = ''
+        for status, mods in sorted_mods.items():
+            # header
+            title = 'DND' if status is discord.Status.dnd else status.name.title()
+            message += '**{} {} moderators:**\n'.format(status_emoji[status], title)
+
+            # body
+            message += '\n'.join(['{0.display_name} ({0})'.format(mod) for mod in sorted(mods, key=lambda m: m.name)]) + '\n\n'
+
+        # Prevent pings
+        await ctx.send(message.replace('@', '@\u200b'))
 
     @commands.command()
     @commands.guild_only()
