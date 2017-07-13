@@ -25,7 +25,7 @@ class YouTube:
 
     def __local_check(self, ctx):
         if ctx.guild is None:
-            return await ctx.send('This command does not work in direct messages!')
+            return False
 
         guild_id = ctx.bot.config.get('ids', {}).get('htstem_id', 0)
         return ctx.guild.id == guild_id if not ctx.bot.debug else True
