@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import random
 import time
 
@@ -25,14 +26,18 @@ class Misc:
                 if response[2] + response[3] < current_time:
                     user = self.bot.get_user(response[1])
                     if user is not None:
-                        await user.send('You asked me to remind you to `{0}`!'.format(response[0]))
+                        await user.send('You asked me to remind you to `{0}`!'.format(base64.b64decode(response[0]).decode('utf-8')))
                     to_remove.append(response)
             
             dbcur.close()
             
             dbcur = self.bot.database.cursor()
             for r in to_remove:
-                dbcur.execute('''DELETE FROM memos WHERE memo = '{}' AND user_id = '{}' AND length = '{}' AND start_time = '{}'; '''.format(*r))
+                try:
+                    dbcur.execute('''DELETE FROM memos WHERE user_id = {} AND start_time = {}; '''.format(r[1], r[3]))
+                except Exception as e:
+                    import traceback
+                    traceback.print_exc()
             dbcur.close()
             self.bot.database.commit()
             
@@ -90,10 +95,16 @@ class Misc:
             else:
                 await ctx.author.send('You can\'t set a memo for longer than one year. Sorry for that.')
             return
+        elif length < 0:
+            if verbose:
+                await ctx.send('Yeah.. No.')
+            else:
+                await ctx.send('Yeah.. No.')
+            return
         
         dbcur = ctx.bot.database.cursor()
         dbcur.execute('''INSERT INTO memos(memo, user_id, length, start_time)
-                         VALUES (?, ?, ?, ?)''', (to_remind, ctx.author.id, length, time.time()))
+                         VALUES (?, ?, ?, ?)''', (base64.b64encode(to_remind.encode('utf-8')), ctx.author.id, length, int(time.time())))
         dbcur.close()
         ctx.bot.database.commit()
         
