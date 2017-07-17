@@ -86,9 +86,9 @@ class Misc:
         
         if length > 8760 * 60 * 60:
             if verbose:
-                await ctx.send('You can\'t set a memo for more than one year. Sorry for that.')
+                await ctx.send('You can\'t set a memo for longer than one year. Sorry for that.')
             else:
-                await ctx.author.send('You can\'t set a memo for more than one year. Sorry for that.')
+                await ctx.author.send('You can\'t set a memo for longer than one year. Sorry for that.')
             return
         
         dbcur = ctx.bot.database.cursor()
