@@ -91,9 +91,9 @@ class Misc:
         ctx.bot.database.commit()
         
         if verbose:
-            await ctx.send('Reminer to `{0}` set in {1}{2}!'.format(to_remind, rem_in, unit))
+            await ctx.send('Reminer to `{0}` set in {1}{2}!'.format(to_remind.replace('@', '@\u200b'), rem_in, unit))
         else:
-            await ctx.author.send('Reminer to `{0}` set in {1}{2}!'.format(to_remind, rem_in, unit))
+            await ctx.author.send('Reminer to `{0}` set in {1}{2}!'.format(to_remind.replace('@', '@\u200b'), rem_in, unit))
 
     @commands.command()
     async def roll(self, ctx, sides: int, how_many_dice: int = 1):
