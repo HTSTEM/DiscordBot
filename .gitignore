@@ -11,3 +11,4 @@ config.yml
 videoURLS.txt
 youtube_ids.txt
 xkcd/
+memos.sqlite

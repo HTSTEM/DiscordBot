@@ -2,6 +2,7 @@ import traceback
 import datetime
 import logging
 import aiohttp
+import sqlite3
 import sys
 import re
 
@@ -27,6 +28,26 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.session = aiohttp.ClientSession(loop=self.loop)
 
         self.uploader_client = DataUploader(self)
+        
+        self.database = sqlite3.connect("memos.sqlite")
+        if not self._check_table_exists("memos"):
+            dbcur = self.database.cursor()
+            dbcur.execute('''
+                CREATE TABLE memos(memo TEXT, user_id INTEGER, length INTEGER, start_time INTEGER)''')
+            dbcur.close()
+            self.database.commit()
+    
+    def _check_table_exists(self, tablename):
+        dbcur = self.database.cursor()
+        dbcur.execute('''
+            SELECT name FROM sqlite_master WHERE type='table' AND name='{0}';
+            '''.format(tablename.replace('\'', '\'\'')))
+        if dbcur.fetchone():
+            dbcur.close()
+            return True
+
+        dbcur.close()
+        return False
 
     async def on_message(self, message):
         channel = message.channel
@@ -42,10 +63,12 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         if allowed is not None:
             if channel.id not in allowed:
-                return
+                if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ')):
+                    return
 
         if channel.id in blocked:
-            return
+            if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ')):
+                return
 
         await self.process_commands(message)
 
@@ -134,6 +157,7 @@ class HTSTEMBote(commands.AutoShardedBot):
 
     async def close(self):
         self.session.close()
+        self.database.close()
         await super().close()
 
     def run(self):
