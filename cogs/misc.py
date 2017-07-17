@@ -84,6 +84,13 @@ class Misc:
         elif unit == 'h':
             length = rem_in * 60 * 60
         
+        if length > 72 * 60 * 60:
+            if verbose:
+                await ctx.send('You can\'t set a memo for more than 72 hours. Sorry for that.')
+            else:
+                await ctx.author.send('You can\'t set a memo for more than 72 hours. Sorry for that.')
+            return
+        
         dbcur = ctx.bot.database.cursor()
         dbcur.execute('''INSERT INTO memos(memo, user_id, length, start_time)
                          VALUES (?, ?, ?, ?)''', (to_remind, ctx.author.id, length, time.time()))
