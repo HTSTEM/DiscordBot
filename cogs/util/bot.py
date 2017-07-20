@@ -13,13 +13,6 @@ import discord
 from .data_uploader import DataUploader
 
 
-class HelperBodge():
-    def __init__(self, data):
-        self.data = data
-    def format(self, arg):
-        return self.data.format(arg.replace('@', '@\u200b'))
-
-
 class HTSTEMBote(commands.AutoShardedBot):
     def __init__(self, log_file=None, *args, **kwargs):
         self.debug = False
@@ -32,7 +25,7 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         super().__init__(
             command_prefix='sb?',
-            command_not_found=HelperBodge('No command called `{}` found.'),
+            command_not_found='No command called `{}` found.',
             *args,
             **kwargs
         )
@@ -64,11 +57,14 @@ class HTSTEMBote(commands.AutoShardedBot):
     async def on_message(self, message):
         channel = message.channel
 
+        if message.content.startswith('sb?help'):
+            message.content = message.clean_content
+        
         # Bypass on direct messages
         if isinstance(channel, discord.DMChannel):
             await self.process_commands(message)
             return
-
+            
         channel_ids = self.config.get('ids', {})
         allowed = channel_ids.get('allowed_channels', None)
         blocked = channel_ids.get('blocked_channels', [])
