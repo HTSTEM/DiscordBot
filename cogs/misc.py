@@ -6,6 +6,8 @@ import time
 from discord.ext import commands
 import discord
 
+from cogs.util import checks
+
 
 class Misc:
     def __init__(self, bot):
@@ -120,6 +122,20 @@ class Misc:
         else:
             await ctx.author.send('Reminder to `{0}` set in {1}{2}!'.format(to_remind.replace('@', '@\u200b'), rem_in, unit))
 
+    @commands.command()
+    @checks.is_developer()
+    async def clear_memos_db(self, ctx):
+        await ctx.send(':warning: Clearing DB!')
+        
+        dbcur = ctx.bot.database.cursor()
+        dbcur.execute('''DROP TABLE memos''')
+        dbcur.execute('''CREATE TABLE memos(memo TEXT, user_id INTEGER, length INTEGER, start_time INTEGER)''')
+        
+        dbcur.close()
+        ctx.bot.database.commit()
+        
+        await ctx.send('Done!')
+    
     @commands.command()
     async def roll(self, ctx, sides: int, how_many_dice: int = 1):
         '''Rolls a dice.'''
