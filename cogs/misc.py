@@ -102,6 +102,13 @@ class Misc:
                 await ctx.send('Yeah.. No.')
             return
         
+        if len(to_remind) > 1500:
+            if verbose:
+                await ctx.send('Did it really need to be that long? *Denied*')
+            else:
+                await ctx.author.send('Did it really need to be that long? *Denied*')
+            return
+        
         dbcur = ctx.bot.database.cursor()
         dbcur.execute('''INSERT INTO memos(memo, user_id, length, start_time)
                          VALUES (?, ?, ?, ?)''', (base64.b64encode(to_remind.encode('utf-8')), ctx.author.id, length, int(time.time())))
