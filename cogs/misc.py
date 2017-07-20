@@ -102,7 +102,7 @@ class Misc:
                 await ctx.send('Yeah.. No.')
             return
         
-        if len(to_remind) > 1500:
+        if len(to_remind.replace('@', '@\u200b')) > 1500:
             if verbose:
                 await ctx.send('Did it really need to be that long? *Denied*')
             else:
