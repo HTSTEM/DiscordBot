@@ -13,6 +13,13 @@ import discord
 from .data_uploader import DataUploader
 
 
+class HelperBodge():
+    def __init__(self, data):
+        self.data = data
+    def format(self, arg):
+        return self.data.format(arg.replace('@', '@\u200b'))
+
+
 class HTSTEMBote(commands.AutoShardedBot):
     def __init__(self, log_file=None, *args, **kwargs):
         self.debug = False
@@ -23,7 +30,12 @@ class HTSTEMBote(commands.AutoShardedBot):
         logging.basicConfig(level=logging.INFO, format='[%(name)s %(levelname)s] %(message)s')
         self.logger = logging.getLogger('bot')
 
-        super().__init__(command_prefix='sb?', *args, **kwargs)
+        super().__init__(
+            command_prefix='sb?',
+            command_not_found=HelperBodge('No command called `{}` found.'),
+            *args,
+            **kwargs
+        )
 
         self.session = aiohttp.ClientSession(loop=self.loop)
 
