@@ -17,7 +17,7 @@ class HelperBodge():
     def __init__(self, data):
         self.data = data
     def format(self, arg):
-        return self.data.format(arg)#.format(arg.replace('@', '@\u200b'))
+        return self.data.format(arg.replace('@', '@\u200b'))
 
 
 class HTSTEMBote(commands.AutoShardedBot):
