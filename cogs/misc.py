@@ -162,8 +162,16 @@ class Misc:
             return await ctx.send('{}? That\'s how many users are on the server! Well, your die rolled a {}, '
                                   'and according to the cache, that member is `{}`.'.format(sides, rolled + 1,
                                                                                             chosen.name))
-        await ctx.send('The {} {}-sided {} rolled {}.'.format(how_many_dice, sides, 'die' if how_many_dice == 1 else 'dice', result))
         result = ', '.join(str(random.randint(1, sides)) for _ in range(how_many_dice))
+
+        die_message = 'The {} {}-sided {} rolled {}.'.format(
+            how_many_dice, sides, 'die' if how_many_dice == 1 else 'dice', result)
+
+        # :blobrolleyes: wooningc
+        if len(die_message) > 2000:
+            return await ctx.send("Congratulations, you've managed to roll a die that we can't send.")
+
+        await ctx.send(die_message)
 
 
 def setup(bot):
