@@ -162,8 +162,8 @@ class Misc:
             return await ctx.send('{}? That\'s how many users are on the server! Well, your die rolled a {}, '
                                   'and according to the cache, that member is `{}`.'.format(sides, rolled + 1,
                                                                                             chosen.name))
-        result = ', '.join(str(random.randint(1, sides)) for i in range(how_many_dice))
         await ctx.send('The {} {}-sided {} rolled {}.'.format(how_many_dice, sides, 'die' if how_many_dice == 1 else 'dice', result))
+        result = ', '.join(str(random.randint(1, sides)) for _ in range(how_many_dice))
 
 
 def setup(bot):
