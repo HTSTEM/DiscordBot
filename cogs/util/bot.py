@@ -2,6 +2,7 @@ import traceback
 import datetime
 import logging
 import aiohttp
+import sqlite3
 import sys
 import re
 
@@ -10,6 +11,13 @@ import ruamel.yaml as yaml
 import discord
 
 from .data_uploader import DataUploader
+
+
+class HelperBodge():
+    def __init__(self, data):
+        self.data = data
+    def format(self, arg):
+        return self.data.format(arg.replace('@', '@\u200b'))
 
 
 class HTSTEMBote(commands.AutoShardedBot):
@@ -22,30 +30,60 @@ class HTSTEMBote(commands.AutoShardedBot):
         logging.basicConfig(level=logging.INFO, format='[%(name)s %(levelname)s] %(message)s')
         self.logger = logging.getLogger('bot')
 
-        super().__init__(command_prefix='sb?', *args, **kwargs)
+        super().__init__(
+            command_prefix='sb?',
+            command_not_found=HelperBodge('No command called `{}` found.'),
+            *args,
+            **kwargs
+        )
 
         self.session = aiohttp.ClientSession(loop=self.loop)
 
         self.uploader_client = DataUploader(self)
+        
+        self.database = sqlite3.connect("memos.sqlite")
+        if not self._check_table_exists("memos"):
+            dbcur = self.database.cursor()
+            dbcur.execute('''
+                CREATE TABLE memos(memo TEXT, user_id INTEGER, length INTEGER, start_time INTEGER)''')
+            dbcur.close()
+            self.database.commit()
+    
+    def _check_table_exists(self, tablename):
+        dbcur = self.database.cursor()
+        dbcur.execute('''
+            SELECT name FROM sqlite_master WHERE type='table' AND name='{0}';
+            '''.format(tablename.replace('\'', '\'\'')))
+        if dbcur.fetchone():
+            dbcur.close()
+            return True
+
+        dbcur.close()
+        return False
 
     async def on_message(self, message):
         channel = message.channel
 
+        if message.content.startswith('sb?help'):
+            message.content = message.clean_content
+        
         # Bypass on direct messages
         if isinstance(channel, discord.DMChannel):
             await self.process_commands(message)
             return
-
+            
         channel_ids = self.config.get('ids', {})
         allowed = channel_ids.get('allowed_channels', None)
         blocked = channel_ids.get('blocked_channels', [])
 
         if allowed is not None:
             if channel.id not in allowed:
-                return
+                if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ')):
+                    return
 
         if channel.id in blocked:
-            return
+            if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ')):
+                return
 
         await self.process_commands(message)
 
@@ -134,6 +172,7 @@ class HTSTEMBote(commands.AutoShardedBot):
 
     async def close(self):
         self.session.close()
+        self.database.close()
         await super().close()
 
     def run(self):
