@@ -12,6 +12,7 @@ import discord
 
 from .ruleBot.rulebot import RuleBot
 from .data_uploader import DataUploader
+from .checks import right_channel
 
 
 class HelperBodge():
@@ -76,23 +77,6 @@ class HTSTEMBote(commands.AutoShardedBot):
         if isinstance(channel, discord.DMChannel):
             await self.process_commands(message)
             return
-            
-        channel_ids = self.config.get('ids', {})
-        allowed = channel_ids.get('allowed_channels', None)
-        blocked = channel_ids.get('blocked_channels', [])
-
-        # WTF is this?!?!?! This is horrible code!
-        # Not that I'm helping though.
-        # -hanss314
-        
-        if allowed is not None:
-            if channel.id not in allowed:
-                if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ') or message.content.startswith('sb?paste ')):
-                    return
-
-        if channel.id in blocked:
-            if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ') or message.content.startswith('sb?paste ')):
-                return
 
         await self.process_commands(message)
 
@@ -200,7 +184,8 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         token = self.config['token']
         cogs = self.config.get('cogs', [])
-
+        self.add_check(right_channel)
+        
         for cog in cogs:
             try:
                 self.load_extension(cog)

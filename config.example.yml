@@ -39,3 +39,8 @@ cogs:
   - cogs.hashing
   - cogs.internet
   - cogs.information
+  
+global_coms:
+  - memo
+  - remind
+  - paste
