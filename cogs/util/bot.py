@@ -81,13 +81,17 @@ class HTSTEMBote(commands.AutoShardedBot):
         allowed = channel_ids.get('allowed_channels', None)
         blocked = channel_ids.get('blocked_channels', [])
 
+        # WTF is this?!?!?! This is horrible code!
+        # Not that I'm helping though.
+        # -hanss314
+        
         if allowed is not None:
             if channel.id not in allowed:
-                if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ')):
+                if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ') or message.content.startswith('sb?paste ')):
                     return
 
         if channel.id in blocked:
-            if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ')):
+            if not (message.content.startswith('sb?memo ') or message.content.startswith('sb?remind ') or message.content.startswith('sb?paste ')):
                 return
 
         await self.process_commands(message)

@@ -17,7 +17,7 @@ class DataUploader:
             'sections': [
                 {
                     'name': title,
-                    'contents': data
+                    'contents': data,
                 }
             ]
         }

@@ -57,6 +57,12 @@ class Internet:
             title = "{0.display_name}#{0.discriminator}".format(ctx.author)
         else:
             title = "{0.display_name}#{0.discriminator} in #{1}".format(ctx.author, ctx.channel.name)
+        
+        language = None
+        if data.startswith('```') and data.endswith('```'):
+            data = data.strip('`')
+            data = data.split('\n')
+            data = '\n'.join(data[1:])
 
         url = await self.uploader_client.upload(
                     data,
