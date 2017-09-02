@@ -6,6 +6,7 @@ from discord.ext import commands
 import discord
 
 from .util.data_uploader import DataUploader
+from .util.converters import CleanedCode
 
 
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
@@ -50,19 +51,13 @@ class Internet:
             await ctx.send(resp.url)
 
     @commands.command(aliases=['paste.ee', 'upload'])
-    async def paste(self, ctx, *, data: str):
+    async def paste(self, ctx, *, data: CleanedCode):
         '''Upload data to https://paste.ee and return the URL'''
 
         if isinstance(ctx.channel, discord.abc.PrivateChannel):
             title = "{0.display_name}#{0.discriminator}".format(ctx.author)
         else:
             title = "{0.display_name}#{0.discriminator} in #{1}".format(ctx.author, ctx.channel.name)
-        
-        language = None
-        if data.startswith('```') and data.endswith('```'):
-            data = data.strip('`')
-            data = data.split('\n')
-            data = '\n'.join(data[1:])
 
         url = await self.uploader_client.upload(
                     data,

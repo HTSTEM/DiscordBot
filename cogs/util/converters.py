@@ -18,3 +18,12 @@ class FuzzyMember(IDConverter):
             result = guild.get_member_named(name[0])
 
         return result
+
+class CleanedCode(IDConverter):
+    async def convert(self, ctx, data):
+        if data.startswith('```') and data.endswith('```'):
+            data = data.strip('`')
+            data = data.split('\n')
+            data = '\n'.join(data[1:])
+
+        return data
