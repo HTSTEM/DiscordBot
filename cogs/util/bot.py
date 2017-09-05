@@ -126,27 +126,29 @@ class HTSTEMBote(commands.AutoShardedBot):
         if isinstance(exception, commands.CommandInvokeError):
             # all exceptions are wrapped in CommandInvokeError if they are not a subclass of CommandError
             # you can access the original exception with .original
-            if isinstance(exception.original, discord.Forbidden):
+            original = exception.original
+            if isinstance(original, discord.Forbidden):
                 # permissions error
                 try:
                     await ctx.send('Permissions error: `{}`'.format(exception))
                 except discord.Forbidden:
                     # we can't send messages in that channel
-                    return
-            elif isinstance(exception.original, discord.HTTPException) and exception.original.status == 400:
-                return await ctx.send('Congratulations! I can\'t send that message.')
+                    pass
+                
+            elif isinstance(original, discord.HTTPException) and original.status == 400:
+                try: await ctx.send('Congratulations! I can\'t send that message.')
+                except discord.Forbidden: pass
+            
+            else:
+                # Print to log then notify developers
+                lines = traceback.format_exception(type(exception),
+                                                exception,
+                                                exception.__traceback__)
 
-            # Print to log then notify developers
-            lines = traceback.format_exception(type(exception),
-                                               exception,
-                                               exception.__traceback__)
+                self.logger.error(''.join(lines))
+                await self.notify_devs(lines, ctx.message)
 
-            self.logger.error(''.join(lines))
-            await self.notify_devs(lines, ctx.message)
-
-            return
-
-        if isinstance(exception, commands.CheckFailure):
+        elif isinstance(exception, commands.CheckFailure):
             await ctx.send('You can\'t do that.')
         elif isinstance(exception, commands.CommandNotFound):
             pass
