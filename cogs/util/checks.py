@@ -30,10 +30,10 @@ def right_channel(ctx: commands.Context) -> bool:
     if allowed is not None:
         if ctx.channel.id not in allowed:
             if not ctx.command.name in globs:
-                return False
+                raise ctx.bot.SilentCheckFailure()
 
     if ctx.channel.id in blocked:
         if not ctx.command.name in globs:
-            return False
+            raise ctx.bot.SilentCheckFailure()
         
     return True
