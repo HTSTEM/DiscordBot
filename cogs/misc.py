@@ -177,8 +177,10 @@ class Misc:
     @commands.command()
     async def isprime(self, ctx, num: int):
         """Very simple prime number checker. Limit is 1000000"""
+        if num in [2, 3, 5, 7]:
+            return await ctx.send("*sigh* Yes, {} is prime.".format(num))
         if num % 2 == 0:
-            return await ctx.send('Why would you think {}, an even number, is prime!'.format(num))
+            return await ctx.send('Why would you think {}, an even number, is prime!?'.format(num))
         if num % 5 == 0: 
             return await ctx.send('Composite. {} literally ends in a 5...'.format(num))
         if num >= 1000000:
