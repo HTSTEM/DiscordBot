@@ -2,6 +2,7 @@ import asyncio
 import base64
 import random
 import time
+from math import sqrt
 
 from discord.ext import commands
 import discord
@@ -171,7 +172,23 @@ class Misc:
         if len(die_message) > 2000:
             return await ctx.send("Congratulations, you've managed to roll a die that we can't send.")
 
-        await ctx.send(die_message)
+        await ctx.send(die_message)  
+
+    @commands.command()
+    async def isprime(self, ctx, num: int):
+        """Very simple prime number checker. Limit is 1000000"""
+        if num % 2 == 0:
+            return await ctx.send('Why would you think {}, an even number, is prime!'.format(num))
+        if num % 5 == 0: 
+            return await ctx.send('Composite. {} literally ends in a 5...'.format(num))
+        if num >= 1000000:
+            return await ctx.send('I may be fast but I\'m not that fast. Try something below 1000000.')
+        a = 3
+        while a <= sqrt(num):
+            if num % a == 0:
+                return await ctx.send('Composite. {0} mod {1} equals 0.'.format(num, a))
+            a = a + (2, 4)[a % 10 == 3]
+        return await ctx.send('Prime! {} is only divisible by 1 and itself'.format(num))
 
 
 def setup(bot):
