@@ -2,7 +2,7 @@ import asyncio
 import base64
 import random
 import time
-from math import sqrt
+import math
 
 from discord.ext import commands
 import discord
@@ -176,21 +176,25 @@ class Misc:
 
     @commands.command()
     async def isprime(self, ctx, num: int):
-        """Very simple prime number checker. Limit is 1000000"""
+        """Very simple prime number checker. Implements a slightly-optimized trial division"""
+        if num < 1:
+            return await ctx.send(f"Don't be silly, {num} can't be prime or composite.")
+        if num == 1:
+            return await ctx.send('Ooh. Is 1 a prime? Some people say it is, some say it isn\'t, most people don\'t care... is it? Hmm? That\'s up to you to decide.')
         if num in [2, 3, 5, 7]:
-            return await ctx.send("*sigh* Yes, {} is prime.".format(num))
+            return await ctx.send(f"Yes, {num} is prime. What did you expect me to say?")
         if num % 2 == 0:
-            return await ctx.send('Why would you think {}, an even number, is prime!?'.format(num))
+            return await ctx.send(f'Why would you think {num}, an even number that isn\'t 2, would be prime?')
         if num % 5 == 0: 
-            return await ctx.send('Composite. {} literally ends in a 5...'.format(num))
-        if num >= 1000000:
-            return await ctx.send('I may be fast but I\'m not that fast. Try something below 1000000.')
+            return await ctx.send(f'Composite. {num} literally ends in a 5...')
+        if num > 1e+12: # Arbitrary limit, adjust as necessary
+            return await ctx.send('I may be fast but I\'m not that fast. Try something below 1 trillion.')
         a = 3
-        while a <= sqrt(num):
+        while a <= math.sqrt(num):
             if num % a == 0:
                 return await ctx.send('Composite. {0} mod {1} equals 0.'.format(num, a))
-            a = a + (2, 4)[a % 10 == 3]
-        return await ctx.send('Prime! {} is only divisible by 1 and itself'.format(num))
+            a = a + (2, 4)[a % 10 == 3] # Skips 5s and even numbers
+        return await ctx.send('Prime! {} is only divisible by 1 and itself.'.format(num))
 
 
 def setup(bot):
