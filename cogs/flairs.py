@@ -7,7 +7,7 @@ flairs = {  # (role_name, twower/command name)
     'yessoan': '#TeamYessoan'
 }
 
-debug = True  # set false for normal use
+debug = False  # set false for normal use
 
 if debug:
     guild_id = 297811083308171264
