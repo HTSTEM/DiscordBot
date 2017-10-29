@@ -1,17 +1,13 @@
 import httplib2
-import asyncio
 import os
-import io
 import re
-
-from googleapiclient.http import MediaIoBaseDownload
 
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-from .html2text import html2text
+from .util.html2text import html2text
 import discord
 
 try:
@@ -29,13 +25,13 @@ PREFIX = 'r.'
 
 MAGICAL_POWERS = [161508165672763392, 140564059417346049, 312615171191341056, 149313154512322560,
                   154825973278310400, 185164223259607040, 127373929600778240, 184884413664854016,
-                  164379304879194112,  98569889437990912, 184079890373541889,
+                  164379304879194112,  98569889437990912, 184079890373541889, 240995021208289280
 ]
 
-SERVER_WHITELIST = [184755239952318464, 290573725366091787, 329367873858568210]
+SERVER_WHITELIST = [184755239952318464, 290573725366091787, 329367873858568210, 297811083308171264]
 
 
-class RuleBot():
+class RuleBot:
     def __init__(self):        
         self.reload_cache()
 
@@ -210,3 +206,6 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
             f.write(data)
         
         self.parse_cache()
+
+def setup(bot):
+    bot.add_cog(RuleBot())

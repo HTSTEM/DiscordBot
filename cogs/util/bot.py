@@ -10,7 +10,6 @@ from discord.ext import commands
 import ruamel.yaml as yaml
 import discord
 
-from .ruleBot.rulebot import RuleBot
 from .data_uploader import DataUploader
 from .checks import right_channel
 
@@ -52,8 +51,7 @@ class HTSTEMBote(commands.AutoShardedBot):
                 CREATE TABLE memos(memo TEXT, user_id INTEGER, length INTEGER, start_time INTEGER)''')
             dbcur.close()
             self.database.commit()
-        
-        self.rule_bot = RuleBot()
+
     
     def _check_table_exists(self, tablename):
         dbcur = self.database.cursor()
@@ -68,7 +66,6 @@ class HTSTEMBote(commands.AutoShardedBot):
         return False
 
     async def on_message(self, message):
-        await self.rule_bot.on_message(message)
     
         channel = message.channel
 
