@@ -62,8 +62,8 @@ class Flairs:
                 print(d)
                 await message.channel.send(d)
 
-        if (command == "help" and message.channel.name != "music" and
-                (isinstance(message.channel, discord.abc.PrivateChannel) or message.guild.id == guild_id)):
+        if (command == "help" and (isinstance(message.channel, discord.abc.PrivateChannel) or
+           (message.guild.id == guild_id and message.channel.name != "music"))):
             names = ['`!{}`'.format(name.lower()) for name in flairs.keys()]
             if len(names) > 1:
                 names[-1] = 'or {}'.format(names[-1])
@@ -72,8 +72,8 @@ class Flairs:
             )
 
         try:
-            if (inHTC and not message.channel.name in ['serious', 'music'] and
-                    (isinstance(message.channel, discord.abc.PrivateChannel) or message.guild.id == guild_id)):
+            if (command != "help" and (isinstance(message.channel, discord.abc.PrivateChannel) or
+               (message.guild.id == guild_id and message.channel.name not in ["music", "serious"]))):
                 user = htc.get_member(message.author.id)
                 roles = htc.roles
                 teams = []
