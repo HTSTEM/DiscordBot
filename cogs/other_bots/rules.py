@@ -7,7 +7,7 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-from .util.html2text import html2text
+from ..util.html2text import html2text
 import discord
 
 try:
@@ -32,13 +32,13 @@ SERVER_WHITELIST = [184755239952318464, 290573725366091787, 329367873858568210, 
 
 
 class RuleBot:
-    def __init__(self):        
+    def __init__(self):
         self.reload_cache()
 
     async def on_message(self, message):
         if message.content.startswith(PREFIX):
             command = message.content[len(PREFIX):]
-            
+
             if isinstance(message.channel, discord.abc.PrivateChannel) or message.guild.id in SERVER_WHITELIST:
                 if command.split(' ')[0] == 'help':
                     msg = '''```yaml
@@ -54,15 +54,15 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
                         await message.channel.send(':mailbox_with_mail:')
                 elif command.startswith('search '):
                     term = command[7:]
-                    
+
                     found = []
-                    
+
                     with message.channel.typing():
                         for block in self.rules:
                             for rule in self.rules[block]:
                                 if term.lower() in self.rules[block][rule].lower():
                                     found.append((block, rule, self.rules[block][rule]))
-                    
+
                     if not found:
                         await message.channel.send('No rule found matching that term')
                     elif len(found) > 5:
@@ -71,7 +71,7 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
                         m = 'I found:'
                         for f in found:
                             m += '\n**Rule {}{}:** {}'.format(f[0], f[1], self.escape(f[2]))
-                            
+
                             if len(m) > 1500:
                                 await message.channel.send(m)
                                 m = ''
@@ -85,7 +85,7 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
                         await message.channel.send('Done!')
                 else:
                     rule = self.lookup_rule(command)
-                
+
                     if rule is not None:
                         await message.channel.send('**Rule {}:** {}\n<https://docs.google.com/document/d/137Fa99avZxFPovkiZRW7xSctFq2iirnKizZ4lHclHWU/edit>'.format(command.upper(), self.escape(rule)))
         else:
@@ -93,22 +93,22 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
                 found = re.findall('\\br\\.([A-Ca-c]\\d{1,2})\\b', message.content)
                 if found:
                     m = ''
-                    
+
                     for f in found:
                         rule = self.lookup_rule(f)
                         if rule is not None:
                             m += '\n**Rule {}:** {}'.format(f.upper(), self.escape(rule))
-                            
+
                             if len(m) > 1500:
                                 await message.channel.send(m)
                                 m = ''
                     m += '\n<https://docs.google.com/document/d/137Fa99avZxFPovkiZRW7xSctFq2iirnKizZ4lHclHWU/edit>'
                     if m:
                         await message.channel.send(m)
-                        
+
     def escape(self, message):
         return message.replace('@', '@\u200b').replace('`', '\\`').replace('*', '\\*').replace('_', '\\_')
-        
+
     def lookup_rule(self, code):
         if len(code) < 2:
             return None
@@ -120,15 +120,15 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
             return None
         if block not in self.rules:
             return None
-        
+
         block = self.rules[block]
-        
+
         if num not in block:
             return None
         rule = block[num]
-        
+
         return rule
-    
+
     def get_credentials(self):
         """Gets valid user credentials from storage.
 
@@ -192,19 +192,19 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
                     self.rules[block][current_rule] += '\n' + line[2:]
                 else:
                     self.rules[block][current_rule] += '\n\u8226 ' + line
-        
+
     def reload_cache(self):
         credentials = self.get_credentials()
         http = credentials.authorize(httplib2.Http())
 
         service = discovery.build('drive', 'v3', http=http)
-        
+
         request = service.files().export(fileId='137Fa99avZxFPovkiZRW7xSctFq2iirnKizZ4lHclHWU', mimeType='text/html')
         data = request.execute()
-        
+
         with open('cache.txt', 'wb') as f:
             f.write(data)
-        
+
         self.parse_cache()
 
 def setup(bot):

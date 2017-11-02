@@ -28,8 +28,8 @@ else:
         110461599176724480
     ]
 
-class Flairs:
 
+class Flairs:
     def __init__(self, bot):
         self.bot = bot
 
@@ -103,7 +103,6 @@ class Flairs:
                             await message.delete()
                         except discord.Forbidden:
                             pass
-
                 else:
                     if command in flairs:
                         for role in teams:
@@ -124,14 +123,11 @@ class Flairs:
                                 await message.delete()
                             except:
                                 pass
-
-
         except Exception as e:
             if debug:
                 raise e
             else:
                 print("[ERROR] A bot-crashing error occured somewhere in the code.")
-
 
     def get_role_count(self, role_name, guild):
         team = discord.utils.get(guild.roles, name=role_name)
