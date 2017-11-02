@@ -32,10 +32,14 @@ SERVER_WHITELIST = [184755239952318464, 290573725366091787, 329367873858568210, 
 
 
 class RuleBot:
-    def __init__(self):
+    def __init__(self, bot):
+        self.bot = bot
         self.reload_cache()
 
     async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+
         if message.content.startswith(PREFIX):
             command = message.content[len(PREFIX):]
 
@@ -208,4 +212,4 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
         self.parse_cache()
 
 def setup(bot):
-    bot.add_cog(RuleBot())
+    bot.add_cog(RuleBot(bot))
