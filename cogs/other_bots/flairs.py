@@ -1,6 +1,6 @@
 import discord
 
-prefix = "!"
+prefix = "t!"
 flairs = {  # (role_name, twower/command name)
     'meester': '#TeamMeester',
     'midnight': '#TeamMidnight',
