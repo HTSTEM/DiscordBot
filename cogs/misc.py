@@ -7,10 +7,14 @@ import math
 from discord.ext import commands
 import discord
 
-from cogs.util import checks
+from .util.checks import is_developer, right_channel
 
 
 class Misc:
+
+    async def __local_check(self, ctx):
+        return right_channel(ctx)
+
     def __init__(self, bot):
         self.bot = bot
         self.task = self.bot.loop.create_task(self.send_reminders())
@@ -124,7 +128,7 @@ class Misc:
             await ctx.author.send('Reminder to `{0}` set in {1}{2}!'.format(to_remind.replace('@', '@\u200b'), rem_in, unit))
 
     @commands.command()
-    @checks.is_developer()
+    @is_developer()
     async def clear_memos_db(self, ctx):
         await ctx.send(':warning: Clearing DB!')
         

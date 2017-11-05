@@ -3,8 +3,14 @@ import hashlib
 from discord.ext import commands
 import discord
 
+from .util.checks import right_channel
+
 
 class Hashing:
+
+    async def __local_check(self, ctx):
+        return right_channel(ctx)
+
     async def hash(self, data: str, hashlib_method: str, pretty_type: str):
         def hash_func():
             func = getattr(hashlib, hashlib_method)

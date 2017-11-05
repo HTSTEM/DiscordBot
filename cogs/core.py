@@ -7,20 +7,24 @@ from discord.ext import commands
 import ruamel.yaml as yaml
 import discord
 
-from cogs.util import checks
+from .util.checks import right_channel, is_developer, is_staff
 
 
 class Core:
+
+    async def __local_check(self, ctx):
+        return right_channel(ctx)
+
     '''Core commands'''
     @commands.command(aliases=['quit', 'kill'])
-    @checks.is_developer()
+    @is_developer()
     async def die(self, ctx):
         '''Disconnects the bot from Discord.'''
         await ctx.send('Logging out...')
         await ctx.bot.logout()
 
     @commands.command()
-    @checks.is_developer()
+    @is_developer()
     async def crash(self, ctx):
         '''Crash the bot'''
         raise Exception("Yeah baby. Errors for all!")
@@ -48,7 +52,7 @@ class Core:
             await ctx.send('\N{OK HAND SIGN} Unloaded cog {} successfully!'.format(cog))
 
     @commands.group(invoke_without_command=True)
-    @checks.is_developer()
+    @is_developer()
     async def reload(self, ctx, *, cog: str):
         '''Reloads an extension'''
         try:
@@ -60,7 +64,7 @@ class Core:
             await ctx.send('\N{OK HAND SIGN} Reloaded cog {} successfully'.format(cog))
 
     @reload.command(name='all')
-    @checks.is_developer()
+    @is_developer()
     async def reload_all(self, ctx):
         '''Reloads all extensions'''
         for extension in ctx.bot.extensions.copy():
@@ -74,7 +78,7 @@ class Core:
         await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
     @commands.command(aliases=['git_pull'])
-    @checks.is_staff()
+    @is_staff()
     async def update(self, ctx):
         '''Updates the bot from git'''
 
@@ -126,7 +130,7 @@ class Core:
         await ctx.send(embed=embed)
 
     @commands.command()
-    @checks.is_developer()
+    @is_developer()
     async def reloadconfig(self, ctx):
         with open('config.yml', 'r') as f:
             ctx.bot.config = yaml.load(f, Loader=yaml.Loader)

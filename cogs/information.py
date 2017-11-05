@@ -8,6 +8,7 @@ import psutil
 import git
 
 from .util.converters import FuzzyMember
+from .util.checks import right_channel
 
 
 def format_fields(fields):
@@ -21,6 +22,10 @@ def format_fields(fields):
 
 
 class Information:
+
+    async def __local_check(self, ctx):
+        return right_channel(ctx)
+
     '''Commands that tell useful information about miscellaneous things'''
 
     @commands.command()

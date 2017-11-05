@@ -11,8 +11,6 @@ import ruamel.yaml as yaml
 import discord
 
 from .data_uploader import DataUploader
-from .checks import right_channel
-
 
 class HelperBodge():
     def __init__(self, data):
@@ -184,7 +182,6 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         token = self.config['token']
         cogs = self.config.get('cogs', [])
-        self.add_check(right_channel)
         
         for cog in cogs:
             try:

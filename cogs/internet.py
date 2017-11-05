@@ -7,12 +7,17 @@ import discord
 
 from .util.data_uploader import DataUploader
 from .util.converters import CleanedCode
+from .util.checks import right_channel
 
 
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
 
 
 class Internet:
+
+    async def __local_check(self, ctx):
+        return right_channel(ctx)
+
     def __init__(self, bot):
         self.bot = bot
         self.uploader_client = DataUploader(bot)

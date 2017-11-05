@@ -10,6 +10,8 @@ from discord.ext import commands
 import feedparser
 import discord
 
+from .util.checks import right_channel
+
 
 class YouTube:
     '''
@@ -24,7 +26,7 @@ class YouTube:
         self.task.cancel()
 
     def __local_check(self, ctx):
-        if ctx.guild is None:
+        if ctx.guild is None or not right_channel(ctx):
             return False
 
         guild_id = ctx.bot.config.get('ids', {}).get('htstem_id', 0)
