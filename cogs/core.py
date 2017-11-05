@@ -78,7 +78,7 @@ class Core:
         await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
     @commands.command(aliases=['git_pull'])
-    @is_staff()
+    @is_developer()
     async def update(self, ctx):
         '''Updates the bot from git'''
 
