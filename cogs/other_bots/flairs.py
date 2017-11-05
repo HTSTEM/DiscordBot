@@ -63,7 +63,7 @@ class Flairs:
                 await message.channel.send(d)
 
         if (command == "help" and (isinstance(message.channel, discord.abc.PrivateChannel) or
-           (message.guild.id == guild_id and message.channel.name != "music"))):
+           (message.guild.id == guild_id and message.channel.name not in ["music", "serious"]))):
             names = ['`{}{}`'.format(prefix, name.lower()) for name in flairs.keys()]
             if len(names) > 1:
                 names[-1] = 'or {}'.format(names[-1])
