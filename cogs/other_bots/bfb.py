@@ -1,13 +1,18 @@
 import discord
 
-prefix = "t!"
-flairs = {  # (role_name, twower/command name)
-    'meester': '#TeamMeester',
-    'midnight': '#TeamMidnight',
-    'yessoan': '#TeamYessoan'
+prefix = "b!"
+flairs = { #(role_name, twower/command name)
+    'deathpact': 'Death P.A.C.T.',
+    'bettername': 'A Better Name Than That',
+    'icecube': 'Team Ice Cube (ALL THE WAY!)',
+    'freefood': 'Free Food',
+    'losers': 'The Losers',
+    'iance': 'iance',
+    'beep': 'BEEP',
+    'bleh': 'Bleh'
 }
 
-debug = False  # set false for normal use
+debug = False #set false for normal use
 
 if debug:
     guild_id = 297811083308171264
@@ -29,18 +34,20 @@ else:
     ]
 
 
-class Flairs:
+class BFB:
+
     def __init__(self, bot):
         self.bot = bot
 
     async def on_message(self, message):
-        if (not message.content.startswith(prefix)) or message.content.startswith(prefix + prefix):
+        if (not message.content.startswith(prefix)) or message.content.startswith(prefix+prefix):
             return
 
         command = message.content.split(' ')[0][len(prefix):].lower()
 
         htc = self.bot.get_guild(guild_id)
         bot = htc.me
+        inHTC = (htc.get_member(message.author.id) != None)
         isOwner = message.author.id in owner_id
 
         if isOwner:
@@ -55,30 +62,29 @@ class Flairs:
                 if htc.large: await self.bot.request_offline_members(htc)
                 d = "--- FLAIR STATS ---\n"
                 for name, role in flairs.items():
-                    d += '**{}**: {}\n'.format(name.title(), self.get_role_count(role, htc))
+                    d += '**{}**: {}\n'.format(name.title(), self.get_role_count(role,htc))
 
                 d += "--- END STATS ---"
                 print(d)
                 await message.channel.send(d)
 
-        if (command == "help" and (isinstance(message.channel, discord.abc.PrivateChannel) or
-           (message.guild.id == guild_id and message.channel.name not in ["music", "serious"]))):
-            names = ['`{}{}`'.format(prefix, name.lower()) for name in flairs.keys()]
+        if (command == "help" and (isinstance(message.channel, discord.abc.PrivateChannel) or message.guild.id == guild_id)):
+            names = ['`{0}{1}`'.format(prefix, name.lower()) for name in flairs.keys()]
             if len(names) > 1:
                 names[-1] = 'or {}'.format(names[-1])
             await message.channel.send(
-                'To join a team, say {}. To leave your team, say `!remove`'.format(', '.join(names))
+                'To join a team, say {}. To leave your team, say `{}remove`'.format(', '.join(names),prefix)
             )
 
         try:
-            if (command != "help" and (isinstance(message.channel, discord.abc.PrivateChannel) or
-               (message.guild.id == guild_id and message.channel.name not in ["music", "serious"]))):
+            if (inHTC and (isinstance(message.channel, discord.abc.PrivateChannel) or message.guild.id == guild_id)):
                 user = htc.get_member(message.author.id)
                 roles = htc.roles
+                teamids = [376314992301047808, 376315776338100235, 376316300701728773, 376316488228798466, 376316879066628096, 376317160739438594, 376317479401553920, 376318324910456834]
                 teams = []
 
                 for role in roles:
-                    if role.name.startswith("#Team"):
+                    if role.id in teamids:
                         teams.append(role)
 
                 if command == "remove":
@@ -88,27 +94,26 @@ class Flairs:
                             removed = True
                             await user.remove_roles(role)
 
-                    if removed:
-                        d = "You have successfully been removed from your team."
-                    else:
-                        d = "You're not on a team!"
+
+                    if removed:  d = "You have successfully been removed from your team."
+                    else: d = "You're not on a team!"
 
                     if isinstance(message.channel, discord.abc.PrivateChannel):
                         await message.channel.send(d)
                     else:
                         await message.channel.send(d, delete_after=5)
 
-                        try:
-                            await message.delete()
-                        except discord.Forbidden:
-                            pass
+                        try: await message.delete()
+                        except discord.Forbidden: pass
+
                 else:
                     if command in flairs:
                         for role in teams:
                             if role in user.roles:
                                 await user.remove_roles(role)
 
-                        team = discord.utils.get(teams, name=flairs[command])
+
+                        team = discord.utils.get(teams,name=flairs[command])
                         await user.add_roles(team)
 
                         if isinstance(message.channel, discord.abc.PrivateChannel):
@@ -118,10 +123,10 @@ class Flairs:
                                 "You have joined {}.".format(team.name),
                                 delete_after=5
                             )
-                            try:
-                                await message.delete()
-                            except:
-                                pass
+                            try: await message.delete()
+                            except: pass
+
+
         except Exception as e:
             if debug:
                 raise e
@@ -130,17 +135,17 @@ class Flairs:
 
     @staticmethod
     def get_role_count(role_name, guild):
-        team = discord.utils.get(guild.roles, name=role_name)
+        team = discord.utils.get(guild.roles,name=role_name)
         count = len(
-            list(
-                filter(
-                    lambda x: team in x.roles,
-                    guild.members
+                    list(
+                        filter(
+                            lambda x:team in x.roles,
+                            guild.members
+                        )
+                    )
                 )
-            )
-        )
         return count
 
 
 def setup(bot):
-    bot.add_cog(Flairs(bot))
+    bot.add_cog(BFB(bot))

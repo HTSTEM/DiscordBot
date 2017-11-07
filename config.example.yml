@@ -39,6 +39,10 @@ cogs:
   - cogs.hashing
   - cogs.internet
   - cogs.information
+  - cogs.other_bots.flairs
+  - cogs.other_bots.rules
+  - cogs.other_bots.colors
+  - cogs.other_bots.bfb
   
 global_coms:
   - memo
