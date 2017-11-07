@@ -6,7 +6,7 @@ venv/
 
 # config
 config.yml
-cogs/util/ruleBot/client_secret.json
+client_secret.json
 
 # state
 videoURLS.txt
