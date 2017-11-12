@@ -10,19 +10,15 @@ from ruamel import yaml
 debug = 0
 
 if debug == 0:
-    TARGET_GUILDS = {
-        'HTC': 184755239952318464,
-        'HTSTEM': 282219466589208576,
-    }
     MIRROR_GUILDS = {
-        TARGET_GUILDS['HTC']: [347626231342170112],
-        TARGET_GUILDS['HTSTEM']: [379387045400936448],
+        184755239952318464: [347626231342170112],  # HTC
+        282219466589208576: [379387045400936448, 379054999524868096],  # HTSTEM
     }
-    #TARGET_GUILD = 184755239952318464
-    #MIRROR_GUILDS = [347626231342170112, 379054999524868096]
+
 elif debug == 1:
-    TARGET_GUILD = 297811083308171264
-    MIRROR_GUILDS = [379054999524868096]
+    MIRROR_GUILDS = {
+        297811083308171264: [379392460637339650, 379054999524868096]
+    }
 
 
 class Archiver:
@@ -58,14 +54,24 @@ class Archiver:
     async def archive_message(self, guild, message):
         nc = None
         if message.channel.id in self.lookup:
-            nc = guild.get_channel(self.lookup[message.channel.id])
+            if not isinstance(self.lookup[message.channel.id], list):
+                self.lookup[message.channel.id] = [self.lookup[message.channel.id]]
+                with open('map.yml', 'w') as f:
+                    yaml.dump(self.lookup, f)
+
+            for cid in self.lookup[message.channel.id]:
+                nc = guild.get_channel(cid)
+                if nc is not None: break
 
             if nc is not None and nc.name != message.channel.name:
                 await nc.edit(name=message.channel.name)
 
         if nc is None:
             nc = await guild.create_text_channel(message.channel.name)
-            self.lookup[message.channel.id] = nc.id
+            try:
+                self.lookup[message.channel.id].append(nc.id)
+            except KeyError:
+                self.lookup[message.channel.id] = []
 
             with open('map.yml', 'w') as f:
                 yaml.dump(self.lookup, f)
