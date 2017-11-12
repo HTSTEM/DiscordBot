@@ -44,7 +44,8 @@ cogs:
   - cogs.other_bots.colors
   - cogs.other_bots.bfb
   - cogs.other_bots.archive
-  
+  - cogs.other_bots.joinbot
+
 global_coms:
   - memo
   - remind
