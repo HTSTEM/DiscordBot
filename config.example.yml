@@ -43,6 +43,7 @@ cogs:
   - cogs.other_bots.rules
   - cogs.other_bots.colors
   - cogs.other_bots.bfb
+  - cogs.other_bots.archive
   
 global_coms:
   - memo
