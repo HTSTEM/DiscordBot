@@ -7,7 +7,7 @@ import discord
 from ruamel import yaml
 
 
-debug = 1
+debug = 0
 
 if debug == 0:
     TARGET_GUILD = 184755239952318464
