@@ -10,8 +10,16 @@ from ruamel import yaml
 debug = 0
 
 if debug == 0:
-    TARGET_GUILD = 184755239952318464
-    MIRROR_GUILDS = [347626231342170112, 379054999524868096]
+    TARGET_GUILDS = {
+        'HTC': 184755239952318464,
+        'HTSTEM': 282219466589208576,
+    }
+    MIRROR_GUILDS = {
+        #TARGET_GUILDS['HTC']: [347626231342170112],
+        TARGET_GUILDS['HTSTEM']: [347626231342170112, 379185501472555008],
+    }
+    #TARGET_GUILD = 184755239952318464
+    #MIRROR_GUILDS = [347626231342170112, 379054999524868096]
 elif debug == 1:
     TARGET_GUILD = 297811083308171264
     MIRROR_GUILDS = [379054999524868096]
@@ -87,8 +95,8 @@ class Archiver:
                 )
 
     async def on_message(self, message):
-        if message.guild.id == TARGET_GUILD:
-            for gid in MIRROR_GUILDS:
+        if message.guild.id in MIRROR_GUILDS:
+            for gid in MIRROR_GUILDS[message.guild.id]:
                 mirror = self.bot.get_guild(gid)
                 if mirror:
                     try:
