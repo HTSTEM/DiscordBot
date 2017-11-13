@@ -45,11 +45,11 @@ class Archiver:
                 embeds=message.embeds,
             )
         except discord.errors.HTTPException as e:
-            if t < 3:
+            if t < 3 and e.status != 400:
                 await asyncio.sleep(0.5)
                 await self.wh(webhook, message, file, t + 1)
-            else:
-                raise e
+            elif e.status == 400: pass
+            else: raise e
 
     async def archive_message(self, guild, message):
         nc = None
