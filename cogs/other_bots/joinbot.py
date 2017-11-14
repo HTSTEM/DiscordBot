@@ -114,7 +114,7 @@ class JoinBot:
 
         if cmd == 'userinfo':
             if args.strip():
-                member = await self.bot.get_user(args)
+                member = await self.get_user(args, message.guild)
             else:
                 member = message.author
 
