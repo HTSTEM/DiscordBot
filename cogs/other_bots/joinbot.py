@@ -233,7 +233,7 @@ class JoinBot:
             self.log.info(f'{after} ({after.id}) changed their avatar from {before.avatar_url} to {after.avatar_url}')
 
             # This whole thing is hacky. Awaiting d.py update to fix.
-            for guild in self.guilds:
+            for guild in self.bot.guilds:
                 if guild.large:
                     # This is spammy on the console in lage guilds
                     await self.bot.request_offline_members(guild)
