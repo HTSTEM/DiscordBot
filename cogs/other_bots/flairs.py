@@ -67,7 +67,7 @@ class Flairs:
             if len(names) > 1:
                 names[-1] = 'or {}'.format(names[-1])
             await message.channel.send(
-                'To join a team, say {}. To leave your team, say `!remove`'.format(', '.join(names))
+                'To join a team, say {}. To leave your team, say `{}remove`'.format(', '.join(names), prefix)
             )
 
         try:
