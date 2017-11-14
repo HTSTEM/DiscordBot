@@ -53,16 +53,16 @@ class JoinBot:
         text = text.strip()
 
         try:
-            args = int(args)
-            return guild.get_member(args)
+            text = int(text)
+            return guild.get_member(text)
         except ValueError:
             pass
 
         if text.startswith('<@') and text.endswith('>'):
             text = text[2:-1]
             try:
-                args = int(args)
-                return guild.get_member(args)
+                args = int(text)
+                return guild.get_member(text)
             except ValueError:
                 pass
 
