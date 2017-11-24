@@ -1,10 +1,8 @@
-from html.parser import HTMLParser
-
 from discord.ext import commands
 import discord
+import tokage
 
 from .util.checks import right_channel
-from .util import tokage
 
 
 class MyAnimeList:
@@ -23,17 +21,11 @@ class MyAnimeList:
 
         anime = await self.mal_client.get_anime(anime_id)
 
-        html = HTMLParser()
-        title = html.unescape(anime.title)
-        j_title = html.unescape(anime.japanese_title)
-        rating = html.unescape(anime.rating)
-        synopsis = html.unescape(anime.synopsis)
-
         embed = discord.Embed()
         embed=discord.Embed(
-            title=j_title,
+            title=anime.japanese_title,
             url=anime.link,
-            description=f'**{title}** ({rating})\n{synopsis}')
+            description=f'**{anime.title}** ({anime.rating})\n{anime.synopsis}')
         embed.set_thumbnail(url=anime.image)
         embed.add_field(name="Score", value=f'{anime.score[0]} ({anime.score[1]} reviews)', inline=True)
         embed.add_field(name="Rank", value=f'#{anime.rank}', inline=True)
