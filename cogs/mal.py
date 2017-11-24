@@ -1,11 +1,10 @@
 from html.parser import HTMLParser
 
-import tokage
-
 from discord.ext import commands
 import discord
 
 from .util.checks import right_channel
+from .util import tokage
 
 
 class MyAnimeList:
