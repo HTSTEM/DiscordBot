@@ -9,6 +9,10 @@ def is_staff():
         return ctx.author.guild_permissions.manage_channels
     return commands.check(predicate)
 
+def is_owner():
+    def predicate(ctx: commands.Context) -> bool:
+        return ctx.author.id == ctx.bot.config['ids']['host']
+    return commands.check(predicate)
 
 def is_developer():
     # Add owner bypass
