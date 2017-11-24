@@ -7,7 +7,7 @@ from discord.ext import commands
 import ruamel.yaml as yaml
 import discord
 
-from .util.checks import right_channel, is_developer, is_staff
+from .util.checks import right_channel, is_developer, is_owner
 
 
 class Core:
@@ -98,7 +98,7 @@ class Core:
         await ctx.send('`Git` response: ```diff\n{}\n{}```'.format(stdout, stderr))
 
     @commands.command(aliases=['eval'])
-    @commands.is_owner()
+    @is_owner()
     async def debug(self, ctx, *, code: str):
         '''Evaluates code'''
 
