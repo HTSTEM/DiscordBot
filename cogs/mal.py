@@ -23,7 +23,7 @@ class MyAnimeList:
 
         synopsis = anime.synopsis
         if len(synopsis) > 500:
-            synopsis = synopsis[:500]
+            synopsis = synopsis[:500].strip()
             synopsis += f'... [Read more]({anime.link})'
 
         embed = discord.Embed()
