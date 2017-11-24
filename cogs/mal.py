@@ -21,11 +21,16 @@ class MyAnimeList:
 
         anime = await self.mal_client.get_anime(anime_id)
 
+        synopsis = anime.synopsis
+        if len(synopsis) > 500:
+            synopsis = synopsis[:500].strip()
+            synopsis += f'... [Read more]({anime.link})'
+
         embed = discord.Embed()
         embed=discord.Embed(
             title=anime.japanese_title,
             url=anime.link,
-            description=f'**{anime.title}** ({anime.rating})\n{anime.synopsis}')
+            description=f'**{anime.title}** ({anime.rating})\n{synopsis}')
         embed.set_thumbnail(url=anime.image)
         embed.add_field(name="Score", value=f'{anime.score[0]} ({anime.score[1]} reviews)', inline=True)
         embed.add_field(name="Rank", value=f'#{anime.rank}', inline=True)
