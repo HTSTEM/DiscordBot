@@ -22,8 +22,8 @@ class MyAnimeList:
         anime = await self.mal_client.get_anime(anime_id)
 
         synopsis = anime.synopsis
-        if len(synopsis) > 1000:
-            synopsis = synopsis[1000:]
+        if len(synopsis) > 500:
+            synopsis = synopsis[500:]
             synopsis += f' [Read more]({anime.link})'
 
         embed = discord.Embed()
