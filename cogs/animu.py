@@ -5,7 +5,7 @@ import tokage
 from .util.checks import right_channel
 
 
-class MyAnimeList:
+class Animu:
     def __init__(self, bot):
         self.bot = bot
         self.mal_client = tokage.Client()
@@ -26,7 +26,7 @@ class MyAnimeList:
         anime = await self.mal_client.get_anime(anime_id)
 
         synopsis = anime.synopsis
-        
+
         if len(synopsis) > 500:
             synopsis = synopsis[:500].strip()
             synopsis += f'... [Read more]({anime.link})'
@@ -51,4 +51,4 @@ class MyAnimeList:
 
 
 def setup(bot):
-    bot.add_cog(MyAnimeList(bot))
+    bot.add_cog(Animu(bot))
