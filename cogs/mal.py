@@ -15,13 +15,18 @@ class MyAnimeList:
 
     @commands.command()
     async def mal(self, ctx, *, query:str):
-        anime_id = await self.mal_client.search_id('anime', query)
+        try:
+            anime_id = await self.mal_client.search_id('anime', query)
+        except tokage.errors.TokageNotFound:
+            anime_id = None
+
         if anime_id is None:
             return await ctx.send('No anime found. Sorry.')
 
         anime = await self.mal_client.get_anime(anime_id)
 
         synopsis = anime.synopsis
+        
         if len(synopsis) > 500:
             synopsis = synopsis[:500].strip()
             synopsis += f'... [Read more]({anime.link})'
