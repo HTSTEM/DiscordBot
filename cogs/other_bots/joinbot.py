@@ -230,7 +230,9 @@ class JoinBot:
 
             await self.broadcast_message(msg, after.guild)
         elif before.avatar_url != after.avatar_url:
-            self.log.info(f'{after} ({after.id}) changed their avatar from {before.avatar_url} to {after.avatar_url}')
+            before_avatar = before.avatar_url_as('png')
+            aftere_avatar = after.avatar_url_as('png')
+            self.log.info(f'{after} ({after.id}) changed their avatar from {before_avatar} to {after_avatar}')
 
             # This whole thing is hacky. Awaiting d.py update to fix.
             for guild in self.bot.guilds:
@@ -239,10 +241,10 @@ class JoinBot:
                     await self.bot.request_offline_members(guild)
 
                 if after in guild.members:
-                    msg = f':frame_photo: User **{before}** changed their avatar from {before.avatar_url} ..'
+                    msg = f':frame_photo: User **{before}** changed their avatar from {before_avatar} ..'
                     await self.broadcast_message(msg, guild, avatar=True)
 
-                    msg = f'.. to {after.avatar_url} ({before.mention})'
+                    msg = f'.. to {after_avatar} ({before.mention})'
                     await self.broadcast_message(msg, guild, avatar=True)
 
 
