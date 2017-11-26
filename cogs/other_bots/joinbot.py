@@ -231,7 +231,7 @@ class JoinBot:
             await self.broadcast_message(msg, after.guild)
         elif before.avatar_url != after.avatar_url:
             before_avatar = before.avatar_url_as(format='png')
-            aftere_avatar = after.avatar_url_as(format='png')
+            after_avatar = after.avatar_url_as(format='png')
             self.log.info(f'{after} ({after.id}) changed their avatar from {before_avatar} to {after_avatar}')
 
             # This whole thing is hacky. Awaiting d.py update to fix.
