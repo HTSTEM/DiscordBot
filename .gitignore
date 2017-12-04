@@ -17,3 +17,6 @@ cache.md
 cache.txt
 map.yml
 htstars.sqlite
+
+# editor configs
+.vscode

@@ -142,6 +142,19 @@ class Misc:
         await ctx.send('Done!')
     
     @commands.command()
+    async def patroncheck(self, ctx)
+        '''Checks for uses with the Bot Supporter role on HTC'''
+        htc = client.get_guild(guild_id)
+        roles = htc.roles
+        patreonrole = discord.utils.get(roles,name="BotSupporter")
+        patrons = []
+        if htc.large: await client.request_offline_members(htc)
+        for user in htc.users:
+            if patreonrole in user.roles:
+                patrons.add(user)
+        await ctx.send({}).format(patrons)
+
+    @commands.command()
     async def roll(self, ctx, sides: int, how_many_dice: int = 1):
         '''Rolls a dice.'''
         if sides < 1 or how_many_dice < 1:
