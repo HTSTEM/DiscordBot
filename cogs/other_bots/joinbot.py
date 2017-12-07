@@ -202,6 +202,8 @@ class JoinBot:
 
     async def on_member_ban(self, guild, member):
         self.bannedusers[guild.id] = member.id
+        # Wait for the entry to appear in the audit logs
+        await asyncio.sleep(3)
 
         event = await guild.audit_logs(action=discord.AuditLogAction.ban, limit=1).flatten()
         event = event[0]
