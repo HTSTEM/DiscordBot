@@ -142,7 +142,7 @@ class Misc:
         await ctx.send('Done!')
     
     @commands.command()
-    async def patroncheck(self, ctx)
+    async def patroncheck(self, ctx):
         '''Checks for uses with the Bot Supporter role on HTC'''
         htc = client.get_guild(guild_id)
         roles = htc.roles

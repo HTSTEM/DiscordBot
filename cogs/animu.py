@@ -3,12 +3,15 @@ import discord
 import tokage
 
 from .util.checks import right_channel
+from .util.da import DeviationCollector
 
 
 class Animu:
     def __init__(self, bot):
         self.bot = bot
         self.mal_client = tokage.Client()
+        
+        self.dc = DeviationCollector(bot)
 
     async def __local_check(self, ctx):
         return right_channel(ctx)
@@ -48,6 +51,10 @@ class Animu:
         embed.set_footer(text=' | '.join(anime.genres))
 
         await ctx.send(embed=embed)
+
+    @commands.command(aliases=['wall'])
+    async def wallpaper(self, ctx):
+        await ctx.send(await self.dc.get_random_deviation(self.bot.loop))
 
 
 def setup(bot):
