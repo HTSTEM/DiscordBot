@@ -2,6 +2,7 @@ import random
 import json
 import os
 
+from fuzzywuzzy import process
 import deviantart
 
 
@@ -54,13 +55,16 @@ class DeviationCollector:
         self.deviations = set()
 
         for n, folder in enumerate(folders):
+            if folder['name'] == 'Featured':
+                continue
+
             has_more = True
             offset = 0
             while has_more:
                 res = self.da.get_gallery_folder(ANIMOO, folder['folderid'], limit=PAGINATE_SIZE, offset=offset)
                 for r in res['results']:
                     if r.content is not None and 'src' in r.content:
-                        self.deviations.add(r.content.get('src'))
+                        self.deviations.add((r.content.get('src'), r.title, folder['name']))
 
                 has_more = res['has_more']
                 offset = res['next_offset']
@@ -69,12 +73,26 @@ class DeviationCollector:
 
         self.deviations = list(self.deviations)
 
-    def _get_random_deviation(self):
-        deviation = None
-        while deviation is None:
-            deviation = random.choice(self.deviations)
+    async def get_deviation(self, loop, search_term):
+        deviation = await self._get_deviation(loop, search_term)
+        return f'I found **{deviation[1]}** from **{deviation[2]}**:\n{deviation[0]}'
 
-        return deviation
+    async def _get_deviation(self, loop, search_term):
+        search_term = search_term.strip()
+        anime = False
+        if search_term.startswith('a:'):
+            search_term = search_term[2:]
+            anime = True
 
-    async def get_random_deviation(self, loop):
-        return await loop.run_in_executor(None, self._get_random_deviation)
+        if not search_term:
+            return random.choice(self.deviations)
+
+        if anime:
+            folders = set()
+            for i in self.deviations:
+                folders.add(i[2])
+            folder = process.extractOne(search_term, folders)[0]
+
+            return random.choice([i for i in self.deviations if i[2] == folder])
+
+        return process.extractOne(search_term, self.deviations, processor=lambda x:x[1])[0]

@@ -10,7 +10,7 @@ class Animu:
     def __init__(self, bot):
         self.bot = bot
         self.mal_client = tokage.Client()
-        
+
         self.dc = DeviationCollector(bot)
 
     async def __local_check(self, ctx):
@@ -53,8 +53,8 @@ class Animu:
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['wall'])
-    async def wallpaper(self, ctx):
-        await ctx.send(await self.dc.get_random_deviation(self.bot.loop))
+    async def wallpaper(self, ctx, *, query:str=''):
+        await ctx.send(await self.dc.get_deviation(self.bot.loop, query))
 
 
 def setup(bot):
