@@ -48,7 +48,7 @@ class PFPGrabber:
             return jdata.get('results')
     
     async def get_image(self, term):
-        term = f'anime {term}'
+        term = f'{term} profile picture'
         
         results = await self._search(term)
         random.shuffle(results)
