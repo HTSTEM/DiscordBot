@@ -9,6 +9,7 @@ from pybooru import Danbooru
 
 from .util.checks import right_channel
 from .util.da import DeviationCollector
+from .util.pfp_gen import PFPGrabber
 
 
 class Animu:
@@ -17,6 +18,8 @@ class Animu:
         self.mal_client = tokage.Client()
 
         self.dc = DeviationCollector(bot)
+        self.pg = PFPGrabber(bot)
+        
         creds = bot.config['danbooru']
         self.danb = Danbooru('danbooru', username=creds.get('user'), api_key=creds.get('key'))
 
@@ -85,6 +88,15 @@ class Animu:
 
         await ctx.send(f'<{fileurl}>') # antiembed for accidental lewdness prevention
 
+    @commands.command()
+    async def pfp(self, ctx, *, query:str):
+        '''Search the internet for a nice square anime picture for you'''
+        image = await self.pg.get_image(query)
+        
+        if image is None:
+            return await ctx.send('No results found')
+        
+        return await ctx.send(f'I found {image}')
 
 def setup(bot):
     bot.add_cog(Animu(bot))
