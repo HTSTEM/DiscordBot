@@ -111,7 +111,7 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
                         await message.channel.send(m)
 
     def escape(self, message):
-        return message.replace('@', '@\u200b').replace('`', '\\`').replace('*', '\\*').replace('_', '\\_')
+        return message.replace('@', '@\u200b').replace('`', '\\`').replace('*', '\\*').replace('_', '\\_').replace('舦', ' •')
 
     def lookup_rule(self, code):
         if len(code) < 2:
