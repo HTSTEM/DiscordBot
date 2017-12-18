@@ -69,7 +69,10 @@ class Animu:
 
     @commands.command()
     async def danbooru(self, ctx, *tags):
-        '''Search Danbooru tags. Safe mode is enabled, but be careful nonetheless'''
+        '''
+        Search Danbooru tags.
+        Safe mode is enabled, but be careful.
+        '''
         tags = [s.replace(' ', '_') for s in tags]
         if len(tags) > 2:
             await ctx.send('Only 2 tags are allowed, taking the first 2.')
