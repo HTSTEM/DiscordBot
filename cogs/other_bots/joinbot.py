@@ -2,6 +2,7 @@ import traceback
 import datetime
 import asyncio
 import logging
+import os
 
 import discord
 
@@ -29,6 +30,12 @@ AVATARLOGS = {
 
 PREFIX = '!'
 
+LOGGING_INVITES = [
+    'Qct6pAM',  # Primary invite
+    'GVEB7yt',  # BFB
+]
+INVITES_FILE = 'invites.log'
+
 
 class JoinBot:
     def __init__(self, bot):
@@ -39,6 +46,10 @@ class JoinBot:
         self.log = logging.getLogger(f'JoinBot')
 
         self.bannedusers = {}
+        
+        if not os.path.exists(INVITES_FILE):
+            open(INVITES_FILE, 'w').close()
+        self.invite_uses = {}
 
     @staticmethod
     def clear_formatting(in_string):
@@ -48,6 +59,17 @@ class JoinBot:
             out_string = "[empty string]"
 
         return out_string
+
+    async def count_uses(self):
+        htc = self.bot.get_guild(GUILDS['HTC'])
+        uses = {}
+        for i in await htc.invites():
+            if i.code in LOGGING_INVITES:
+                uses[i.code] = i.uses
+        return uses
+
+    async def on_ready(self):
+        self.invite_uses = await self.count_uses()
 
     async def get_user(self, text, guild):
         text = text.strip()
@@ -160,6 +182,17 @@ class JoinBot:
     async def on_member_join(self, member):
         if member.guild.id == GUILDS['HTC']:
             await self.bot.change_presence(game=discord.Game(name=f'for {member.guild.member_count} users'))
+            
+            await asyncio.sleep(0.5)  # Wait for invites to update to be safe
+            new_uses = await self.count_uses()
+            upped = []
+            for i in new_uses:
+                if new_uses[i] > self.invite_uses[i]:
+                    upped.append(i)
+            with open(INVITES_FILE, 'a') as f:
+                f.write(f'{",".join(upped)}|{member}\n')
+                self.log.info(f'{member.name} used invite: {", ".join(upped)}')
+            self.invite_uses = new_uses
 
         time_now = datetime.datetime.utcnow()
 

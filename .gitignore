@@ -18,6 +18,7 @@ cache.txt
 map.yml
 htstars.sqlite
 da_cache.json
+invites.log
 
 # editor configs
 .vscode
