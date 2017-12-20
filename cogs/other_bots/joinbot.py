@@ -199,7 +199,10 @@ class JoinBot:
         self.log.info(f'A user joined {member.guild.name}: {member} ({member.id})`')
 
         msg = f':white_check_mark: {member.mention} (`{member}` User #{member.guild.member_count}) '
-        msg += f'user joined the server with invite `{", ".join(upped)}`.'
+        if member.guild.id == GUILDS['HTC'] and upped:
+            msg += f'user joined the server with invite `{", ".join(upped)}`.'
+        else:
+            msg += f'user joined the server.'
         if not member.avatar_url:
             msg += '\n:no_mouth: User doesn\'t have an avatar.'
 
