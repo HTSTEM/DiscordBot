@@ -180,6 +180,8 @@ class JoinBot:
         pass
 
     async def on_member_join(self, member):
+        if len(self.invite_uses) == 0:
+            await self.on_ready()
         if member.guild.id == GUILDS['HTC']:
             await self.bot.change_presence(game=discord.Game(name=f'for {member.guild.member_count} users'))
             
@@ -199,7 +201,7 @@ class JoinBot:
         self.log.info(f'A user joined {member.guild.name}: {member} ({member.id})`')
 
         msg = f':white_check_mark: {member.mention} (`{member}` User #{member.guild.member_count}) '
-        msg += f'user joined the server with invite `{upped}`.'
+        msg += f'user joined the server with invite `{", ".join(upped)}`.'
         if not member.avatar_url:
             msg += '\n:no_mouth: User doesn\'t have an avatar.'
 
