@@ -58,6 +58,7 @@ class Spoilers:
         elif command in ['help']:
             msg  = f'**SpoilerBot Help:**\n'
             msg += f'- Type `{PREFIX}spoil_me` to gain access to spoilers.\n'
+            msg += f'- Type `{PREFIX}spoil_forever` to gain access to spoilers forever.\n'
             msg += f'- Type `{PREFIX}remove` to revoke access.'
             await message.channel.send(msg)
 
