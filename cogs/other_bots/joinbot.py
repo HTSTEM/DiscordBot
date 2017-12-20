@@ -180,7 +180,7 @@ class JoinBot:
         if member.guild.id == GUILDS['HTC']:
             await self.bot.change_presence(game=discord.Game(name=f'for {member.guild.member_count} users'))
 
-            await asyncio.sleep(2)  # Wait for invites to update to be safe
+            await asyncio.sleep(2)  # Wait for invites to update to be safe
             new_uses = await self.count_uses()
             upped = []
 
