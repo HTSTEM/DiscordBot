@@ -50,6 +50,7 @@ class JoinBot:
         if not os.path.exists(INVITES_FILE):
             open(INVITES_FILE, 'w').close()
         self.invite_uses = {}
+        asyncio.ensure_future(self.count_uses_on_reload())
 
     @staticmethod
     def clear_formatting(in_string):
@@ -68,7 +69,8 @@ class JoinBot:
                 uses[i.code] = i.uses
         return uses
 
-    async def on_ready(self):
+    async def count_uses_on_reload(self):
+        await self.bot.wait_until_ready()
         self.invite_uses = await self.count_uses()
 
     async def get_user(self, text, guild):
@@ -180,8 +182,6 @@ class JoinBot:
         pass
 
     async def on_member_join(self, member):
-        if len(self.invite_uses) == 0:
-            await self.on_ready()
         if member.guild.id == GUILDS['HTC']:
             await self.bot.change_presence(game=discord.Game(name=f'for {member.guild.member_count} users'))
             
