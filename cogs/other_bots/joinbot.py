@@ -34,7 +34,7 @@ LOGGING_INVITES = [
     'Qct6pAM',  # Primary invite
     'GVEB7yt',  # BFB
 ]
-INVITES_FILE = 'invites.log'
+INVITES_FILE = 'files/invites.log'
 
 
 class JoinBot:
