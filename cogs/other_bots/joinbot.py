@@ -196,9 +196,10 @@ class JoinBot:
 
         time_now = datetime.datetime.utcnow()
 
-        self.log.info(f'A user joined {member.guild.name}: {member} ({member.id})')
+        self.log.info(f'A user joined {member.guild.name}: {member} ({member.id})`')
 
-        msg = f':white_check_mark: {member.mention} (`{member}` User #{member.guild.member_count}) user joined the server.'
+        msg = f':white_check_mark: {member.mention} (`{member}` User #{member.guild.member_count}) '
+        msg += f'user joined the server with invite `{upped}`.'
         if not member.avatar_url:
             msg += '\n:no_mouth: User doesn\'t have an avatar.'
 
