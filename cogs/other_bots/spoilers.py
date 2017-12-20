@@ -22,6 +22,8 @@ class Spoilers:
         
         if command in ['spoilerwall', 'spoiler_wall']:
             if message.channel.permissions_for(message.author).manage_channels:
+                if message.guild.large:
+                    await self.bot.request_offline_members(message.guild)
                 for member in message.guild.members:
                     if spoiler_role in member.roles:
                         await member.remove_roles(spoiler_role)
