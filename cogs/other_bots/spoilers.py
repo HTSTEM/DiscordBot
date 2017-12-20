@@ -4,6 +4,7 @@ import discord
 PREFIX = "s!"
 HTC = 184755239952318464
 SPOILER_ROLE = 392842859931369483
+SADAMA_ROLE = 392847202575187970
 
 
 class Spoilers:
@@ -19,6 +20,7 @@ class Spoilers:
         command = message.content.split(' ')[0][len(PREFIX):].lower()
 
         spoiler_role = discord.utils.get(message.guild.roles, id=SPOILER_ROLE)
+        sadama_role = discord.utils.get(message.guild.roles, id=SADAMA_ROLE)
         
         if command in ['spoilerwall', 'spoiler_wall']:
             if message.channel.permissions_for(message.author).manage_channels:
@@ -32,21 +34,31 @@ class Spoilers:
             else:
                 pass  # You can't do this, suckah'
         elif command in ['spoilers', 'spoil', 'spoilme', 'spoil_me', 'access']:
-            if spoiler_role not in message.author.roles:
+            if spoiler_role not in message.author.roles and sadama_role not in message.author.roles:
                 await message.author.add_roles(spoiler_role)
                 await message.channel.send('You can now view the spoilers channel.', delete_after=10)
             else:
                 await message.channel.send('You already have access to the spoilers channel.', delete_after=10)
-        elif command in ['remove']:
+        
+        elif command in ['spoil_forever']:
             if spoiler_role in message.author.roles:
                 await message.author.remove_roles(spoiler_role)
+            if sadama_role not in message.author.roles:
+                await message.author.add_roles(sadama_role)
+                await message.channel.send('You can now view the spoilers channel forever.', delete_after=10)
+            else:
+                await message.channel.send('You already have access to the spoilers channel forever.', delete_after=10)
+        
+        elif command in ['remove']:
+            if spoiler_role in message.author.roles or sadama_role in message.author.roles:
+                await message.author.remove_roles(spoiler_role, sadama_role)
                 await message.channel.send('You can now no longer view the spoilers channel.', delete_after=10)
             else:
                 await message.channel.send('You already don\'t have access to the spoilers channel.', delete_after=10)
         elif command in ['help']:
             msg  = f'**SpoilerBot Help:**\n'
             msg += f'- Type `{PREFIX}spoil_me` to gain access to spoilers.\n'
-            msg += f'- Type `{PREFIX}remove` to loose access.'
+            msg += f'- Type `{PREFIX}remove` to revoke access.'
             await message.channel.send(msg)
 
 
