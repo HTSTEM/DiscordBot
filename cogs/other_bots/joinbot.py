@@ -184,17 +184,23 @@ class JoinBot:
     async def on_member_join(self, member):
         if member.guild.id == GUILDS['HTC']:
             await self.bot.change_presence(game=discord.Game(name=f'for {member.guild.member_count} users'))
-            
-            await asyncio.sleep(0.5)  # Wait for invites to update to be safe
-            new_uses = await self.count_uses()
             upped = []
-            for i in new_uses:
-                if new_uses[i] > self.invite_uses[i]:
-                    upped.append(i)
-            with open(INVITES_FILE, 'a') as f:
-                f.write(f'{",".join(upped)}|{member}\n')
-                self.log.info(f'{member.name} used invite: {", ".join(upped)}')
-            self.invite_uses = new_uses
+            new_uses = []
+            for _ in range(10):
+                new_uses = await self.count_uses()
+                for i in new_uses:
+                    if new_uses[i] > self.invite_uses[i]:
+                        upped.append(i)
+                with open(INVITES_FILE, 'a') as f:
+                    f.write(f'{",".join(upped)}|{member}\n')
+                    self.log.info(f'{member.name} used invite: {", ".join(upped)}')
+                if len(upped) > 0:
+                    self.invite_uses = new_uses
+                    break
+                else:
+                    await asyncio.sleep(0.5)  # Wait for invites to update to be safe
+            else:
+                self.invite_uses = new_uses
 
         time_now = datetime.datetime.utcnow()
 
