@@ -47,7 +47,7 @@ class Spoilers:
                 is_channel = m.channel == message.channel
                 return is_author and is_channel
 
-            await ctx.send('Are you **sure** you want to do this? You will have this role **forever**. (Type `y` to continue)', delete_after=10)
+            await message.channel.send('Are you **sure** you want to do this? You will have this role **forever**. (Type `y` to continue)', delete_after=10)
             response_message = await client.wait_for('message', check=check)
             if response_message.content.lower() != 'y':
                 return message.channel.send('Aborted.', delete_after=10)
