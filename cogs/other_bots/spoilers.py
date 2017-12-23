@@ -1,5 +1,5 @@
 import discord
-
+import asyncio
 
 PREFIX = "s!"
 HTC = 184755239952318464
@@ -51,8 +51,12 @@ class Spoilers:
                 return is_author and is_channel
 
             await message.channel.send('Are you **sure** you want to do this? You will have this role **forever**. (Type `I consent` to continue)', delete_after=10)
-            response_message = await self.bot.wait_for('message', check=check)
-            if response_message.content.lower() != 'i consent':
+            try:
+                response_message = await self.bot.wait_for('message', check=check, timeout=10)
+            except asyncio.TimeoutError:
+                response_message = None
+
+            if response_message is None or response_message.content.lower() != 'i consent':
                 message.channel.send('Aborted.', delete_after=10)
                 try:
                     await message.delete()
