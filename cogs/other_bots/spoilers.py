@@ -41,6 +41,17 @@ class Spoilers:
                 await message.channel.send('You already have access to the spoilers channel.', delete_after=10)
 
         elif command in ['spoil_forever', 'spoilforever']:
+            def check(m):
+                if not m.content: return False
+                is_author = m.author == message.author
+                is_channel = m.channel == message.channel
+                return is_author and is_channel
+
+            await ctx.send('Are you **sure** you want to do this? You will have this role **forever**. (Type `y` to continue)', delete_after=10)
+            response_message = await ctx.bot.wait_for('message', check=check)
+            if response_message.content.lower() != 'y':
+                return message.channel.send('Aborted.', delete_after=10)
+
             if spoiler_role in message.author.roles:
                 await message.author.remove_roles(spoiler_role)
             if sadama_role not in message.author.roles:
