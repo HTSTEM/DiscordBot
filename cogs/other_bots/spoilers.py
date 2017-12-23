@@ -60,7 +60,8 @@ class Spoilers:
                 message.channel.send('Aborted.', delete_after=10)
                 try:
                     await message.delete()
-                    await response_message.delete()
+                    if response_message is not None:
+                        await response_message.delete()
                 except discord.Forbidden:
                     pass
                 return
