@@ -127,7 +127,7 @@ class BFB:
                                 delete_after=5
                             )
                             try: await message.delete()
-                            except: pass
+                            except discord.Forbidden: pass
 
 
         except Exception as e:

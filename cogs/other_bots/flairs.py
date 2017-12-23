@@ -120,7 +120,7 @@ class Flairs:
                             )
                             try:
                                 await message.delete()
-                            except:
+                            except discord.Forbidden:
                                 pass
         except Exception as e:
             if debug:

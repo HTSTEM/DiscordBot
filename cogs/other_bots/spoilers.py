@@ -40,6 +40,9 @@ class Spoilers:
             else:
                 await message.channel.send('You already have access to the spoilers channel.', delete_after=10)
 
+            try: await message.delete()
+            except discord.Forbidden: pass
+
         elif command in ['spoil_forever', 'spoilforever']:
             def check(m):
                 if not m.content: return False
@@ -50,7 +53,10 @@ class Spoilers:
             await message.channel.send('Are you **sure** you want to do this? You will have this role **forever**. (Type `I consent` to continue)', delete_after=10)
             response_message = await self.bot.wait_for('message', check=check)
             if response_message.content.lower() != 'i consent':
-                return message.channel.send('Aborted.', delete_after=10)
+                message.channel.send('Aborted.', delete_after=10)
+                try: await message.delete()
+                except discord.Forbidden: pass
+                return
 
             if spoiler_role in message.author.roles:
                 await message.author.remove_roles(spoiler_role)
@@ -60,12 +66,19 @@ class Spoilers:
             else:
                 await message.channel.send('You already have access to the spoilers channel forever.', delete_after=10)
 
+            try:  await message.delete()
+            except discord.Forbidden: pass
+
         elif command in ['remove']:
             if spoiler_role in message.author.roles or sadama_role in message.author.roles:
                 await message.author.remove_roles(spoiler_role, sadama_role)
                 await message.channel.send('You can now no longer view the spoilers channel.', delete_after=10)
             else:
                 await message.channel.send('You already don\'t have access to the spoilers channel.', delete_after=10)
+
+            try:  await message.delete()
+            except discord.Forbidden: pass
+
         elif command in ['help']:
             msg  = f'**SpoilerBot Help:**\n'
             msg += f'- Type `{PREFIX}spoil_me` to gain access to spoilers.\n'
