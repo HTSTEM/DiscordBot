@@ -185,8 +185,9 @@ class JoinBot:
             upped = []
 
             for i in new_uses:
-                if new_uses[i] > self.invite_uses[i]:
+                if i not in self.invite_uses or new_uses[i] > self.invite_uses[i]:
                     upped.append(i)
+
 
             with open(INVITES_FILE, 'a') as f:
                 f.write(f'{",".join(upped)}|{member}\n')
