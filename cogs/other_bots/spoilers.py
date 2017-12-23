@@ -54,8 +54,11 @@ class Spoilers:
             response_message = await self.bot.wait_for('message', check=check)
             if response_message.content.lower() != 'i consent':
                 message.channel.send('Aborted.', delete_after=10)
-                try: await message.delete()
-                except discord.Forbidden: pass
+                try:
+                    await message.delete()
+                    await response_message.delete()
+                except discord.Forbidden:
+                    pass
                 return
 
             if spoiler_role in message.author.roles:
@@ -66,8 +69,11 @@ class Spoilers:
             else:
                 await message.channel.send('You already have access to the spoilers channel forever.', delete_after=10)
 
-            try:  await message.delete()
-            except discord.Forbidden: pass
+            try:
+                await message.delete()
+                await response_message.delete()
+            except discord.Forbidden:
+                pass
 
         elif command in ['remove']:
             if spoiler_role in message.author.roles or sadama_role in message.author.roles:
