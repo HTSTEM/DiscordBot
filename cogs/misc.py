@@ -268,11 +268,11 @@ class Misc:
             a = a + (2, 4)[a % 10 == 3]  # Skips 5s and even numbers
         return await ctx.send('Prime! {} is only divisible by 1 and itself.'.format(num))
 
-    @commands.command(aliases=['tatsukete_eirin', 'eirin'])
+    @commands.command()
     async def help(self, ctx, *args):
         """This help message"""
         if len(args) == 0:
-            cats = [cog for cog in self.bot.cogs]
+            cats = [cog for cog in self.bot.cogs if self.bot.get_cog_commands(cog)]
             cats.sort()
             width = max([len(cat) for cat in cats]) + 2
             d = '**Categories:**\n'
@@ -285,7 +285,7 @@ class Misc:
             d += 'Use `{0}help <command>` to get in depth help for a command.\n'.format(ctx.prefix)
 
         elif len(args) == 1:
-            cats = {cog.lower(): cog for cog in self.bot.cogs}
+            cats = {cog.lower(): cog for cog in self.bot.cogs if self.bot.get_cog_commands(cog)}
             if args[0].lower() in cats:
                 cog_name = cats[args[0].lower()]
                 d = 'Commands in category **`{}`**:\n'.format(cog_name)
@@ -302,7 +302,7 @@ class Misc:
                 d += '\n'
             else:
                 if args[0] not in ctx.bot.all_commands:
-                    d = 'Unyu?'
+                    d = 'Command not found.'
                 else:
                     cmd = ctx.bot.all_commands[args[0]]
                     d = self.get_help(ctx, cmd)
@@ -320,9 +320,9 @@ class Misc:
                     cmd_name += cmd.name + ' '
                 else:
                     if cmd == ctx.bot:
-                        d += 'Unyu?'
+                        d += 'Command not found.'
                     else:
-                        d += 'Unyu?'
+                        d += 'Command not found.'
                     break
 
             else:
