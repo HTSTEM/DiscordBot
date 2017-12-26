@@ -1,6 +1,7 @@
 import urllib.parse
 import random
 import time
+import aiohttp
 
 from discord.ext import commands
 import discord
@@ -11,11 +12,13 @@ from .util.checks import right_channel
 
 
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
+VT_API = 'https://www.virustotal.com/vtapi/v2'
 
 
 class Internet:
 
-    async def __local_check(self, ctx):
+    @staticmethod
+    async def __local_check(ctx):
         return right_channel(ctx)
 
     def __init__(self, bot):
@@ -24,40 +27,40 @@ class Internet:
 
     @commands.command(aliases=['adam', 'slice', 'jake', 'sills', 'zwei'])
     async def dog(self, ctx):
-        '''Sends a picture of a random dog'''
+        """Sends a picture of a random dog"""
         async with ctx.bot.session.get('http://random.dog/woof.json') as resp:
             json = await resp.json()
             await ctx.send(json['url'])
 
     @commands.command(aliases=['b1nzy'])
     async def cat(self, ctx):
-        '''Sends a picture of a random cat'''
+        """Sends a picture of a random cat"""
         async with ctx.bot.session.get('http://random.cat/meow') as resp:
             json = await resp.json()
             await ctx.send(json['file'])
 
     @commands.command(aliases=['g'])
     async def google(self, ctx, *, query: str):
-        '''Google for a query'''
+        """Google for a query"""
         op = urllib.parse.urlencode({'q': query})
         await ctx.send('https://google.com/search?{}&safe=active'.format(op))
 
     @commands.command(aliases=['wa', 'alpha', 'wolfram_alpha'])
     async def wolfram(self, ctx, *, query: str):
-        '''Search Wolfram|Alpha for a query'''
+        """Search Wolfram|Alpha for a query"""
         op = urllib.parse.urlencode({'i': query})
         await ctx.send('https://www.wolframalpha.com/input/?{}'.format(op))
 
     @commands.command()
     async def lucky(self, ctx, *, query: str):
-        '''I'm feeling lucky. Are you?'''
+        """I'm feeling lucky. Are you?"""
         op = urllib.parse.urlencode({'q': query})
         async with ctx.bot.session.get('https://google.com/search?{}&safe=active&&btnI'.format(op)) as resp:
             await ctx.send(resp.url)
 
     @commands.command(aliases=['paste.ee', 'upload'])
     async def paste(self, ctx, *, data: CleanedCode):
-        '''Upload data to https://paste.ee and return the URL'''
+        """Upload data to https://paste.ee and return the URL"""
 
         if isinstance(ctx.channel, discord.abc.PrivateChannel):
             title = "{0.display_name}#{0.discriminator}".format(ctx.author)
@@ -86,7 +89,7 @@ class Internet:
 
     @commands.group(invoke_without_command=True)
     async def xkcd(self, ctx, *, comic_number: int):
-        ''' Shows an XKCD comic by comic number. '''
+        """ Shows an XKCD comic by comic number. """
         latest = await self.fetch_comic_data(latest=True)
 
         if comic_number > latest['num']:
@@ -105,13 +108,13 @@ class Internet:
 
     @xkcd.command()
     async def latest(self, ctx):
-        ''' Shows the latest XKCD comic. '''
+        """ Shows the latest XKCD comic. """
         latest = await self.fetch_comic_data(latest=True)
         await self.post_comic(ctx, latest, latest['num'])
 
     @xkcd.command()
     async def random(self, ctx):
-        ''' Shows a random XKCD comic. '''
+        """ Shows a random XKCD comic. """
         latest = await self.fetch_comic_data(latest=True)
         comic_number = random.randint(1, latest['num'])
         target = await self.fetch_comic_data(comic_number)
@@ -120,7 +123,7 @@ class Internet:
 
     @commands.command(aliases=['latency'])
     async def ping(self, ctx):
-        '''Views websocket and message send latency.'''
+        """Views websocket and message send latency."""
         # Websocket latency
         results = []
         for shard in ctx.bot.shards.values():
@@ -137,6 +140,23 @@ class Internet:
         rtt_latency = round((rtt_after - rtt_before) * 1000)
 
         await message.edit(content='WS: **{0} ms**\nRTT: **{1} ms**'.format(', '.join(map(str, results)), rtt_latency))
+
+    @commands.command(aliases=['scan'])
+    @commands.cooldown(4, 60)
+    async def virustotal(self, ctx, url):
+        """Scan a url"""
+        key = self.bot.config['virustotal']
+        params = {'apikey': key, 'url': url}
+        async with aiohttp.ClientSession() as session:
+            async with session.post(VT_API+'/url/scan', data=params) as request:
+                response = await request.json()
+
+        if response['response_code'] == -1:
+            await ctx.send('Invalid url.')
+        elif 'permalink' not in response:
+            await ctx.send('Search failed. Are you sure you entered a valid url?')
+        else:
+            await ctx.send(f'Scan results found.\n{response["permalink"]}')
 
 
 def setup(bot):
