@@ -249,7 +249,7 @@ class JoinBot:
         reason = event.reason
         self.log.info(f'Reason: {reason}')
 
-        msg = f':hammer: {member.mention} (`{member}`) was :banana:'d from the server. Reason: {reason}'
+        msg = f':hammer: {member.mention} (`{member}`) was :banana:\'d from the server. Reason: {reason}'
         await self.broadcast_message(msg, guild)
 
     async def on_member_unban(self, guild, member):
