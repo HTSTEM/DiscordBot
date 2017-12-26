@@ -1,3 +1,4 @@
+import urllib.parse
 import httplib2
 import os
 import re
@@ -39,6 +40,11 @@ class RuleBot:
     async def on_message(self, message):
         if message.author == self.bot.user:
             return
+
+        if message.content.startswith('r.34 '):
+            s = message.content[5:]
+            if s:
+                return await message.channel.send(f'<https://google.com/search?safe=active&tbm=isch&q={urllib.parse.quote(s)}>')
 
         if message.content.startswith(PREFIX):
             command = message.content[len(PREFIX):]
