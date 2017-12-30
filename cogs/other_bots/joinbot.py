@@ -3,9 +3,9 @@ import datetime
 import asyncio
 import logging
 import os
-
+import shutil
+import requests
 import discord
-
 
 BOTE_SPAM = [282500390891683841, 290757101914030080, 207659596167249920]
 
@@ -80,8 +80,7 @@ class JoinBot:
         if text.startswith('<@') and text.endswith('>'):
             text = text[2:-1]
             try:
-                args = int(text)
-                return guild.get_member(text)
+                return guild.get_member(int(text))
             except ValueError:
                 pass
 
@@ -109,14 +108,14 @@ class JoinBot:
         if log_channel is not None:
             try:
                 await log_channel.send(msg)
-            except Exception:
+            except discord.DiscordException:
                 self.log.error('An issue occured while trying to send to a joinlog.')
                 traceback.print_exc()
 
         if backup_channel is not None:
             try:
                 await backup_channel.send(msg)
-            except Exception:
+            except discord.DiscordException:
                 self.log.error('An issue occured while trying to send to a backup.')
                 traceback.print_exc()
 
@@ -140,7 +139,7 @@ class JoinBot:
             if member is None:
                 await message.channel.send('No user found.')
             else:
-                username = self.clear_formatting(member.name)
+                # username = self.clear_formatting(member.name)
                 discrim = f'#{member.discriminator}'
 
                 nickname = 'None'
@@ -177,17 +176,16 @@ class JoinBot:
         pass
 
     async def on_member_join(self, member):
+        upped = []
         if member.guild.id == GUILDS['HTC']:
             await self.bot.change_presence(game=discord.Game(name=f'for {member.guild.member_count} users'))
 
             await asyncio.sleep(2)  # Wait for invites to update to be safe
             new_uses = await self.count_uses()
-            upped = []
 
             for i in new_uses:
                 if i not in self.invite_uses or new_uses[i] > self.invite_uses[i]:
                     upped.append(i)
-
 
             with open(INVITES_FILE, 'a') as f:
                 f.write(f'{",".join(upped)}|{member}\n')
@@ -216,7 +214,7 @@ class JoinBot:
                 msg += ':clock1: '
 
             msg += 'User\'s account was created at ' + creation_time.strftime("%m/%d/%Y %I:%M:%S %p")
-        except Exception:
+        except discord.DiscordException:
             self.log.error('Something happened while tryin\' to do the timestamp grabby thing:')
             traceback.print_exc()
 
@@ -229,7 +227,7 @@ class JoinBot:
         # Wait for the ban event to fire (if at all)
         await asyncio.sleep(0.25)
         if member.guild.id in self.bannedusers and \
-          member.id == self.bannedusers[member.guild.id]:
+         member.id == self.bannedusers[member.guild.id]:
             del self.bannedusers[member.guild.id]
             return
 
@@ -259,7 +257,7 @@ class JoinBot:
         await self.broadcast_message(msg, guild)
 
     async def on_member_update(self, before, after):
-        #if before.guild.id == 81384788765712384: return
+        # if before.guild.id == 81384788765712384: return
 
         if before.name != after.name:
             self.log.info(f'A user ({before.id}) changed their name from {before} to {after}')
@@ -272,7 +270,13 @@ class JoinBot:
         elif before.avatar_url != after.avatar_url:
             before_avatar = before.avatar_url_as(format='png')
             after_avatar = after.avatar_url_as(format='png')
+            to_save = after.avatar_url_as(format='jpg', size=512)
             self.log.info(f'{after} ({after.id}) changed their avatar from {before_avatar} to {after_avatar}')
+            r = requests.get(to_save, stream=True)
+            if r.status_code == 200:
+                with open(f'/var/www/{to_save.split("/")[-1].split("?")[0]}', 'wb') as f:
+                    r.raw.decode_content = True
+                    shutil.copyfileobj(r.raw, f)
 
             # This whole thing is hacky. Awaiting d.py update to fix.
             for guild in self.bot.guilds:
