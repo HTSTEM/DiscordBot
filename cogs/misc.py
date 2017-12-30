@@ -205,7 +205,7 @@ class Misc:
         for user in htc.members:
             if patreonrole in user.roles:
                 patrons.add(user)
-        await ctx.send("{}").format(", ".join(patrons))
+        await ctx.send("{}".format(", ".join(patrons)))
 
     @commands.command()
     async def roll(self, ctx, sides: int, how_many_dice: int = 1):
