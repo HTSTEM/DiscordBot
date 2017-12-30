@@ -201,10 +201,10 @@ class Misc:
         htc = self.bot.get_guild(184755239952318464)
         roles = htc.roles
         patreonrole = discord.utils.get(roles, name="BotSupporter")
-        patrons = set()
+        patrons = []
         for user in htc.members:
             if patreonrole in user.roles:
-                patrons.add(user)
+                patrons.append(user)
         await ctx.send("{}".format(", ".join(patrons)))
 
     @commands.command()
