@@ -42,7 +42,7 @@ class JoinBot:
         self.log = logging.getLogger(f'JoinBot')
 
         self.bannedusers = {}
-        
+
         if not os.path.exists(INVITES_FILE):
             open(INVITES_FILE, 'w').close()
         self.invite_uses = {}
@@ -189,7 +189,7 @@ class JoinBot:
 
             with open(INVITES_FILE, 'a') as f:
                 f.write(f'{",".join(upped)}|{member}\n')
-            
+
             self.log.info(f'{member.name} used invite: {", ".join(upped)}')
             self.invite_uses = new_uses
 
@@ -273,10 +273,13 @@ class JoinBot:
             to_save = after.avatar_url_as(format='jpg', size=512)
             self.log.info(f'{after} ({after.id}) changed their avatar from {before_avatar} to {after_avatar}')
             r = requests.get(to_save, stream=True)
+
+            avatar_path = f'avatars/{to_save.split("/")[-1].split("?")[0]}'
             if r.status_code == 200:
-                with open(f'/var/www/avatars/{to_save.split("/")[-1].split("?")[0]}', 'wb') as f:
+                with open(f'/var/www/avatars/{avatar_path}', 'wb') as f:
                     r.raw.decode_content = True
                     shutil.copyfileobj(r.raw, f)
+                before_avatar = 'https://htcraft.ml/{avatar_path}'
 
             # This whole thing is hacky. Awaiting d.py update to fix.
             for guild in self.bot.guilds:
