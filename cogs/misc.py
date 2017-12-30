@@ -202,7 +202,7 @@ class Misc:
         roles = htc.roles
         patreonrole = discord.utils.get(roles, name="BotSupporter")
         patrons = set()
-        for user in htc.users:
+        for user in htc.members:
             if patreonrole in user.roles:
                 patrons.add(user)
         await ctx.send({}).format(patrons)
