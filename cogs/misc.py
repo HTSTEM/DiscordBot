@@ -198,7 +198,7 @@ class Misc:
     @commands.command()
     async def patroncheck(self, ctx):
         """Checks for uses with the Bot Supporter role on HTC"""
-        htc = self.bot.get_guild(guild_id)
+        htc = self.bot.get_guild(184755239952318464)
         roles = htc.roles
         patreonrole = discord.utils.get(roles, name="BotSupporter")
         patrons = set()
