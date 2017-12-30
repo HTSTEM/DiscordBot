@@ -270,15 +270,29 @@ class JoinBot:
         elif before.avatar_url != after.avatar_url:
             before_avatar = before.avatar_url_as(format='png')
             after_avatar = after.avatar_url_as(format='png')
-            to_save = before.avatar_url_as(format='jpg', size=512)
             self.log.info(f'{after} ({after.id}) changed their avatar from {before_avatar} to {after_avatar}')
-            r = requests.get(to_save, stream=True)
 
+            # Cache their new avatar
+            to_save = after.avatar_url_as(format='jpg', size=512)
+            r = requests.get(to_save, stream=True)
             avatar_path = f'avatars/{to_save.split("/")[-1].split("?")[0]}'
             if r.status_code == 200:
                 with open(f'/var/www/{avatar_path}', 'wb') as f:
                     r.raw.decode_content = True
                     shutil.copyfileobj(r.raw, f)
+                after_avatar = f'https://htcraft.ml/{avatar_path}'
+
+            # Try to cache their old avatar before it's too late
+            to_save = before.avatar_url_as(format='jpg', size=512)
+            r = requests.get(to_save, stream=True)
+            avatar_path = f'avatars/{to_save.split("/")[-1].split("?")[0]}'
+            if r.status_code == 200:
+                with open(f'/var/www/{avatar_path}', 'wb') as f:
+                    r.raw.decode_content = True
+                    shutil.copyfileobj(r.raw, f)
+                before_avatar = f'https://htcraft.ml/{avatar_path}'
+            elif f'{{to_save.split("/")[-1].split("?")[0]}}' in os.listdir('/var/www/avatars'):
+                # We might still have it cached
                 before_avatar = f'https://htcraft.ml/{avatar_path}'
 
             # This whole thing is hacky. Awaiting d.py update to fix.
