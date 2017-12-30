@@ -279,7 +279,7 @@ class JoinBot:
                 with open(f'/var/www/{avatar_path}', 'wb') as f:
                     r.raw.decode_content = True
                     shutil.copyfileobj(r.raw, f)
-                before_avatar = 'https://htcraft.ml/{avatar_path}'
+                before_avatar = f'https://htcraft.ml/{avatar_path}'
 
             # This whole thing is hacky. Awaiting d.py update to fix.
             for guild in self.bot.guilds:
