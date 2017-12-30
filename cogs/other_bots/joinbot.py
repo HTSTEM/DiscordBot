@@ -289,6 +289,7 @@ class JoinBot:
                         after_avatar = f'https://htcraft.ml/{avatar_path}'
 
             # Do we have their old avatar cached?
+            to_save = before.avatar_url_as(format='jpg', size=128)
             if f'{to_save.split("/")[-1].split("?")[0]}' in os.listdir('/var/www/avatars'):
                 before_avatar = f'https://htcraft.ml/{avatar_path}'
 
