@@ -1,10 +1,11 @@
+import itertools
 import traceback
 import datetime
 import asyncio
 import logging
 import os
 import shutil
-import requests
+import aiohttp
 import discord
 
 BOTE_SPAM = [282500390891683841, 290757101914030080, 207659596167249920]
@@ -130,7 +131,10 @@ class JoinBot:
         cmd = args[0]
         args = ' '.join(args[1:])
 
-        if cmd == 'userinfo':
+        if cmd == 'build_avatar_cache':
+            if message.author.id in [161508165672763392, 240995021208289280, 140564059417346049]:
+                await self.build_avatar_cache(message.channel)
+        elif cmd == 'userinfo':
             if args.strip():
                 member = await self.get_user(args, message.guild)
             else:
@@ -273,26 +277,19 @@ class JoinBot:
             self.log.info(f'{after} ({after.id}) changed their avatar from {before_avatar} to {after_avatar}')
 
             # Cache their new avatar
-            to_save = after.avatar_url_as(format='jpg', size=512)
-            r = requests.get(to_save, stream=True)
+            to_save = after.avatar_url_as(format='jpg', size=128)
             avatar_path = f'avatars/{to_save.split("/")[-1].split("?")[0]}'
-            if r.status_code == 200:
-                with open(f'/var/www/{avatar_path}', 'wb') as f:
-                    r.raw.decode_content = True
-                    shutil.copyfileobj(r.raw, f)
-                after_avatar = f'https://htcraft.ml/{avatar_path}'
+            with aiohttp.ClientSession() as session:
+                async with session.get(to_save) as r:
+                    if r.status == 200:
+                        resp = await r.read()
 
-            # Try to cache their old avatar before it's too late
-            to_save = before.avatar_url_as(format='jpg', size=512)
-            r = requests.get(to_save, stream=True)
-            avatar_path = f'avatars/{to_save.split("/")[-1].split("?")[0]}'
-            if r.status_code == 200:
-                with open(f'/var/www/{avatar_path}', 'wb') as f:
-                    r.raw.decode_content = True
-                    shutil.copyfileobj(r.raw, f)
-                before_avatar = f'https://htcraft.ml/{avatar_path}'
-            elif f'{{to_save.split("/")[-1].split("?")[0]}}' in os.listdir('/var/www/avatars'):
-                # We might still have it cached
+                        with open(f'/var/www/{avatar_path}', 'wb') as f:
+                            f.write(resp)
+                        after_avatar = f'https://htcraft.ml/{avatar_path}'
+
+            # Do we have their old avatar cached?
+            if f'{to_save.split("/")[-1].split("?")[0]}' in os.listdir('/var/www/avatars'):
                 before_avatar = f'https://htcraft.ml/{avatar_path}'
 
             # This whole thing is hacky. Awaiting d.py update to fix.
@@ -307,6 +304,35 @@ class JoinBot:
 
                     msg = f'.. to {after_avatar} ({before.mention})'
                     await self.broadcast_message(msg, guild, avatar=True)
+
+    async def build_avatar_cache(self, channel):
+        await channel.send('Building avatar cache! This may take a while.')
+
+        with aiohttp.ClientSession() as session:
+            members = list(self.bot.get_all_members())
+
+            # Splits up members into chunks of 10 members at once for building up asyncio.groups
+            for member_list in list(itertools.zip_longest(*[iter(members)] * 10, fillvalue=None)):
+                async def task(session, member):
+                    url = member.avatar_url_as(format='jpg', size=128)
+                    file_path = f'/var/www/avatars/{url.split("/")[-1].split("?")[0]}'
+
+                    if os.path.exists(file_path):
+                        return
+
+                    async with session.get(url) as resp:
+                        response = await resp.read()
+                        with open(file_path, 'wb') as f:
+                            f.write(response)
+
+                task_list = []
+                for member in member_list:
+                    if member and member.avatar_url:
+                        task_list.append(task(session, member))
+
+                await asyncio.gather(*task_list, loop=self.bot.loop)
+
+        await channel.send('Avatar cache fully loaded!')
 
 
 def setup(bot):
