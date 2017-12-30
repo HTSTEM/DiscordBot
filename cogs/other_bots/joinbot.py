@@ -276,7 +276,7 @@ class JoinBot:
 
             avatar_path = f'avatars/{to_save.split("/")[-1].split("?")[0]}'
             if r.status_code == 200:
-                with open(f'/var/www/avatars/{avatar_path}', 'wb') as f:
+                with open(f'/var/www/{avatar_path}', 'wb') as f:
                     r.raw.decode_content = True
                     shutil.copyfileobj(r.raw, f)
                 before_avatar = 'https://htcraft.ml/{avatar_path}'
