@@ -4,6 +4,7 @@ import base64
 import random
 import time
 import math
+import os
 
 from discord.ext import commands
 import discord
