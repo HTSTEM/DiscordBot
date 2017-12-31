@@ -288,7 +288,7 @@ class Misc:
         if not obj.callback.__module__.startswith('discord'):
             # not a built-in command
             location = os.path.relpath(src.co_filename).replace('\\', '/')
-            source_url = 'https://github.com/HTSTEM/DiscordBot/blob'
+            source_url = 'https://github.com/HTSTEM/DiscordBot/blob/python-ext.com'
         else:
             location = obj.callback.__module__.replace('.', '/') + '.py'
             source_url = 'https://github.com/Rapptz/discord.py/blob/rewrite'
