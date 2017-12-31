@@ -75,7 +75,7 @@ class Misc:
             to_remove = []
 
             dbcur = self.bot.database.cursor()
-            
+
             dbcur.execute("""SELECT memo, user_id, length, start_time FROM memos""")
             for response in dbcur.fetchall():
                 if response[2] + response[3] < current_time:
@@ -85,9 +85,9 @@ class Misc:
                             f'You asked me to remind you to `{base64.b64decode(response[0]).decode("utf-8")}`!'
                         )
                     to_remove.append(response)
-            
+
             dbcur.close()
-            
+
             dbcur = self.bot.database.cursor()
             for r in to_remove:
                 try:
@@ -97,30 +97,30 @@ class Misc:
                     traceback.print_exc()
             dbcur.close()
             self.bot.database.commit()
-            
+
             await asyncio.sleep(5)
-        
+
     @commands.command(aliases=['memo'])
     async def remind(self, ctx, remind_in, *, to_remind):
         """Sets a reminder.
         remind_in takes the form of <time><unit> where unit is h, m or s.
         For example, 15m would be 15 minutes.
         """
-    
+
         # Bodge to detect if the command is being run from a non-bot channel
         verbose = True
-        
+
         channel_ids = ctx.bot.config.get('ids', {})
         allowed = channel_ids.get('allowed_channels', None)
         blocked = channel_ids.get('blocked_channels', [])
-        
+
         if allowed is not None:
             if ctx.channel.id not in allowed:
                     verbose = False
 
         if ctx.channel.id in blocked:
-            verbose = False        
-    
+            verbose = False
+
         if len(remind_in) < 2:
             if verbose:
                 await ctx.send('Invalid timeframe')
@@ -138,14 +138,14 @@ class Misc:
             if verbose:
                 await ctx.send('Unit must be `h`, `m` or `s`')
             return
-        
+
         if unit == 's':
             length = rem_in
         elif unit == 'm':
             length = rem_in * 60
         elif unit == 'h':
             length = rem_in * 60 * 60
-        
+
         if length > 8760 * 60 * 60:
             if verbose:
                 await ctx.send('You can\'t set a memo for longer than one year. Sorry for that.')
@@ -158,14 +158,14 @@ class Misc:
             else:
                 await ctx.send('Yeah.. No.')
             return
-        
+
         if len(to_remind.replace('@', '@\u200b')) > 1500:
             if verbose:
                 await ctx.send('Did it really need to be that long? *Denied*')
             else:
                 await ctx.author.send('Did it really need to be that long? *Denied*')
             return
-        
+
         dbcur = ctx.bot.database.cursor()
         dbcur.execute(
             """INSERT INTO memos(memo, user_id, length, start_time) VALUES (?, ?, ?, ?)""",
@@ -173,7 +173,7 @@ class Misc:
         )
         dbcur.close()
         ctx.bot.database.commit()
-        
+
         if verbose:
             await ctx.send('Reminder to `{0}` set in {1}{2}!'.format(to_remind.replace('@', '@\u200b'), rem_in, unit))
         else:
@@ -185,16 +185,16 @@ class Misc:
     @is_developer()
     async def clear_memos_db(self, ctx):
         await ctx.send(':warning: Clearing DB!')
-        
+
         dbcur = ctx.bot.database.cursor()
         dbcur.execute("""DROP TABLE memos""")
         dbcur.execute("""CREATE TABLE memos(memo TEXT, user_id INTEGER, length INTEGER, start_time INTEGER)""")
-        
+
         dbcur.close()
         ctx.bot.database.commit()
-        
+
         await ctx.send('Done!')
-    
+
     @commands.command()
     async def patroncheck(self, ctx):
         """Checks for uses with the Bot Supporter role on HTC"""
@@ -242,7 +242,7 @@ class Misc:
         if len(die_message) > 2000:
             return await ctx.send("Congratulations, you've managed to roll a die that we can't send.")
 
-        await ctx.send(die_message)  
+        await ctx.send(die_message)
 
     @commands.command()
     async def isprime(self, ctx, num: int):
@@ -257,7 +257,7 @@ class Misc:
             return await ctx.send(f"Yes, {num} is prime. What did you expect me to say?")
         if num % 2 == 0:
             return await ctx.send(f'Why would you think {num}, an even number that isn\'t 2, would be prime?')
-        if num % 5 == 0: 
+        if num % 5 == 0:
             return await ctx.send(f'Composite. {num} literally ends in a 5...')
         if num > 1e+12:  # Arbitrary limit, adjust as necessary
             return await ctx.send('I may be fast but I\'m not that fast. Try something below 1 trillion.')
@@ -267,6 +267,32 @@ class Misc:
                 return await ctx.send('Composite. {0} mod {1} equals 0.'.format(num, a))
             a = a + (2, 4)[a % 10 == 3]  # Skips 5s and even numbers
         return await ctx.send('Prime! {} is only divisible by 1 and itself.'.format(num))
+
+    @commands.command()
+    async def source(self, ctx, *, command: str = None):
+        """Displays the source for a command."""
+        source_url = 'https://github.com/HTSTEM/DiscordBot'
+        if command is None:
+            return await ctx.send(source_url)
+
+        obj = self.bot.get_command(command.replace('.', ' '))
+        if obj is None:
+            return await ctx.send('Could not find command.')
+
+        # since we found the command we're looking for, presumably anyway, let's
+        # try to access the code itself
+        src = obj.callback.__code__
+        lines, firstlineno = inspect.getsourcelines(src)
+        if not obj.callback.__module__.startswith('discord'):
+            # not a built-in command
+            location = os.path.relpath(src.co_filename).replace('\\', '/')
+            source_url = 'https://github.com/HTSTEM/DiscordBot/blob'
+        else:
+            location = obj.callback.__module__.replace('.', '/') + '.py'
+            source_url = 'https://github.com/Rapptz/discord.py/blob/rewrite'
+
+        final_url = f'<{source_url}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>'
+        await ctx.send(final_url)
 
     @commands.command()
     async def help(self, ctx, *args):
