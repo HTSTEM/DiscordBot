@@ -19,7 +19,7 @@ class Animu:
 
         self.dc = DeviationCollector(bot)
         self.pg = PFPGrabber(bot)
-        
+
         creds = bot.config['danbooru']
         self.danb = Danbooru('danbooru', username=creds.get('user'), api_key=creds.get('key'))
 
@@ -82,6 +82,9 @@ class Animu:
             functools.partial(self.danb.post_list, tags='rating:s ' + ' '.join(tags), page=1, limit=200)
         )
 
+        if not posts:
+            return await ctx.send('No results found.')
+
         post = random.choice(posts)
 
         try:
@@ -95,10 +98,10 @@ class Animu:
     async def pfp(self, ctx, *, query:str):
         '''Search the internet for a nice square anime picture for you'''
         image = await self.pg.get_image(query)
-        
+
         if image is None:
             return await ctx.send('No results found')
-        
+
         return await ctx.send(f'I found {image}')
 
 def setup(bot):
