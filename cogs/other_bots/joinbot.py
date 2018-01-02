@@ -29,9 +29,22 @@ AVATARLOGS = {
     GUILDS['HTSTEM']: 305337565513515008
 }
 
+
+GUILDS = {
+    'HTC': 290573725366091787,
+}
+AVATARLOGS = {
+    GUILDS['HTC']: 290757101914030080,
+}
+
+
 PREFIX = '!'
 
 INVITES_FILE = '/var/www/invites.log'
+AVATARS_CACHE = '/var/www/avatars'
+AVATARS_ENDPOINT = 'avatars'
+AVATAR_FORMAT = 'jpg'
+AVATAR_SIZE = 128
 
 
 class JoinBot:
@@ -57,6 +70,12 @@ class JoinBot:
             out_string = "[empty string]"
 
         return out_string
+
+    async def on_ready(self):
+        # Load up a full list of all the members
+        for guild in self.bot.guilds:
+            if guild.large:
+                await self.bot.request_offline_members(guild)
 
     async def count_uses(self):
         htc = self.bot.get_guild(GUILDS['HTC'])
@@ -180,6 +199,8 @@ class JoinBot:
         pass
 
     async def on_member_join(self, member):
+        await self.cache_avatar(member)
+
         upped = []
         if member.guild.id == GUILDS['HTC']:
             await self.bot.change_presence(game=discord.Game(name=f'for {member.guild.member_count} users'))
@@ -225,6 +246,11 @@ class JoinBot:
         await self.broadcast_message(msg, member.guild)
 
     async def on_member_remove(self, member):
+        avatar_url = member.avatar_url_as(format=AVATAR_FORMAT, size=AVATAR_SIZE)
+        avatar_path = f'{AVATARS_CACHE}/{member.avatar}.{AVATAR_FORMAT}'
+        if os.path.exists(avatar_path):
+            os.remove(avatar_path)
+
         if member.guild.id == GUILDS['HTC']:
             await self.bot.change_presence(game=discord.Game(name=f'for {member.guild.member_count} users'))
 
@@ -277,35 +303,33 @@ class JoinBot:
             self.log.info(f'{after} ({after.id}) changed their avatar from {before_avatar} to {after_avatar}')
 
             # Cache their new avatar
-            to_save = after.avatar_url_as(format='jpg', size=128)
-            avatar_path = f'avatars/{to_save.split("/")[-1].split("?")[0]}'
-            with aiohttp.ClientSession() as session:
-                async with session.get(to_save) as r:
-                    if r.status == 200:
-                        resp = await r.read()
-
-                        with open(f'/var/www/{avatar_path}', 'wb') as f:
-                            f.write(resp)
-                        after_avatar = f'https://htcraft.ml/{avatar_path}'
-
+            await self.cache_avatar(after)
+            after_avatar = f'{AVATARS_ENDPOINT}/{after.avatar}.{AVATAR_FORMAT}'
             # Do we have their old avatar cached?
-            to_save = before.avatar_url_as(format='jpg', size=128)
-            avatar_path = f'avatars/{to_save.split("/")[-1].split("?")[0]}'
-            if f'{to_save.split("/")[-1].split("?")[0]}' in os.listdir('/var/www/avatars'):
-                before_avatar = f'https://htcraft.ml/{avatar_path}'
+            if f'{before.avatar}.{AVATAR_FORMAT}' in os.listdir(AVATARS_CACHE):
+                before_avatar = f'{AVATARS_ENDPOINT}/{before.avatar}.{AVATAR_FORMAT}'
 
             # This whole thing is hacky. Awaiting d.py update to fix.
             for guild in self.bot.guilds:
-                if guild.large:
-                    # This is spammy on the console in lage guilds
-                    await self.bot.request_offline_members(guild)
-
                 if after in guild.members:
                     msg = f':frame_photo: User **{before}** changed their avatar from {before_avatar} ..'
                     await self.broadcast_message(msg, guild, avatar=True)
 
                     msg = f'.. to {after_avatar} ({before.mention})'
                     await self.broadcast_message(msg, guild, avatar=True)
+
+    async def cache_avatar(self, member, session=None):
+        if session is None:
+            session = self.bot.session
+
+        url = member.avatar_url_as(format=AVATAR_FORMAT, size=AVATAR_SIZE)
+        file_path = f'{AVATARS_CACHE}/{member.avatar}.{AVATAR_FORMAT}'
+
+        if not os.path.exists(file_path):
+            async with session.get(url) as resp:
+                response = await resp.read()
+                with open(file_path, 'wb') as f:
+                    f.write(response)
 
     async def build_avatar_cache(self, channel):
         await channel.send('Building avatar cache! This may take a while.')
@@ -315,22 +339,10 @@ class JoinBot:
 
             # Splits up members into chunks of 10 members at once for building up asyncio.groups
             for member_list in list(itertools.zip_longest(*[iter(members)] * 10, fillvalue=None)):
-                async def task(session, member):
-                    url = member.avatar_url_as(format='jpg', size=128)
-                    file_path = f'/var/www/avatars/{url.split("/")[-1].split("?")[0]}'
-
-                    if os.path.exists(file_path):
-                        return
-
-                    async with session.get(url) as resp:
-                        response = await resp.read()
-                        with open(file_path, 'wb') as f:
-                            f.write(response)
-
                 task_list = []
                 for member in member_list:
                     if member and member.avatar_url:
-                        task_list.append(task(session, member))
+                        task_list.append(self.cache_avatar(member, session))
 
                 await asyncio.gather(*task_list, loop=self.bot.loop)
 
