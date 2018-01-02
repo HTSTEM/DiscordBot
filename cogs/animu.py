@@ -76,7 +76,7 @@ class Animu:
         hide = True
         if tags and tags[0] == 'lesssafe':
             hide = False
-            tags.pop(0)
+            tags = tags[1:]
 
         tags = [s.replace(' ', '_') for s in tags]
         if len(tags) > 2:
