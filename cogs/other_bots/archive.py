@@ -27,11 +27,11 @@ class Archiver:
 
         self.bot = bot
 
-        if not os.path.exists('map.yml'):
-            with open('map.yml', 'w') as f:
+        if not os.path.exists('config/map.yml'):
+            with open('config/map.yml', 'w') as f:
                 f.write('{}')
 
-        with open('map.yml') as f:
+        with open('config/map.yml') as f:
             self.lookup = yaml.safe_load(f)
 
     async def wh(self, webhook, message, file=None, t=0):
@@ -56,7 +56,7 @@ class Archiver:
         if message.channel.id in self.lookup:
             if not isinstance(self.lookup[message.channel.id], list):
                 self.lookup[message.channel.id] = [self.lookup[message.channel.id]]
-                with open('map.yml', 'w') as f:
+                with open('config/map.yml', 'w') as f:
                     yaml.dump(self.lookup, f)
 
             for cid in self.lookup[message.channel.id]:
@@ -73,7 +73,7 @@ class Archiver:
             except KeyError:
                 self.lookup[message.channel.id] = []
 
-            with open('map.yml', 'w') as f:
+            with open('config/map.yml', 'w') as f:
                 yaml.dump(self.lookup, f)
 
         webhooks = await nc.webhooks()

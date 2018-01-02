@@ -145,7 +145,10 @@ class Internet:
     @commands.cooldown(4, 60)
     async def virustotal(self, ctx, url):
         """Scan a url"""
-        key = self.bot.config['virustotal']
+        key_file = self.bot.config['virustotal'].get('key_file')
+        with open(key_file) as f:
+            key = f.read().split('\n')[0].strip()
+
         params = {'apikey': key, 'url': url}
         async with aiohttp.ClientSession() as session:
             async with session.post(VT_API+'/url/scan', data=params) as request:

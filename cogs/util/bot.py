@@ -21,11 +21,11 @@ class HelperBodge():
 
 class HTSTEMBote(commands.AutoShardedBot):
     class SilentCheckFailure(commands.CheckFailure): pass
-    
+
     def __init__(self, log_file=None, *args, **kwargs):
         self.debug = False
         self.config = {}
-        with open('config.yml', 'r') as f:
+        with open('config/config.yml', 'r') as f:
             self.config = yaml.load(f, Loader=yaml.Loader)
 
         logging.basicConfig(level=logging.INFO, format='[%(name)s %(levelname)s] %(message)s')
@@ -41,8 +41,8 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.session = aiohttp.ClientSession(loop=self.loop)
 
         self.uploader_client = DataUploader(self)
-        
-        self.database = sqlite3.connect("memos.sqlite")
+
+        self.database = sqlite3.connect("config/memos.sqlite")
         if not self._check_table_exists("memos"):
             dbcur = self.database.cursor()
             dbcur.execute('''
@@ -50,7 +50,7 @@ class HTSTEMBote(commands.AutoShardedBot):
             dbcur.close()
             self.database.commit()
 
-    
+
     def _check_table_exists(self, tablename):
         dbcur = self.database.cursor()
         dbcur.execute('''
@@ -64,12 +64,12 @@ class HTSTEMBote(commands.AutoShardedBot):
         return False
 
     async def on_message(self, message):
-    
+
         channel = message.channel
 
         if message.content.startswith('sb?help'):
             message.content = message.clean_content
-        
+
         # Bypass on direct messages
         if isinstance(channel, discord.DMChannel):
             await self.process_commands(message)
@@ -124,11 +124,11 @@ class HTSTEMBote(commands.AutoShardedBot):
                 except discord.Forbidden:
                     # we can't send messages in that channel
                     pass
-                
+
             elif isinstance(original, discord.HTTPException) and original.status == 400:
                 try: await ctx.send('Congratulations! I can\'t send that message.')
                 except discord.Forbidden: pass
-            
+
             else:
                 # Print to log then notify developers
                 lines = traceback.format_exception(type(exception),
@@ -180,9 +180,12 @@ class HTSTEMBote(commands.AutoShardedBot):
             self.logger.info('Debug mode active...')
             self.debug = True
 
-        token = self.config['token']
+        token_file = self.config['token_file']
+        with open(token_file) as f:
+            token = f.read().split('\n')[0].strip()
+
         cogs = self.config.get('cogs', [])
-        
+
         for cog in cogs:
             try:
                 self.load_extension(cog)

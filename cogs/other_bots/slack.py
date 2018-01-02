@@ -14,15 +14,15 @@ class ExtendedSlackClient(SlackClient):
     def __init__(self, bot):
         self.bot = bot
 
-        with open('slack/slack_token.txt') as f:
+        with open('config/slack/slack_token.txt') as f:
             tok = self._strip_token(f)
             self.sc = SlackClient(tok)
 
             self.sc.rtm_connect(with_team_state=False)
 
-        with open('slack/hooks.json') as f:
+        with open('config/slack/hooks.json') as f:
             self.webhooks = json.load(f)
-        with open('slack/dc_map.json') as f:
+        with open('config/slack/dc_map.json') as f:
             self.dc_map = json.load(f)
 
         self.loop_running = False

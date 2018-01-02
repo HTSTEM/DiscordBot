@@ -21,7 +21,11 @@ class Animu:
         self.pg = PFPGrabber(bot)
 
         creds = bot.config['danbooru']
-        self.danb = Danbooru('danbooru', username=creds.get('user'), api_key=creds.get('key'))
+        key_file = creds.get('key_file')
+        with open(key_file) as f:
+            key = f.read().split('\n')[0].strip()
+
+        self.danb = Danbooru('danbooru', username=creds.get('user'), api_key=key)
 
     async def __local_check(self, ctx):
         return right_channel(ctx)

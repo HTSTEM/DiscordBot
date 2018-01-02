@@ -5,9 +5,13 @@ venv/
 .idea
 
 # config
-config.yml
-client_secret.json
-slack/*
+config/client_secret.json
+config/da_secret.txt
+config/danbooru_key.txt
+config/paste_ee_key.txt
+config/token.txt
+config/virustotal_key.txt
+config/slack/*
 
 # state
 videoURLS.txt

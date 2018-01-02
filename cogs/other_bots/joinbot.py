@@ -71,12 +71,6 @@ class JoinBot:
 
         return out_string
 
-    async def on_ready(self):
-        # Load up a full list of all the members
-        for guild in self.bot.guilds:
-            if guild.large:
-                await self.bot.request_offline_members(guild)
-
     async def count_uses(self):
         htc = self.bot.get_guild(GUILDS['HTC'])
         uses = {}

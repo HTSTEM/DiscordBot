@@ -19,7 +19,7 @@ except ImportError:
 
 
 SCOPES = 'https://www.googleapis.com/auth/drive'
-CLIENT_SECRET_FILE = 'client_secret.json'
+CLIENT_SECRET_FILE = 'config/client_secret.json'
 APPLICATION_NAME = 'HTC RuleBot'
 
 PREFIX = 'r.'
@@ -171,10 +171,10 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
         return credentials
 
     def parse_cache(self):
-        with open('cache.txt', 'rb') as f:
+        with open('state_cache/cache.txt', 'rb') as f:
             html = f.read().decode('utf-8')
         md = html2text(html)
-        with open('cache.md', 'wb') as f:
+        with open('state_cache/cache.md', 'wb') as f:
             f.write(md.encode('utf-8'))
 
         block = None
@@ -215,7 +215,7 @@ r.reload_rules          Fetch the rules from Google Drive and update the local c
         request = service.files().export(fileId='137Fa99avZxFPovkiZRW7xSctFq2iirnKizZ4lHclHWU', mimeType='text/html')
         data = request.execute()
 
-        with open('cache.txt', 'wb') as f:
+        with open('state_cache/cache.txt', 'wb') as f:
             f.write(data)
 
         self.parse_cache()

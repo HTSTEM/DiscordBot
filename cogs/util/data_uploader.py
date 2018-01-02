@@ -7,7 +7,10 @@ class DataUploader:
     def __init__(self, bot):
         self.bot = bot
         self.config = self.bot.config.get('paste.ee', {})
-        self.api_key = self.config.get('api_key', '')
+
+        key_file = self.config.get('api_key_file')
+        with open(key_file) as f:
+            self.__api_key = f.read().split('\n')[0].strip()
 
     async def upload(self, data, title=None):
         if title is None:
@@ -23,7 +26,7 @@ class DataUploader:
         }
         headers = {
             'content-type': 'application/json',
-            'X-Auth-Token': self.api_key,
+            'X-Auth-Token': self.__api_key,
         }
         async with self.bot.session.post(ENDPOINT, headers=headers, json=json_data) as resp:
             json_obj = await resp.json()
