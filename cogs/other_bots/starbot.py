@@ -14,7 +14,7 @@ class StarBot:
 
         self.config = bot.config['starbot']
 
-        self.database = sqlite3.connect("htstars.sqlite")
+        self.database = sqlite3.connect("state_cache/htstars.sqlite")
         cursor = self.database.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS stars
                           (original_id INTEGER,
