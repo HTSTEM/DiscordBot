@@ -23,12 +23,13 @@ class Animu:
         creds = bot.config['danbooru']
         self.danb = Danbooru('danbooru', username=creds.get('user'), api_key=creds.get('key'))
 
-    async def __local_check(self, ctx):
+    @staticmethod
+    async def __local_check(ctx):
         return right_channel(ctx)
 
     @commands.command()
-    async def mal(self, ctx, *, query:str):
-        '''Search MyAnimeList'''
+    async def mal(self, ctx, *, query: str):
+        """Search MyAnimeList"""
         try:
             anime_id = await self.mal_client.search_id('anime', query)
         except tokage.errors.TokageNotFound:
@@ -45,7 +46,7 @@ class Animu:
             synopsis = synopsis[:500].strip()
             synopsis += f'... [Read more]({anime.link})'
 
-        embed=discord.Embed(
+        embed = discord.Embed(
             title=anime.japanese_title,
             url=anime.link,
             description=f'**{anime.title}** ({anime.rating})\n{synopsis}')
@@ -63,16 +64,16 @@ class Animu:
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['wall'])
-    async def wallpaper(self, ctx, *, query:str=''):
-        '''Get an anime wallpaper from deviantart'''
+    async def wallpaper(self, ctx, *, query: str=''):
+        """Get an anime wallpaper from deviantart"""
         await ctx.send(await self.dc.get_deviation(self.bot.loop, query))
 
     @commands.command()
     async def danbooru(self, ctx, *tags):
-        '''
+        """
         Search Danbooru tags.
         Safe mode is enabled, but be careful.
-        '''
+        """
         hide = True
         if tags and tags[0] == 'lesssafe':
             hide = False
@@ -83,9 +84,13 @@ class Animu:
             await ctx.send('Only 2 tags are allowed, taking the first 2.')
             tags = tags[:2]
 
-        posts = await self.bot.loop.run_in_executor(None,
-            functools.partial(self.danb.post_list, tags='rating:s ' + ' '.join(tags), page=1, limit=200)
-        )
+        try:
+            posts = await self.bot.loop.run_in_executor(
+                None,
+                functools.partial(self.danb.post_list, tags='rating:s ' + ' '.join(tags), page=1, limit=200)
+            )
+        except KeyError:
+            return await ctx.send('Uh oh, something happened. Are your tags valid?')
 
         if not posts:
             return await ctx.send('No results found.')
@@ -98,19 +103,20 @@ class Animu:
             fileurl = 'http://danbooru.donmai.us' + post['source']
 
         if hide:
-            return await ctx.send(f'<{fileurl}>') # antiembed for accidental lewdness prevention
+            return await ctx.send(f'<{fileurl}>')  # antiembed for accidental lewdness prevention
 
         return await ctx.send(fileurl)
 
     @commands.command()
-    async def pfp(self, ctx, *, query:str):
-        '''Search the internet for a nice square anime picture for you'''
+    async def pfp(self, ctx, *, query: str):
+        """Search the internet for a nice square anime picture for you"""
         image = await self.pg.get_image(query)
 
         if image is None:
             return await ctx.send('No results found')
 
         return await ctx.send(f'I found {image}')
+
 
 def setup(bot):
     bot.add_cog(Animu(bot))
