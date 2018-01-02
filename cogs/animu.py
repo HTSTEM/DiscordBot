@@ -111,8 +111,8 @@ class Animu:
     @commands.command()
     async def pfp(self, ctx, *, query: str):
         """Search the internet for a nice square anime picture for you"""
-        image = await self.pg.get_image(query)
 
+        image = await self.pg.get_image(query)
         if image is None:
             return await ctx.send('No results found')
 
