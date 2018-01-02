@@ -29,20 +29,11 @@ AVATARLOGS = {
     GUILDS['HTSTEM']: 305337565513515008
 }
 
-
-GUILDS = {
-    'HTC': 290573725366091787,
-}
-AVATARLOGS = {
-    GUILDS['HTC']: 290757101914030080,
-}
-
-
 PREFIX = '!'
 
 INVITES_FILE = '/var/www/invites.log'
 AVATARS_CACHE = '/var/www/avatars'
-AVATARS_ENDPOINT = 'avatars'
+AVATARS_ENDPOINT = 'https://htcraft.ml/avatars'
 AVATAR_FORMAT = 'jpg'
 AVATAR_SIZE = 128
 
