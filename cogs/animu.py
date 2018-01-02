@@ -73,6 +73,11 @@ class Animu:
         Search Danbooru tags.
         Safe mode is enabled, but be careful.
         '''
+        hide = True
+        if tags and tags[0] == 'lesssafe':
+            hide = False
+            tags.pop(0)
+
         tags = [s.replace(' ', '_') for s in tags]
         if len(tags) > 2:
             await ctx.send('Only 2 tags are allowed, taking the first 2.')
@@ -92,7 +97,10 @@ class Animu:
         except KeyError:
             fileurl = 'http://danbooru.donmai.us' + post['source']
 
-        await ctx.send(f'<{fileurl}>') # antiembed for accidental lewdness prevention
+        if hide:
+            return await ctx.send(f'<{fileurl}>') # antiembed for accidental lewdness prevention
+
+        return await ctx.send(fileurl)
 
     @commands.command()
     async def pfp(self, ctx, *, query:str):
