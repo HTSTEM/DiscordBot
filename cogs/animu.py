@@ -6,6 +6,7 @@ import functools
 
 from discord.ext import commands
 from pybooru import Danbooru
+from pybooru.exceptions import PybooruHTTPError
 
 from .util.checks import right_channel
 from .util.da import DeviationCollector
@@ -89,7 +90,7 @@ class Animu:
                 None,
                 functools.partial(self.danb.post_list, tags='rating:s ' + ' '.join(tags), page=1, limit=200)
             )
-        except KeyError:
+        except (KeyError, PybooruHTTPError):
             return await ctx.send('Uh oh, something happened. Are your tags valid?')
 
         if not posts:
