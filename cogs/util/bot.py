@@ -124,12 +124,11 @@ class HTSTEMBote(commands.AutoShardedBot):
                 except discord.Forbidden:
                     # we can't send messages in that channel
                     pass
-
             elif isinstance(original, discord.HTTPException) and original.status == 400:
                 try: await ctx.send('Congratulations! I can\'t send that message.')
                 except discord.Forbidden: pass
 
-            else:
+            if not (isinstance(original, discord.HTTPException) and original.status == 400):
                 # Print to log then notify developers
                 lines = traceback.format_exception(type(exception),
                                                 exception,
@@ -140,6 +139,7 @@ class HTSTEMBote(commands.AutoShardedBot):
 
         elif isinstance(exception, commands.CheckFailure):
             if not isinstance(exception, self.SilentCheckFailure):
+                self.logger.error(ctx.channel)
                 await ctx.send('You can\'t do that.')
         elif isinstance(exception, commands.CommandNotFound):
             pass

@@ -45,6 +45,7 @@ ids:
     - 381941901961461761
     - 383041784495734785
     - 382704944857350155
+    - 334296605349904384
   blocked_channels:
     - 282631584903987201
 
@@ -77,6 +78,7 @@ cogs:
   - cogs.other_bots.joinbot
   - cogs.other_bots.starbot
   - cogs.other_bots.spoilers
+  - cogs.other_bots.moderation
 
 global_coms:
   - memo

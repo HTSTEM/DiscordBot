@@ -29,7 +29,6 @@ class Misc:
         params = list(cmd.clean_params.items())
         p_str = ''
         for p in params:
-            print(p[1], p[1].default, p[1].empty)
             if p[1].default == p[1].empty:
                 p_str += f' <{p[0]}>'
             else:
