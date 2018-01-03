@@ -132,5 +132,7 @@ class Moderation:
         if self.memelord_role in member.roles:
             await member.remove_roles(self.memelord_role)
 
+        await m_channel.send(f'{member} was released.')
+
 def setup(bot):
     bot.add_cog(Moderation(bot))
