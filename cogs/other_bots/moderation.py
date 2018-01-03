@@ -124,9 +124,9 @@ class Moderation:
         await m_channel.send(msg)
 
         await asyncio.sleep(length * 60)
-
-        # Has it been overwritten?
-        if this_meme not in self.memelordings: return
+        member = ctx.guild.get_member(member.id)
+        # Has it been overwritten or has the member left?
+        if this_meme not in self.memelordings or member is None: return
 
         # REMOVE ROLE
         if self.memelord_role in member.roles:
