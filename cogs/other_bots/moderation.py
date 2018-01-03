@@ -20,7 +20,7 @@ class Moderation:
         self.bot = bot
 
         self.memelordings = [
-        #   (member, time, started, reason, uuid)
+            # (member, time, started, reason, uuid)
         ]
         self.bannedusers = {}
         self.moderator_role = None
@@ -51,7 +51,9 @@ class Moderation:
 
         if self.memelord_role in member.roles:
             channel = self.bot.get_guild(HTC).get_channel(JOINBOT_CHANNEL)
-            return await channel.send(f':rotating_light::rotating_light: **{member} was a memelord!** :rotating_light::rotating_light:')
+            return await channel.send(
+                f':rotating_light::rotating_light: **{member} was a memelord!** :rotating_light::rotating_light:'
+            )
 
     # Commands stuff
     async def __local_check(self, ctx):
@@ -72,7 +74,7 @@ class Moderation:
         for i in list(self.memelordings):
             if i[0] == member.id:
                 self.memelordings.remove(i)
-                chaned = True
+                changed = True
 
         if changed:
             return await ctx.send(f'{member} has been removed from the local database.')
@@ -133,6 +135,7 @@ class Moderation:
             await member.remove_roles(self.memelord_role)
 
         await m_channel.send(f'{member} was released.')
+
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
