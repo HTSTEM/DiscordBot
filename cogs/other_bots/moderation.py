@@ -118,7 +118,7 @@ class Moderation:
 
         msg = f'{member.mention}, you have been memelorded for {length} minutes'
         if reason:
-            msg += f' beacuse:\n{reason}'
+            msg += f' because:\n{reason}'
         else:
             msg += '.'
         await m_channel.send(msg)
