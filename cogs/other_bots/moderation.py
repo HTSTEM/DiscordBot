@@ -20,7 +20,7 @@ class Moderation:
         self.bot = bot
 
         self.memelordings = [
-            # (member, time, started, reason, uuid)
+            # (member id, time, started, reason, uuid)
         ]
         self.bannedusers = {}
         self.moderator_role = None
@@ -43,8 +43,8 @@ class Moderation:
 
     async def on_member_join(self, member):
         for memelording in self.memelordings:
-            if member.id == memelording[0].id:
-                memelording[0] = member
+            if member.id == memelording[0]:
+                memelording[0] = member.id
                 await member.add_roles(self.memelord_role)
 
     async def on_member_remove(self, member):
