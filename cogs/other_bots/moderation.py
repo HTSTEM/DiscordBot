@@ -131,10 +131,13 @@ class Moderation:
         if this_meme not in self.memelordings or member is None: return
 
         # REMOVE ROLE
-        if self.memelord_role in member.roles:
-            await member.remove_roles(self.memelord_role)
-
-        await m_channel.send(f'{member} was released.')
+        try:
+            if self.memelord_role in member.roles:
+                await member.remove_roles(self.memelord_role)
+        except discord.NotFound:
+            await m_channel.send(f'{member} left')
+        else:
+            await m_channel.send(f'{member} was released.')
 
 
 def setup(bot):
