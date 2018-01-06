@@ -41,6 +41,12 @@ class Moderation:
     async def on_member_ban(self, guild, member):
         self.bannedusers[guild.id] = member.id
 
+    async def on_member_join(self, member):
+        for memelording in self.memelordings:
+            if member.id == memelording[0].id:
+                memelording[0] = member
+                await member.add_roles(self.memelord_role)
+
     async def on_member_remove(self, member):
         # Wait for the ban event to fire (if at all)
         await asyncio.sleep(0.25)
