@@ -25,7 +25,7 @@ class Moderation:
                 self.memelordings = yaml.load(memelord_file)
         except FileNotFoundError:
             self.memelordings = [
-                # [member id, time, ended, reason, uuid]
+                # [member id, time, ending, reason, uuid]
             ]
 
         self.bannedusers = {}
@@ -65,6 +65,20 @@ class Moderation:
             self.moderator_role = discord.utils.get(htc.roles, id=MODERATOR_ROLE)
         if self.memelord_role is None:
             self.memelord_role = discord.utils.get(htc.roles, id=MEMELORD_ROLE)
+
+    async def on_message(self, message):
+        if message.channel.id == MEMELORD_CHANNEL:
+            for memelording in self.memelordings:
+                if memelording[2] is None and memelording[0] == message.author.id:
+                    length = memelording[1] * 60
+                    memelording[2] = time.time() + length
+                    reason = memelording[3]
+                    msg = f'{message.author.mention}, you have been memelorded for {length} minutes'
+                    if reason:
+                        msg += f' because:\n{reason}'
+                    else:
+                        msg += '.'
+                    await message.channel.send(msg)
 
     async def on_member_ban(self, guild, member):
         self.bannedusers[guild.id] = member.id
@@ -145,19 +159,6 @@ class Moderation:
 
         m_channel = self.bot.get_guild(HTC).get_channel(MEMELORD_CHANNEL)
         await m_channel.send(member.mention)  # Ping 'em
-
-        # WAIT FOR MESSAGE
-        def check(m):
-            return m.channel.id == MEMELORD_CHANNEL and m.author.id == member.id
-        await self.bot.wait_for('message', check=check)
-        if this_meme not in self.memelordings: return
-        this_meme[2] = time.time() + length * 60
-        msg = f'{member.mention}, you have been memelorded for {length} minutes'
-        if reason:
-            msg += f' because:\n{reason}'
-        else:
-            msg += '.'
-        await m_channel.send(msg)
 
     @memelord.after_invoke
     @forget_memelord.after_invoke
