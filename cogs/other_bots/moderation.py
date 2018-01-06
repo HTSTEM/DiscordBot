@@ -2,6 +2,8 @@ import asyncio
 import time
 import uuid
 
+from ruamel import yaml
+
 from discord.ext import commands
 import discord
 
@@ -18,10 +20,14 @@ class Moderation:
         super().__init__()
 
         self.bot = bot
+        try:
+            with open('memelords.yml', 'r') as memelord_file:
+                self.memelordings = yaml.load(memelord_file)
+        except FileNotFoundError:
+            self.memelordings = [
+                # [member id, time, ended, reason, uuid]
+            ]
 
-        self.memelordings = [
-            # (member id, time, started, reason, uuid)
-        ]
         self.bannedusers = {}
         self.moderator_role = None
         self.memelord_role = None
@@ -30,6 +36,28 @@ class Moderation:
         if htc is not None:
             self.moderator_role = discord.utils.get(htc.roles, id=MODERATOR_ROLE)
             self.memelord_role = discord.utils.get(htc.roles, id=MEMELORD_ROLE)
+
+        self.timer = self.bot.loop.create_task(self.check_timer())
+
+    async def check_timer(self):
+        await self.bot.wait_until_ready()
+        m_channel = self.bot.get_guild(HTC).get_channel(MEMELORD_CHANNEL)
+        while True:
+            for memelording in list(self.memelordings):
+                if memelording[2] is not None and time.time() > memelording[2]:
+                    member = m_channel.guild.get_member(memelording[0])
+                    try:
+                        if self.memelord_role in member.roles:
+                            await member.remove_roles(self.memelord_role)
+                    except discord.NotFound:
+                        await m_channel.send(f'{member} left')
+                    else:
+                        await m_channel.send(f'{member} was released.')
+
+                    self.memelordings.remove(memelording)
+
+                await self.save(None)
+            await asyncio.sleep(5)
 
     async def on_ready(self):
         htc = self.bot.get_guild(HTC)
@@ -111,7 +139,7 @@ class Moderation:
             await member.add_roles(self.memelord_role)
 
         if extended:
-            await ctx.send(f'{member}\'s pumishment has been extended to {length} minutes.')
+            await ctx.send(f'{member}\'s punishment has been extended to {length} minutes.')
         else:
             await ctx.send(f'{member} has been memelorded for {length} minutes.')
 
@@ -123,7 +151,7 @@ class Moderation:
             return m.channel.id == MEMELORD_CHANNEL and m.author.id == member.id
         await self.bot.wait_for('message', check=check)
         if this_meme not in self.memelordings: return
-
+        this_meme[2] = time.time() + length * 60
         msg = f'{member.mention}, you have been memelorded for {length} minutes'
         if reason:
             msg += f' because:\n{reason}'
@@ -131,19 +159,11 @@ class Moderation:
             msg += '.'
         await m_channel.send(msg)
 
-        await asyncio.sleep(length * 60)
-        member = ctx.guild.get_member(member.id)
-        # Has it been overwritten or has the member left?
-        if this_meme not in self.memelordings or member is None: return
-
-        # REMOVE ROLE
-        try:
-            if self.memelord_role in member.roles:
-                await member.remove_roles(self.memelord_role)
-        except discord.NotFound:
-            await m_channel.send(f'{member} left')
-        else:
-            await m_channel.send(f'{member} was released.')
+    @memelord.after_invoke
+    @forget_memelord.after_invoke
+    async def save(self, _):
+        with open('memelords.yml', 'w') as memelord_file:
+            yaml.dump(self.memelordings, memelord_file)
 
 
 def setup(bot):
