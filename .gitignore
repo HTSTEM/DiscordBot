@@ -2,7 +2,6 @@
 __pycache__/
 *.pyc
 venv/
-.idea
 
 # config
 config/client_secret.json
@@ -24,6 +23,11 @@ map.yml
 htstars.sqlite
 da_cache.json
 invites.log
+avatar_cache/
+client_secret.json
+config.yml
+
 
 # editor configs
 .vscode
+.idea
