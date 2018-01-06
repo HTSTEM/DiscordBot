@@ -21,7 +21,7 @@ class Moderation:
 
         self.bot = bot
         try:
-            with open('memelords.yml', 'r') as memelord_file:
+            with open('state_cache/memelords.yml', 'r') as memelord_file:
                 self.memelordings = yaml.load(memelord_file)
         except FileNotFoundError:
             self.memelordings = [
@@ -163,7 +163,7 @@ class Moderation:
     @memelord.after_invoke
     @forget_memelord.after_invoke
     async def save(self, _):
-        with open('memelords.yml', 'w') as memelord_file:
+        with open('state_cache/memelords.yml', 'w') as memelord_file:
             yaml.dump(self.memelordings, memelord_file)
 
 
