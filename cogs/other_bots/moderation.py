@@ -70,7 +70,7 @@ class Moderation:
         if message.channel.id == MEMELORD_CHANNEL:
             for memelording in self.memelordings:
                 if memelording[2] is None and memelording[0] == message.author.id:
-                    length = memelording[1] * 60
+                    length = memelording[1]
                     memelording[2] = time.time() + length
                     reason = memelording[3]
                     msg = f'{message.author.mention}, you have been memelorded for {length} minutes'
@@ -129,7 +129,20 @@ class Moderation:
         return await ctx.send(f'{member} isn\'t *in* the local database.')
 
     @commands.command()
-    async def memelord(self, ctx, member: commands.MemberConverter, length: int, *, reason: str=''):
+    async def memelord(self, ctx, member: commands.MemberConverter, length: str, *, reason: str=''):
+        unit = length[-1]
+        try:
+            if unit in '0123456789':
+                length = int(length)
+            elif unit in ['m', 'h', 'd']:
+                if unit == 'm': length = int(length[:-1])
+                if unit == 'h': length = int(length[:-1]) * 60
+                if unit == 'd': length = int(length[:-1]) * 3600
+            else:
+                return await ctx.send('Expected the unit to be "m", "h" or "d".')
+        except ValueError:
+            return await ctx.send('Expected length to be an integer with an optional unit.')
+
         unique_key = uuid.uuid4().hex  # Used just to avoide collisions
 
         extended = False
