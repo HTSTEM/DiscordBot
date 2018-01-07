@@ -71,7 +71,7 @@ class Moderation:
             for memelording in self.memelordings:
                 if memelording[2] is None and memelording[0] == message.author.id:
                     length = memelording[1]
-                    memelording[2] = time.time() + length
+                    memelording[2] = time.time() + (length * 60)
                     reason = memelording[3]
                     msg = f'{message.author.mention}, you have been memelorded for {length} minutes'
                     if reason:
