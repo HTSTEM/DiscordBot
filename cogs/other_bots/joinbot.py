@@ -301,10 +301,14 @@ class JoinBot:
                     await self.bot.request_offline_members(guild)
 
                 if after in guild.members:
-                    msg = f':frame_photo: User **{before}** changed their avatar from {before_avatar} ..'
+                    msg = f':frame_photo: User **{after}** changed their avatar from {before_avatar} ..'
                     await self.broadcast_message(msg, guild, avatar=True)
-
-                    msg = f'.. to {after_avatar} ({before.mention})'
+                    #Prevent certain users from being mentioned
+                    #Currently included: Satomi
+                    if after.id not in [154825973278310400]:
+                        msg = f'.. to {after_avatar} ({before.mention})'
+                    else:
+                        msg = f'.. to {after_avatar}'
                     await self.broadcast_message(msg, guild, avatar=True)
 
     async def build_avatar_cache(self, channel):
