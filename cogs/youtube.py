@@ -61,15 +61,15 @@ class YouTube:
         # *cough* *cough* botterwhydidyouchangeit *cough*
         await self.bot.wait_until_ready()
 
-        if not os.path.exists('videoURLS.txt'):
-            os.mknod('videoURLS.txt')
+        if not os.path.exists('state_cache/videoURLS.txt'):
+            os.mknod('state_cache/videoURLS.txt')
 
         feed_url = self.config.get('feed_url', None)
 
         if feed_url is None:
             return
 
-        with open('videoURLS.txt') as f:
+        with open('state_cache/videoURLS.txt') as f:
             urls = f.readlines()
 
         while True:
@@ -97,7 +97,7 @@ class YouTube:
                                        .format(role, ' '.join(map(lambda x: x['name'], video['authors'])),
                                                title, href))
 
-            with open('videoURLS.txt', 'w') as f:
+            with open('state_cache/videoURLS.txt', 'w') as f:
                 f.writelines(urls)
 
             await asyncio.sleep(15)

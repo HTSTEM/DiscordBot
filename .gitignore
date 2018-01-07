@@ -2,12 +2,15 @@
 __pycache__/
 *.pyc
 venv/
-.idea
 
 # config
-config.yml
-client_secret.json
-slack/*
+config/client_secret.json
+config/da_secret.txt
+config/danbooru_key.txt
+config/paste_ee_key.txt
+config/token.txt
+config/virustotal_key.txt
+config/slack/*
 
 # state
 videoURLS.txt
@@ -20,6 +23,12 @@ map.yml
 htstars.sqlite
 da_cache.json
 invites.log
+avatar_cache/
+client_secret.json
+config.yml
+memelords.yml
+
 
 # editor configs
 .vscode
+.idea

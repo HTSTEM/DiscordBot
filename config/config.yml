@@ -1,0 +1,87 @@
+token_file:
+  config/token.txt
+
+# External services
+paste.ee:
+  api_key_file:
+    config/paste_ee_key.txt
+
+deviantart:
+  client_id:
+    '7233'
+  client_secret_file:
+    config/da_secret.txt
+
+danbooru:
+  user: htstem
+  key_file: config/danbooru_key.txt
+
+virustotal:
+  key_file: config/virustotal_key.txt
+
+# Discord-based config
+youtube:
+  feed_url:
+    http://youtube.com/feeds/videos.xml?user=carykh
+
+  role_id:
+    289942717419749377
+
+  announcements_channel:
+    282225245761306624
+
+ids:
+  host: 240995021208289280
+  developers:
+    - 140564059417346049
+    - 161508165672763392
+    - 240995021208289280
+  developer_role_id: 282642024325316609
+  htstem_id: 282219466589208576
+  allowed_channels:
+    - 282500390891683841
+    - 381950042770243584
+    - 384226265453821953
+    - 381941901961461761
+    - 383041784495734785
+    - 382704944857350155
+    - 334296605349904384
+  blocked_channels:
+    - 282631584903987201
+
+starbot:
+  stars: # a list of possible reactions
+    - ⭐
+  starboards:
+    282219466589208576:  # HTStem
+      channel: 375361337464979467
+      threshold: 3
+    381941901462470658:  # ChiP
+      channel: 387055833332187159
+      threshold: 5
+
+# D.py setup
+cogs:
+  - cogs.core
+  - cogs.misc
+  - cogs.animu
+  - cogs.youtube
+  - cogs.hashing
+  - cogs.internet
+  - cogs.information
+  - cogs.other_bots.flairs
+  - cogs.other_bots.rules
+  - cogs.other_bots.colors
+  - cogs.other_bots.bfb
+  - cogs.other_bots.slack
+  - cogs.other_bots.archive
+  - cogs.other_bots.joinbot
+  - cogs.other_bots.starbot
+  - cogs.other_bots.spoilers
+  - cogs.other_bots.moderation
+
+global_coms:
+  - memo
+  - remind
+  - paste
+  - google

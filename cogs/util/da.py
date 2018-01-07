@@ -8,7 +8,7 @@ import deviantart
 
 PAGINATE_SIZE = 10
 ANIMOO = 'minimalistic-animoo'
-CACHE_FILE = 'da_cache.json'
+CACHE_FILE = 'state_cache/da_cache.json'
 
 
 class DeviationCollector:
@@ -17,7 +17,11 @@ class DeviationCollector:
 
         self.config = self.bot.config.get('deviantart', {})
 
-        self.da = deviantart.Api(self.config.get('client_id'), self.config.get('client_secret'))
+        secret_file = self.config.get('client_secret_file')
+        with open(secret_file) as f:
+            secret = f.read().split('\n')[0].strip()
+
+        self.da = deviantart.Api(self.config.get('client_id'), secret)
 
         if not os.path.exists(CACHE_FILE):
             self.generate_cache()

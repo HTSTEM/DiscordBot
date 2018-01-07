@@ -14,7 +14,10 @@ class PFPGrabber:
 
         async with self.session.post(url, data=params) as response:
             data = await response.text()
-            searchObj = re.search(r'vqd=(\d+)\&', data, re.M|re.I)
+            search_obj = re.search(r'vqd=(\d+)&', data, re.M | re.I)
+
+        if search_obj is None:
+            return []
 
         headers = {
             'dnt': '1',
@@ -31,16 +34,16 @@ class PFPGrabber:
             ('l', 'wt-wt'),
             ('o', 'json'),
             ('q', keywords),
-            ('vqd', searchObj.group(1)),
+            ('vqd', search_obj.group(1)),
             ('f', ',,,'),
             ('p', '2'),
             ('t', 'hf'),
             ('iaf', 'layout:aspect-square')
         )
 
-        requestUrl = url + "i.js";
+        request_url = url + "i.js"
         
-        async with self.session.get(requestUrl, params=params, headers=headers) as response:
+        async with self.session.get(request_url, params=params, headers=headers) as response:
             data = await response.text()
             
             jdata = json.loads(data)
