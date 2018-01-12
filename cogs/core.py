@@ -11,10 +11,10 @@ from .util.checks import right_channel, is_developer, is_owner
 
 
 class Core:
-    '''
+
     async def __local_check(self, ctx):
         return right_channel(ctx)
-    '''
+
     '''Core commands'''
     @commands.command(aliases=['quit', 'kill'])
     @is_developer()
