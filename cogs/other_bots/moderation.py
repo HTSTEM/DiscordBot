@@ -10,10 +10,11 @@ import discord
 
 MEMELORD_CHANNEL = 334296605349904384
 JOINBOT_CHANNEL = 207659596167249920
-MODERATOR_ROLE = 191344863038537728
+MODERATOR_ROLE = 297811340486115330
 MEMELORD_ROLE = 334301546710040576
-HTC = 184755239952318464
+HTC = 297811083308171264
 MEMES_CHANNEL = 334296645833326604
+MEMES_VC = 348301159573880834
 
 
 class Moderation:
@@ -130,10 +131,6 @@ class Moderation:
 
     @commands.command()
     async def ratelimit(self, ctx, seconds_per_message: float = None):
-        '''
-        Set or clear a ratelimit for the memes channel.
-        Run with no arguments to clear ratelimit.
-        '''
         if seconds_per_message is not None:
             self.limit = seconds_per_message
             await ctx.send(f'Rate limit set to 1 message every {self.limit} second(s).')
@@ -143,7 +140,6 @@ class Moderation:
 
     @commands.command()
     async def forget_memelord(self, ctx, member: commands.MemberConverter):
-        ''' Unmemelord a user.'''
         changed = False
         for i in list(self.memelordings):
             if i[0] == member.id:
@@ -156,7 +152,6 @@ class Moderation:
 
     @commands.command()
     async def memelord(self, ctx, member: commands.MemberConverter, length: str, *, reason: str=''):
-        '''Memelord a user'''
         unit = length[-1]
         try:
             if unit in '0123456789':
@@ -170,7 +165,7 @@ class Moderation:
         except ValueError:
             return await ctx.send('Expected length to be an integer with an optional unit.')
 
-        unique_key = uuid.uuid4().hex  # Used just to avoide collisions
+        unique_key = uuid.uuid4().hex  # Used just to avoid collisions
 
         extended = False
         for i in list(self.memelordings):
@@ -187,6 +182,10 @@ class Moderation:
 
         this_meme = [member.id, length, None, reason, unique_key]
         self.memelordings.append(this_meme)
+
+        if member.voice:
+            afk = ctx.guild.afk_channel
+            await member.move_to(afk, reason='Memelorded')
 
         # APPLY ROLE
         if self.memelord_role not in member.roles:
@@ -205,6 +204,20 @@ class Moderation:
     async def save(self, _):
         with open('state_cache/memelords.yml', 'w') as memelord_file:
             yaml.dump(self.memelordings, memelord_file)
+
+    @commands.command(aliases=['cleanvc'])
+    async def clean_vc(self, ctx):
+        afk = ctx.guild.afk_channel
+        if afk is None:
+            return await ctx.send('No AFK channel found.')
+
+        vc = ctx.guild.get_channel(MEMES_VC)
+        if not isinstance(vc, discord.VoiceChannel):
+            return await ctx.send('No VC found.')
+
+        for member in vc.members:
+            if member.voice.mute or member.voice.self_mute:
+                await member.move_to(afk, reason='Muted member cleaning')
 
 
 def setup(bot):
