@@ -130,6 +130,10 @@ class Moderation:
 
     @commands.command()
     async def ratelimit(self, ctx, seconds_per_message: float = None):
+        '''
+        Set or clear a ratelimit for the memes channel.
+        Run with no arguments to clear ratelimit.
+        '''
         if seconds_per_message is not None:
             self.limit = seconds_per_message
             await ctx.send(f'Rate limit set to 1 message every {self.limit} second(s).')
@@ -139,6 +143,7 @@ class Moderation:
 
     @commands.command()
     async def forget_memelord(self, ctx, member: commands.MemberConverter):
+        ''' Unmemelord a user.'''
         changed = False
         for i in list(self.memelordings):
             if i[0] == member.id:
@@ -151,6 +156,7 @@ class Moderation:
 
     @commands.command()
     async def memelord(self, ctx, member: commands.MemberConverter, length: str, *, reason: str=''):
+        '''Memelord a user'''
         unit = length[-1]
         try:
             if unit in '0123456789':
