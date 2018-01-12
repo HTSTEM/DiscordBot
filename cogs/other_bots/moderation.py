@@ -13,6 +13,7 @@ JOINBOT_CHANNEL = 207659596167249920
 MODERATOR_ROLE = 191344863038537728
 MEMELORD_ROLE = 334301546710040576
 HTC = 184755239952318464
+MEMES_CHANNEL = 334296645833326604
 
 
 class Moderation:
@@ -38,6 +39,8 @@ class Moderation:
             self.memelord_role = discord.utils.get(htc.roles, id=MEMELORD_ROLE)
 
         self.timer = self.bot.loop.create_task(self.check_timer())
+        self.limit = None
+        self.message_rates = {}
 
     async def check_timer(self):
         await self.bot.wait_until_ready()
@@ -80,6 +83,15 @@ class Moderation:
                         msg += '.'
                     await message.channel.send(msg)
 
+        elif self.limit is not None and message.channel.id == MEMES_CHANNEL:
+            try:
+                if time.time() < self.message_rates[message.author.id]:
+                    await message.delete()
+                else:
+                    self.message_rates[message.author.id] = time.time() + self.limit
+            except KeyError:
+                self.message_rates[message.author.id] = time.time() + self.limit
+
     async def on_member_ban(self, guild, member):
         self.bannedusers[guild.id] = member.id
 
@@ -107,14 +119,23 @@ class Moderation:
     async def __local_check(self, ctx):
         if ctx.guild.id != HTC:
             raise self.bot.SilentCheckFailure
-
+        '''
         if ctx.channel.id != MEMELORD_CHANNEL:
             raise self.bot.SilentCheckFailure
-
+        '''
         if self.moderator_role not in ctx.author.roles:
             raise self.bot.SilentCheckFailure
 
         return True
+
+    @commands.command()
+    async def ratelimit(self, ctx, seconds_per_message: float = None):
+        if seconds_per_message is not None:
+            self.limit = seconds_per_message
+            await ctx.send(f'Rate limit set to 1 message every {self.limit} second(s).')
+        else:
+            self.limit = None
+            await ctx.send('Rate limit removed')
 
     @commands.command()
     async def forget_memelord(self, ctx, member: commands.MemberConverter):
