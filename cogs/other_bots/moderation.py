@@ -66,10 +66,12 @@ class Moderation:
                             await member.remove_roles(self.memelord_role)
                     except discord.NotFound:
                         await m_channel.send(f'{member} left')
+                    except Exception:
+                        pass
                     else:
                         await m_channel.send(f'{member} was released.')
-
-                    self.memelordings.remove(memelording)
+                    finally:
+                        self.memelordings.remove(memelording)
 
                 await self.save(None)
             await asyncio.sleep(5)
