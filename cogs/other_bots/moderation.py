@@ -98,6 +98,10 @@ class Moderation:
                     await message.channel.send(msg)
 
         elif self.limit is not None and message.channel.id == MEMES_CHANNEL:
+            if message.channel.permissions_for(message.author).manage_messages:
+                # Use Manage Messages to test if a member classes as a moderator
+                return
+
             try:
                 if time.time() < self.message_rates[message.author.id]:
                     await message.delete()
