@@ -44,7 +44,7 @@ class Spoilers:
                 await message.channel.send('You already have access to the spoilers channel.', delete_after=10)
 
             try: await message.delete()
-            except discord.Forbidden: pass
+            except (discord.Forbidden, discord.NotFound): pass
 
 
         elif command in ['votespoilers', 'spoilvotes', 'spoilv', 'vspoilers', 'vspoil', 'spoil_votes', 'vote_spoilers']:
@@ -55,7 +55,7 @@ class Spoilers:
                 await message.channel.send('You already have access to the vote spoilers channel.', delete_after=10)
 
             try: await message.delete()
-            except discord.Forbidden: pass
+            except (discord.Forbidden, discord.NotFound): pass
 
 
         elif command in ['spoil_forever', 'spoilforever']:
@@ -77,7 +77,7 @@ class Spoilers:
                     await message.delete()
                     if response_message is not None:
                         await response_message.delete()
-                except discord.Forbidden:
+                except (discord.Forbidden, discord.NotFound):
                     pass
                 return
 
@@ -90,9 +90,9 @@ class Spoilers:
                 await message.channel.send('You already have access to the spoilers channel forever.', delete_after=10)
 
             try:
-                await message.delete()
                 await response_message.delete()
-            except discord.Forbidden:
+                await message.delete()
+            except (discord.Forbidden, discord.NotFound):
                 pass
 
         elif command in ['remove']:
@@ -102,8 +102,8 @@ class Spoilers:
             else:
                 await message.channel.send('You already don\'t have access to the spoilers channels.', delete_after=10)
 
-            try:  await message.delete()
-            except discord.Forbidden: pass
+            try: await message.delete()
+            except (discord.Forbidden, discord.NotFound): pass
 
         elif command in ['help']:
             msg  = f'**SpoilerBot Help:**\n'

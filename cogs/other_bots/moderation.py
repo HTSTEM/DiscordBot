@@ -212,6 +212,7 @@ class Moderation:
         m_channel = self.bot.get_guild(HTC).get_channel(MEMELORD_CHANNEL)
         await m_channel.send(member.mention)  # Ping 'em
 
+
     @memelord.after_invoke
     @forget_memelord.after_invoke
     async def save(self, _):
