@@ -24,7 +24,8 @@ else:
     ]
 
 
-class Colours:
+class Colors:
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -53,7 +54,7 @@ class Colours:
                 else:
                     print("The bot currently has permission to manage roles.")
 
-            if command == "colourstats":
+            if command == "colorstats":
                 if htc.large: await self.bot.request_offline_members(htc)
                 d = "--- FLAIR STATS ---\n"
                 for role in teams:
@@ -68,12 +69,12 @@ class Colours:
             if len(names) > 1:
                 names[-1] = 'or {}'.format(names[-1])
             await message.channel.send(
-                'To Colour™ yourself, say {0}. To Un-Colour™, say `{1}remove`. To get a Random™ Colour™, use `{1}random`.'.format(', '.join(names),prefix)
+                'To Color™ yourself, say {0}. To Un-Color™, say `{1}remove`. To get a Random™ Color™, use `{1}random`.'.format(', '.join(names),prefix)
             )
 
         if (command == "list" and (isinstance(message.channel, discord.abc.PrivateChannel) or message.guild.id == guild_id)):
             await message.channel.send(
-                'Here\'s an image showing all the available Colours™: <https://i.imgur.com/SIPaKUM.png>'
+                'Here\'s an image showing all the available Colors™: <https://i.imgur.com/SIPaKUM.png>'
             )
 
         try:
@@ -88,8 +89,8 @@ class Colours:
                             await user.remove_roles(role)
 
 
-                    if removed:  d = "You have successfully been Un-Coloured™."
-                    else: d = "You aren't Coloured™!"
+                    if removed:  d = "You have successfully been Un-Colored™."
+                    else: d = "You aren't Colored™!"
 
                     if isinstance(message.channel, discord.abc.PrivateChannel):
                         await message.channel.send(d)
@@ -108,10 +109,10 @@ class Colours:
                     await user.add_roles(team)
 
                     if isinstance(message.channel, discord.abc.PrivateChannel):
-                        await message.channel.send("Your Colour™ is now {}.".format(team.name))
+                        await message.channel.send("Your Color™ is now {}.".format(team.name))
                     else:
                         await message.channel.send(
-                            "Your Colour™ is now {}.".format(team.name),
+                            "Your Color™ is now {}.".format(team.name),
                             delete_after=5
                         )
                         try: await message.delete()
@@ -129,10 +130,10 @@ class Colours:
                         await user.add_roles(team)
 
                         if isinstance(message.channel, discord.abc.PrivateChannel):
-                            await message.channel.send("Your Colour™ is now {}.".format(team.name))
+                            await message.channel.send("Your Color™ is now {}.".format(team.name))
                         else:
                             await message.channel.send(
-                                "Your Colour™ is now {}.".format(team.name),
+                                "Your Color™ is now {}.".format(team.name),
                                 delete_after=5
                             )
                             try: await message.delete()
@@ -143,7 +144,7 @@ class Colours:
             if debug:
                 raise e
             else:
-                print("[ERROR] A Colour™-crashing error occured somewhere in the code.")
+                print("[ERROR] A Color™-crashing error occured somewhere in the code.")
 
     @staticmethod
     def get_role_count(role_name, guild):
@@ -160,4 +161,4 @@ class Colours:
 
 
 def setup(bot):
-    bot.add_cog(Colours(bot))
+    bot.add_cog(Colors(bot))
