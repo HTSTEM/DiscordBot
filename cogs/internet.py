@@ -18,6 +18,8 @@ XKCD_RSS = 'https://xkcd.com/rss.xml'
 BOTE_SPAM = 282219466589208576
 VT_API = 'https://www.virustotal.com/vtapi/v2'
 
+cog = None
+
 
 class Internet:
 
@@ -29,7 +31,7 @@ class Internet:
         self.bot = bot
         self.uploader_client = DataUploader(bot)
         self.xkcd_feed = feedparser.parse(XKCD_RSS)
-        bot.loop.create_task(self.check_xkcd())
+        self.checker = bot.loop.create_task(self.check_xkcd())
 
     async def check_xkcd(self):
         while True:
@@ -182,4 +184,10 @@ class Internet:
 
 
 def setup(bot):
+    global cog
     bot.add_cog(Internet(bot))
+    cog = bot.cogs['Internet']
+
+def teardown(bot):
+    global cog
+    cog.checker.close()

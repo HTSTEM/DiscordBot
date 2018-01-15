@@ -27,6 +27,8 @@ else: # htc
     MEMES_CHANNEL = 334296645833326604
     MEMES_VC = 334321731277684736
 
+cog = None
+
 
 class Moderation:
     def __init__(self, bot):
@@ -240,4 +242,10 @@ class Moderation:
 
 
 def setup(bot):
+    global cog
     bot.add_cog(Moderation(bot))
+    cog = bot.cogs['Moderation']
+
+def teardown(bot):
+    global cog
+    cog.timer.close()
