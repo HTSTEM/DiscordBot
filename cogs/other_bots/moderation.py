@@ -148,6 +148,7 @@ class Moderation:
 
     @commands.command()
     async def ratelimit(self, ctx, seconds_per_message: float = None):
+        self.message_rates = {}
         if seconds_per_message is not None:
             self.limit = seconds_per_message
             await ctx.send(f'Rate limit set to 1 message every {self.limit} second(s).')
