@@ -15,7 +15,7 @@ from .util.checks import right_channel
 
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
 XKCD_RSS = 'https://xkcd.com/rss.xml'
-BOTE_SPAM = 282219466589208576
+BOTE_SPAM = 282500390891683841
 VT_API = 'https://www.virustotal.com/vtapi/v2'
 
 cog = None
