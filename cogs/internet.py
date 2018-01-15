@@ -2,6 +2,8 @@ import urllib.parse
 import random
 import time
 import aiohttp
+import feedparser
+import asyncio
 
 from discord.ext import commands
 import discord
@@ -12,6 +14,7 @@ from .util.checks import right_channel
 
 
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
+XKCD_RSS = 'https://xkcd.com/rss.xml'
 VT_API = 'https://www.virustotal.com/vtapi/v2'
 
 
@@ -24,6 +27,20 @@ class Internet:
     def __init__(self, bot):
         self.bot = bot
         self.uploader_client = DataUploader(bot)
+        self.xkcd_feed = feedparser.parse(XKCD_RSS)
+        bot.loop.create_task(self.check_xkcd())
+
+    async def check_xkcd(self):
+        while True:
+            feed = feedparser.parse(XKCD_RSS, modified=self.xkcd_feed.modified)
+            if feed.status == 200:
+                self.xkcd_feed = feed
+                for id in self.bot.config['ids']['allowed_channels']:
+                    channel = self.bot.get_channel(id)
+                    if channel is not None:
+                        await channel.send(feed.entries[0].link)
+
+            await asyncio.sleep(600)
 
     @commands.command(aliases=['adam', 'slice', 'jake', 'sills', 'zwei'])
     async def dog(self, ctx):
