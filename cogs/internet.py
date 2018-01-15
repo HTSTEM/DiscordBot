@@ -15,6 +15,7 @@ from .util.checks import right_channel
 
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
 XKCD_RSS = 'https://xkcd.com/rss.xml'
+BOTE_SPAM = 282219466589208576
 VT_API = 'https://www.virustotal.com/vtapi/v2'
 
 
@@ -34,11 +35,12 @@ class Internet:
         while True:
             feed = feedparser.parse(XKCD_RSS, modified=self.xkcd_feed.modified)
             if feed.status == 200:
-                self.xkcd_feed = feed
-                for id in self.bot.config['ids']['allowed_channels']:
-                    channel = self.bot.get_channel(id)
+                if feed.entries[0].link != self.xkcd_feed.entries[0].link:
+                    channel = self.bot.get_channel(BOTE_SPAM)
                     if channel is not None:
                         await channel.send(feed.entries[0].link)
+
+                    self.xkcd_feed = feed
 
             await asyncio.sleep(600)
 
