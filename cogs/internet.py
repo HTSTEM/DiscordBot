@@ -1,3 +1,5 @@
+from urllib.parse import quote as uriquote
+from lxml import etree
 import urllib.parse
 import random
 import time
