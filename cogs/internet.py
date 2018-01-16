@@ -314,8 +314,8 @@ class Internet:
 
         return card, entries
 
-    @commands.command(aliases=['google'])
-    async def g(self, ctx, *, query):
+    @commands.command(aliases=['g'])
+    async def google(self, ctx, *, query):
         '''Searches google and gives you top result.'''
         await ctx.trigger_typing()
         try:
