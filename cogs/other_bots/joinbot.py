@@ -286,7 +286,7 @@ class JoinBot:
         elif before.discriminator != after.discriminator:
             self.log.info(f'A User ({before.id}) changed their discriminator from {before.discriminator} to {before.discriminator}')
             
-            msg = f':repeat: User **{before}**\'s discrim changed from {before.discriminator} to {after.discriminator}'
+            msg = f':repeat: User **{before}** ({before.mention})\'s discrim changed from {before.discriminator} to {after.discriminator}'
             
             await self.broadcast_message(msg, after.guild)
             
