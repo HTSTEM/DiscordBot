@@ -53,7 +53,7 @@ class Moderation:
             self.memelord_role = discord.utils.get(htc.roles, id=MEMELORD_ROLE)
 
         self.timer = self.bot.loop.create_task(self.check_timer())
-        self.limit = None
+        self.limit = (-1, 0)  # x per y <- (x, y)
         self.message_rates = {}
 
     async def check_timer(self):
@@ -99,18 +99,23 @@ class Moderation:
                         msg += '.'
                     await message.channel.send(msg)
 
-        elif self.limit is not None and message.channel.id == MEMES_CHANNEL:
+        elif self.limit != (-1, 0) and message.channel.id == MEMES_CHANNEL:
             if message.channel.permissions_for(message.author).manage_messages:
                 # Use Manage Messages to test if a member classes as a moderator
                 return
 
             try:
-                if time.time() < self.message_rates[message.author.id]:
+                now = time.time()
+                for i in list(self.message_rates[message.author.id]):
+                    if now - i[1] > self.limit[1]:
+                        self.message_rates[message.author.id].remove(i)
+
+                if len(self.message_rates[message.author.id]) > self.limit[0] - 1:
                     await message.delete()
                 else:
-                    self.message_rates[message.author.id] = time.time() + self.limit
+                    self.message_rates[message.author.id].append(time.time())
             except KeyError:
-                self.message_rates[message.author.id] = time.time() + self.limit
+                self.message_rates[message.author.id] = [time.time()]
 
     async def on_member_ban(self, guild, member):
         self.bannedusers[guild.id] = member.id
@@ -149,13 +154,13 @@ class Moderation:
         return True
 
     @commands.command()
-    async def ratelimit(self, ctx, seconds_per_message: float = None):
+    async def ratelimit(self, ctx, messages: int=-1, seconds: int=0):
         self.message_rates = {}
         if seconds_per_message is not None:
-            self.limit = seconds_per_message
-            await ctx.send(f'Rate limit set to 1 message every {self.limit} second(s).')
+            self.limit = (messages, seconds)
+            await ctx.send(f'Rate limit set to {self.limit[0]} message(s) every {self.limit[1]} second(s).')
         else:
-            self.limit = None
+            self.limit = (-1, 0)
             await ctx.send('Rate limit removed')
 
     @commands.command()
