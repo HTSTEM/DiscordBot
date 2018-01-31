@@ -107,7 +107,7 @@ class Moderation:
             try:
                 now = time.time()
                 for i in list(self.message_rates[message.author.id]):
-                    if now - i[1] > self.limit[1]:
+                    if now - i > self.limit[1]:
                         self.message_rates[message.author.id].remove(i)
 
                 if len(self.message_rates[message.author.id]) > self.limit[0] - 1:
