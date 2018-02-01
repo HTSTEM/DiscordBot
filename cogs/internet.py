@@ -349,7 +349,7 @@ class Internet:
     async def wolfram(self, ctx, *, query: str):
         """Search Wolfram|Alpha for a query"""
         op = urllib.parse.urlencode({'i': query})
-        await ctx.send('https://www.wolframalpha.com/input/?{}'.format(op))
+        await ctx.send('<https://www.wolframalpha.com/input/?{}>'.format(op))
 
     @commands.command()
     async def lucky(self, ctx, *, query: str):
