@@ -230,7 +230,6 @@ class JoinBot:
         await self.broadcast_message(msg, member.guild)
 
     async def on_member_remove(self, member):
-        avatar_url = member.avatar_url_as(format=AVATAR_FORMAT, size=AVATAR_SIZE)
         avatar_path = f'{AVATARS_CACHE}/{member.avatar}.{AVATAR_FORMAT}'
         if os.path.exists(avatar_path):
             os.remove(avatar_path)

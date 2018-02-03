@@ -19,6 +19,7 @@ if debug == 1: # hanss314
     HTC = 297811083308171264
     MEMES_CHANNEL = 315541099298947073
     MEMES_VC = 348301159573880834
+    MUTED_ROLE = 207659596167249920
 
 else: # htc
     MEMELORD_CHANNEL = 334296605349904384
@@ -28,6 +29,7 @@ else: # htc
     HTC = 184755239952318464
     MEMES_CHANNEL = 334296645833326604
     MEMES_VC = 334321731277684736
+    MUTED_ROLE = 207659596167249920
 
 cog = None
 
@@ -48,11 +50,13 @@ class Moderation:
         self.bannedusers = {}
         self.moderator_role = None
         self.memelord_role = None
+        self.muted_role = None
 
         htc = self.bot.get_guild(HTC)
         if htc is not None:
             self.moderator_role = discord.utils.get(htc.roles, id=MODERATOR_ROLE)
             self.memelord_role = discord.utils.get(htc.roles, id=MEMELORD_ROLE)
+            self.muted_role = discord.utils.get(htc.roles, id=MUTED_ROLE)
 
         self.timer = self.bot.loop.create_task(self.check_timer())
         self.limit = (-1, 0)  # x per y <- (x, y)
@@ -86,6 +90,8 @@ class Moderation:
             self.moderator_role = discord.utils.get(htc.roles, id=MODERATOR_ROLE)
         if self.memelord_role is None:
             self.memelord_role = discord.utils.get(htc.roles, id=MEMELORD_ROLE)
+        if self.muted_role is None:
+            self.muted_role = discord.utils.get(htc.roles, id=MUTED_ROLE)
 
     async def on_message(self, message):
         if message.channel.id == MEMELORD_CHANNEL:
@@ -140,6 +146,12 @@ class Moderation:
             channel = self.bot.get_guild(HTC).get_channel(JOINBOT_CHANNEL)
             return await channel.send(
                 f':rotating_light::rotating_light: **{member} was a memelord!** :rotating_light::rotating_light:'
+            )
+
+        if self.muted_role in member.roles:
+            channel = self.bot.get_guild(HTC).get_channel(JOINBOT_CHANNEL)
+            return await channel.send(
+                f':rotating_light::rotating_light: **{member} was muted!** :rotating_light::rotating_light:'
             )
 
     # Commands stuff
