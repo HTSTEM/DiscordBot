@@ -222,7 +222,9 @@ class Moderation:
             await ctx.send(f'{member} has been memelorded for {length} minutes.')
 
         m_channel = self.bot.get_guild(HTC).get_channel(MEMELORD_CHANNEL)
-        await m_channel.send(member.mention)  # Ping 'em
+        await m_channel.send(
+            f'{member.mention} Please respond in snail time to start the timer or see the reason'
+        )  # Ping 'em
 
 
     @memelord.after_invoke
