@@ -7,6 +7,8 @@ from ruamel import yaml
 from discord.ext import commands
 import discord
 
+from .spoilers import SADAMA_ROLE, VSPOILER_ROLE, SPOILER_ROLE
+
 debug = 0
 
 if debug == 1: # hanss314
@@ -211,6 +213,10 @@ class Moderation:
         if member.voice:
             afk = ctx.guild.afk_channel
             await member.move_to(afk, reason='Memelorded')
+
+        for role in member.roles:
+            if role.id in [VSPOILER_ROLE, SPOILER_ROLE, SADAMA_ROLE]:
+                await member.remove_roles(role, reason='Memelorded')
 
         # APPLY ROLE
         if self.memelord_role not in member.roles:

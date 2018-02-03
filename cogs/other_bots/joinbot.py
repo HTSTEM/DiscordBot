@@ -4,7 +4,6 @@ import datetime
 import asyncio
 import logging
 import os
-import shutil
 import aiohttp
 import discord
 
