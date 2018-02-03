@@ -19,7 +19,7 @@ if debug == 1: # hanss314
     HTC = 297811083308171264
     MEMES_CHANNEL = 315541099298947073
     MEMES_VC = 348301159573880834
-    MUTED_ROLE = 207659596167249920
+    MUTED_ROLE = 409418244139646982
 
 else: # htc
     MEMELORD_CHANNEL = 334296605349904384
@@ -166,6 +166,14 @@ class Moderation:
             raise self.bot.SilentCheckFailure
 
         return True
+
+    @commands.command()
+    async def mute(self, ctx, *members: commands.MemberConverter):
+        """Mutes members"""
+        for member in members:
+            await member.add_roles(self.muted_role)
+
+        await ctx.send(f'Muted {", ".join(str(member) for member in members)}.')
 
     @commands.command()
     async def ratelimit(self, ctx, messages: int=-1, seconds: int=0):
