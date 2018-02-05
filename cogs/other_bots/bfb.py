@@ -42,6 +42,8 @@ class BFB:
     async def on_message(self, message):
         if (not message.content.startswith(prefix)) or message.content.startswith(prefix+prefix):
             return
+        if message.channel.id == 334296605349904384:
+            return
 
         command = message.content.split(' ')[0][len(prefix):].lower()
 

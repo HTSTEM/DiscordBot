@@ -17,6 +17,8 @@ class Spoilers:
             return
         if message.guild is None or message.guild.id != HTC:
             return
+        if message.channel.id == 334296605349904384:
+            return
 
         command = message.content.split(' ')[0][len(PREFIX):].lower()
 
