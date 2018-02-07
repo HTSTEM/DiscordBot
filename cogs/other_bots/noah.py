@@ -9,7 +9,7 @@ class Hi:
 
     async def on_message(self, message):
         if message.guild is None:
-            if '!' not in message.content.lower():
+            #if '!' not in message.content.lower():
                 c = self.bot.get_channel(410911182158036992)
                 embed = discord.Embed(description=message.content)
                 if message.embeds:
