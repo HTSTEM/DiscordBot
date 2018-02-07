@@ -69,12 +69,13 @@ class Flairs:
             if len(names) > 1:
                 names[-1] = 'or {}'.format(names[-1])
             await message.channel.send(
-                'To join a team, say {}. To leave your team, say `{}remove`'.format(', '.join(names), prefix)
+                'To join a team, say {}. To leave your team, say `{}remove`'.format(', '.join(names), prefix), delete_after=20
             )
+            await message.delete()
 
         try:
             if (command != "help" and (isinstance(message.channel, discord.abc.PrivateChannel) or
-               (message.guild.id == guild_id and message.channel.name not in ["music", "serious"]))):
+               (message.guild.id == guild_id))):
                 user = htc.get_member(message.author.id)
                 roles = htc.roles
                 teams = []

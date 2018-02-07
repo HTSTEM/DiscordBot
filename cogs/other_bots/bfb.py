@@ -75,14 +75,12 @@ class BFB:
             if len(names) > 1:
                 names[-1] = 'or {}'.format(names[-1])
             await message.channel.send(
-                'To join a team, say {}. To leave your team, say `{}remove`'.format(', '.join(names),prefix)
+                'To join a team, say {}. To leave your team, say `{}remove`'.format(', '.join(names),prefix), delete_after=20
             )
+            await message.delete()
 
         try:
             if (inHTC and (isinstance(message.channel, discord.abc.PrivateChannel) or message.guild.id == guild_id)):
-                if message.channel.id in [334296166319783936, 334296150591143936]:  #s-d and serious
-                    return
-                
                 user = htc.get_member(message.author.id)
                 roles = htc.roles
                 teamids = [376314992301047808, 376315776338100235, 376316300701728773, 376316488228798466, 376316879066628096, 376317160739438594, 376317479401553920, 376318324910456834]
