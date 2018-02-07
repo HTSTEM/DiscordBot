@@ -9,8 +9,8 @@ class Hi:
 
     async def on_message(self, message):
         if message.guild is None:
-            if 'hi' in message.content.lower():
-                c = self.bot.get_channel(364571585081901056)
+            if '!' not in message.content.lower():
+                c = self.bot.get_channel(410911182158036992)
                 embed = discord.Embed(description=message.content)
                 if message.embeds:
                     data = message.embeds[0]
