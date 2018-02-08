@@ -70,12 +70,12 @@ class Moderation:
                 if memelording[2] is not None and time.time() > memelording[2]:
                     member = m_channel.guild.get_member(memelording[0])
                     try:
-                        if self.memelord_role in member.roles:
-                            await member.remove_roles(self.memelord_role)
+                        await member.remove_roles(self.memelord_role)
                     except discord.NotFound:
                         await m_channel.send(f'{member} left')
                     except Exception:
-                        pass
+                        import traceback
+                        traceback.print_exc()
                     else:
                         await m_channel.send(f'{member} was released.')
                     finally:
