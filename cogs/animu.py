@@ -7,6 +7,7 @@ import functools
 from discord.ext import commands
 from pybooru import Danbooru
 from pybooru.exceptions import PybooruHTTPError
+import pixiv
 
 from .util.checks import right_channel
 from .util.da import DeviationCollector
@@ -27,6 +28,13 @@ class Animu:
             key = f.read().split('\n')[0].strip()
 
         self.danb = Danbooru('danbooru', username=creds.get('user'), api_key=key)
+
+        creds = bot.config['pixiv']
+        pwd_file = creds.get('pwd_file')
+        with open(pwd_file) as f:
+            pwd = f.read().split('\n')[0].strip()
+
+        self.pixiv = pixiv.login(creds.get('user'), pwd_file)
 
     @staticmethod
     async def __local_check(ctx):
@@ -111,6 +119,13 @@ class Animu:
             return await ctx.send(f'<{fileurl}>')  # antiembed for accidental lewdness prevention
 
         return await ctx.send(fileurl)
+
+    @commands.command()
+    async def pixiv(self, ctx, *, query: str):
+        r = self.pixiv.search(query)
+        if not r:
+            return await ctx.send('No results found.')
+        return await ctx.send(r[0].image)
 
     @commands.command()
     async def pfp(self, ctx, *, query: str):

@@ -12,6 +12,10 @@ deviantart:
   client_secret_file:
     config/da_secret.txt
 
+pixiv:
+  user: user_nnpa3353
+  pwd_file: config/pixiv.txt
+
 danbooru:
   user: htstem
   key_file: config/danbooru_key.txt
