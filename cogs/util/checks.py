@@ -11,7 +11,7 @@ def is_staff():
 
 def is_owner():
     def predicate(ctx: commands.Context) -> bool:
-        return ctx.author.id == ctx.bot.config['ids']['host']
+        return ctx.author.id in ctx.bot.config['ids']['hosts']
     return commands.check(predicate)
 
 def is_developer():
@@ -30,7 +30,7 @@ def right_channel(ctx: commands.Context) -> bool:
     globs = ctx.bot.config.get('global_coms', {})
     allowed = channel_ids.get('allowed_channels', None)
     blocked = channel_ids.get('blocked_channels', [])
-    
+
     if allowed is not None:
         if ctx.channel.id not in allowed:
             if not ctx.command.name in globs:
@@ -39,5 +39,5 @@ def right_channel(ctx: commands.Context) -> bool:
     if ctx.channel.id in blocked:
         if not ctx.command.name in globs:
             raise ctx.bot.SilentCheckFailure()
-        
+
     return True
