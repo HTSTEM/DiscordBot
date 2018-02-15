@@ -156,7 +156,7 @@ class Moderation:
 
     # Commands stuff
     async def __local_check(self, ctx):
-        if ctx.guild.id != HTC:
+        if ctx.guild is None or ctx.guild.id != HTC:
             raise self.bot.SilentCheckFailure
         '''
         if ctx.channel.id != MEMELORD_CHANNEL:
