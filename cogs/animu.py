@@ -1,4 +1,5 @@
 import random
+import os
 
 import discord
 import tokage
@@ -34,7 +35,7 @@ class Animu:
         with open(pwd_file) as f:
             pwd = f.read().split('\n')[0].strip()
 
-        self.pixiv = pixiv.login(creds.get('user'), pwd_file)
+#        self.pixiv_ = pixiv.login(creds.get('user'), pwd)
 
     @staticmethod
     async def __local_check(ctx):
@@ -122,10 +123,29 @@ class Animu:
 
     @commands.command()
     async def pixiv(self, ctx, *, query: str):
-        r = self.pixiv.search(query)
-        if not r:
-            return await ctx.send('No results found.')
-        return await ctx.send(r[0].image)
+        """Find some fun things on Pixiv"""
+        return
+        async with ctx.typing():
+            r = self.pixiv_.search(query)
+            if not r:
+                return await ctx.send('No results found.')
+
+            await ctx.send(f'I found: https://pixiv.net/i/{random.choice(r).id}')
+
+    @commands.command()
+    async def pixivfr(self, ctx, *, query: str):
+        """Find some fun things on Pixiv (full-res)"""
+
+        async with ctx.typing():
+            r = self.pixiv_.search(query)
+            if not r:
+                return await ctx.send('No results found.')
+
+            fn = random.choice(r).save()
+
+            with open(fn, 'rb') as f:
+                await ctx.send(f'I found:', file=discord.File(f))
+            os.remove(fn)
 
     @commands.command()
     async def pfp(self, ctx, *, query: str):
