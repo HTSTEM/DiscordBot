@@ -75,7 +75,9 @@ class HTSTEMBote(commands.AutoShardedBot):
             await self.process_commands(message)
             return
 
-        await self.process_commands(message)
+        # Process messages from users
+        if not message.author.bot:
+            await self.process_commands(message)
 
     async def notify_devs(self, lines, message: discord.Message = None):
         # form embed
