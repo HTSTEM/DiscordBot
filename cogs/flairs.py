@@ -86,7 +86,10 @@ class Flairs:
                                   delete_after=5)
 
         if flair:
-            if flair not in flairs:
+            for category in flairs:
+                if category.lower() == flair.lower():
+                    break
+            else
                 return await ctx.send('No category found with that name.',
                                       delete_after=5)
 
