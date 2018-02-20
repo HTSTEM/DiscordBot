@@ -89,7 +89,7 @@ class Flairs:
             for category in flairs:
                 if category.lower() == flair.lower():
                     break
-            else
+            else:
                 return await ctx.send('No category found with that name.',
                                       delete_after=5)
 
