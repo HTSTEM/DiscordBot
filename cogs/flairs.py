@@ -4,8 +4,6 @@ import discord
 import asyncio
 
 
-# Format:
-# FLAIRS[guild_id][category][name] = role_id
 FLAIRS = {
     184755239952318464: {
         'BFB': {
@@ -74,6 +72,50 @@ class Flairs:
 
         await ctx.send(embed=embed)
 
+    @commands.command()
+    @commands.guild_only()
+    async def fclear(self, ctx, *, flair:str=''):
+        await self.safe_delete(ctx)
+
+        flairs = FLAIRS.get(ctx.guild.id)
+        if flairs is None or len(flairs) == 0:
+            return await ctx.send('No flairs setup', delete_after=5)
+
+        if not ctx.me.guild_permissions.manage_roles:
+            return await ctx.send('I don\'t have `Manage Roles` permission.',
+                                  delete_after=5)
+
+        if flair:
+            if flair not in flairs:
+                return await ctx.send('No category found with that name.',
+                                      delete_after=5)
+
+            to_remove = []
+            for f in flairs[category]:
+                role = discord.utils.get(ctx.guild.roles,
+                                         id=flairs[category][f])
+                if role is not None:
+                    to_remove.append(role)
+
+            await ctx.author.remove_roles(*to_remove)
+
+            return await ctx.send(f'All "{category}" flairs have been removed.',
+                                  delete_after=5)
+        else:
+            to_remove = []
+
+            for category in flairs:
+                for f in flairs[category]:
+                    role = discord.utils.get(ctx.guild.roles,
+                                             id=flairs[category][f])
+                    if role is not None:
+                        to_remove.append(role)
+
+            await ctx.author.remove_roles(*to_remove)
+
+            return await ctx.send('All your flairs have been removed.',
+                                  delete_after=5)
+
     @commands.command(aliases=['flair'])
     @commands.guild_only()
     async def f(self, ctx, *, flair:str=''):
@@ -105,7 +147,9 @@ class Flairs:
             role = discord.utils.get(ctx.guild.roles, id=flairs[category][f])
             if f == flair:
                 if role is None:
-                    return await ctx.send('The flairs have be configured incorrectly; this flair is unavaliable.',
+                    return await ctx.send('The flairs have be configured '\
+                                          'incorrectly; this flair is '\
+                                          'unavaliable.',
                                           delete_after=5)
                 to_add = role
             elif role is not None:
