@@ -72,14 +72,12 @@ cogs:
   - cogs.core
   - cogs.misc
   - cogs.animu
+  - cogs.flairs
   - cogs.youtube
   - cogs.hashing
   - cogs.internet
   - cogs.information
-  - cogs.other_bots.flairs
   - cogs.other_bots.rules
-  - cogs.other_bots.colors
-  - cogs.other_bots.bfb
   - cogs.other_bots.slack
   - cogs.other_bots.archive
   - cogs.other_bots.joinbot
