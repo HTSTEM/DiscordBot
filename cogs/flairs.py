@@ -54,9 +54,10 @@ class Flairs:
 
         asyncio.ensure_future(_delete(), loop=self.bot.loop)
 
-    @commands.command()
+    @commands.command(aliases=['listflairs'])
     @commands.guild_only()
     async def flairs(self, ctx):
+        """List the available flairs for this server"""
         embed = discord.Embed(title='Available flairs:',
                               color=ctx.me.color.value)
         flairs = FLAIRS.get(ctx.guild.id)
@@ -74,7 +75,8 @@ class Flairs:
 
     @commands.command()
     @commands.guild_only()
-    async def fclear(self, ctx, *, flair:str=''):
+    async def fclear(self, ctx, *, flair: str=''):
+        """Remove all your flairs for this server"""
         await self.safe_delete(ctx)
 
         flairs = FLAIRS.get(ctx.guild.id)
@@ -121,7 +123,8 @@ class Flairs:
 
     @commands.command(aliases=['flair'])
     @commands.guild_only()
-    async def f(self, ctx, *, flair:str=''):
+    async def f(self, ctx, *, flair: str=''):
+        """Get a flair"""
         await self.safe_delete(ctx)
 
         flairs = FLAIRS.get(ctx.guild.id)
@@ -129,7 +132,7 @@ class Flairs:
             return await ctx.send('No flairs setup', delete_after=5)
 
         if not flair:
-            return await ctx.send('I need to know what flair you want.. '\
+            return await ctx.send('I need to know what flair you want.. '
                                   f'Use `{ctx.prefix}flairs` to list them all.',
                                   delete_after=5)
 
@@ -150,8 +153,8 @@ class Flairs:
             role = discord.utils.get(ctx.guild.roles, id=flairs[category][f])
             if f == flair:
                 if role is None:
-                    return await ctx.send('The flairs have be configured '\
-                                          'incorrectly; this flair is '\
+                    return await ctx.send('The flairs have be configured '
+                                          'incorrectly; this flair is '
                                           'unavaliable.',
                                           delete_after=5)
                 to_add = role
