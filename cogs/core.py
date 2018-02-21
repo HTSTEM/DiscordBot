@@ -77,6 +77,14 @@ class Core:
 
         await ctx.send('\N{OK HAND SIGN} Reloaded {} cogs successfully'.format(len(ctx.bot.extensions)))
 
+    @reload.command(name='config')
+    @is_developer()
+    async def reload_config(self, ctx):
+        '''Reload the config file'''
+        with open('config/config.yml', 'r') as f:
+            ctx.bot.config = yaml.load(f, Loader=yaml.Loader)
+        await ctx.send('Reloaded config file.')
+
     @commands.command(aliases=['git_pull'])
     @is_developer()
     async def update(self, ctx):
@@ -128,13 +136,6 @@ class Core:
         embed = discord.Embed(colour=colour, title=code, description='```py\n{}```'.format(result))
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
-
-    @commands.command()
-    @is_developer()
-    async def reloadconfig(self, ctx):
-        with open('config.yml', 'r') as f:
-            ctx.bot.config = yaml.load(f, Loader=yaml.Loader)
-        await ctx.send('Reloaded config file.')
 
 
 def setup(bot):
