@@ -61,7 +61,7 @@ FLAIRS = {
         'Payday': {
             'payday': 409499286079012864,
         },
-        'Tarraria': {
+        'Terraria': {
             'terraria': 409809297967415296,
         },
         'Midnight': {
