@@ -64,8 +64,8 @@ class Flairs:
         if flairs is None or len(flairs) == 0:
             embed.add_field(name='Error', value='No flairs setup')
         else:
-            embed.description = f'*Use `{ctx.prefix}fclear` to remove your '\
-                                 'flairs.*'
+            embed.description = f'*Use `{ctx.prefix}fclear [catrgory '\
+                                 '(optional)]` to remove your flairs.*'
 
             for f in flairs:
                 embed.add_field(
