@@ -43,12 +43,13 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.uploader_client = DataUploader(self)
 
         self.database = sqlite3.connect("config/memos.sqlite")
-        if not self._check_table_exists("memos"):
-            dbcur = self.database.cursor()
-            dbcur.execute('''
-                CREATE TABLE memos(memo TEXT, user_id INTEGER, length INTEGER, start_time INTEGER)''')
-            dbcur.close()
-            self.database.commit()
+
+        dbcur = self.database.cursor()
+        dbcur.execute('''
+            CREATE TABLE IF NOT EXISTS memos
+            (memo TEXT, user_id INTEGER, length INTEGER, start_time INTEGER)''')
+        dbcur.close()
+        self.database.commit()
 
     async def get_prefix(self, message):
         if message.guild is None:
@@ -56,18 +57,6 @@ class HTSTEMBote(commands.AutoShardedBot):
         if message.guild.id not in self.config['prefix']:
             return self.config['prefix']['default']
         return self.config['prefix'][message.guild.id]
-
-    def _check_table_exists(self, tablename):
-        dbcur = self.database.cursor()
-        dbcur.execute('''
-            SELECT name FROM sqlite_master WHERE type='table' AND name='{0}';
-            '''.format(tablename.replace('\'', '\'\'')))
-        if dbcur.fetchone():
-            dbcur.close()
-            return True
-
-        dbcur.close()
-        return False
 
     async def on_message(self, message):
 
