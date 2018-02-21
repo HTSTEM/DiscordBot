@@ -1,6 +1,12 @@
 token_file:
   config/token.txt
 
+prefix:
+  default:
+    '?'
+  282219466589208576:
+    'sb?'
+
 # External services
 paste.ee:
   api_key_file:

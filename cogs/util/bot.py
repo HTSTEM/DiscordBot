@@ -32,7 +32,7 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.logger = logging.getLogger('bot')
 
         super().__init__(
-            command_prefix='sb?',
+            command_prefix='',
             command_not_found=HelperBodge('No command called `{}` found.'),
             *args,
             **kwargs
@@ -50,6 +50,12 @@ class HTSTEMBote(commands.AutoShardedBot):
             dbcur.close()
             self.database.commit()
 
+    async def get_prefix(self, message):
+        if message.guild is None:
+            return [self.config['prefix'][i] for i in self.config['prefix']]
+        if message.guild.id not in self.config['prefix']:
+            return self.config['prefix']['default']
+        return self.config['prefix'][message.guild.id]
 
     def _check_table_exists(self, tablename):
         dbcur = self.database.cursor()
