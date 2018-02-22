@@ -30,7 +30,7 @@ class Core:
         raise Exception("Yeah baby. Errors for all!")
 
     @commands.command()
-    @commands.is_owner()
+    @is_developer()
     async def load(self, ctx, *, cog: str):
         '''Loads an extension'''
         try:
@@ -41,7 +41,7 @@ class Core:
             await ctx.send('\N{OK HAND SIGN} Loaded cog {} successfully!'.format(cog))
 
     @commands.command()
-    @commands.is_owner()
+    @is_developer()
     async def unload(self, ctx, *, cog: str):
         '''Unloads an extension'''
         try:
