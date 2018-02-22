@@ -32,31 +32,6 @@ class YouTube:
         guild_id = ctx.bot.config.get('ids', {}).get('htstem_id', 0)
         return ctx.guild.id == guild_id if not ctx.bot.debug else True
 
-    @commands.group(aliases=['yt'], invoke_without_command=True)
-    @commands.guild_only()
-    async def youtube(self, ctx):
-        '''Commands related to the YouTube feed.'''
-        formatted = await ctx.bot.formatter.format_help_for(ctx, ctx.command)
-
-        for page in formatted:
-            await ctx.send(page)
-
-    @youtube.command()
-    async def on(self, ctx):
-        '''Add the YouTube role'''
-        role_id = self.config.get('role_id', 0)
-        role = discord.utils.find(lambda r: r.id == role_id or r.name == 'YouTube', ctx.guild.roles)
-        await ctx.author.add_roles(role)
-        await ctx.send("Sweet! You're all set to get notifications for YouTube videos.")
-
-    @youtube.command()
-    async def off(self, ctx):
-        '''Remove the YouTube role'''
-        role_id = self.config.get('role_id', 0)
-        role = discord.utils.find(lambda r: r.id == role_id or r.name == 'YouTube', ctx.guild.roles)
-        await ctx.author.remove_roles(role)
-        await ctx.send("You'll no longer recieve notifications for new videos.")
-
     async def youtube_feed(self):
         # File managment could be improved
         # *cough* *cough* botterwhydidyouchangeit *cough*
