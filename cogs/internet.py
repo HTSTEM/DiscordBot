@@ -13,6 +13,7 @@ import discord
 from .util.data_uploader import DataUploader
 from .util.converters import CleanedCode
 from .util.checks import right_channel
+from .util.duckduckgo import DuckDuckGo
 
 
 XKCD_ENDPOINT = 'https://xkcd.com/{}/info.0.json'
@@ -34,6 +35,8 @@ class Internet:
         self.uploader_client = DataUploader(bot)
         self.xkcd_feed = feedparser.parse(XKCD_RSS)
         self.checker = bot.loop.create_task(self.check_xkcd())
+
+        self.ddg = DuckDuckGo(bot)
 
     async def check_xkcd(self):
         while True:
@@ -460,6 +463,27 @@ class Internet:
             await ctx.send('Search failed. Are you sure you entered a valid url?')
         else:
             await ctx.send(f'Scan results found.\n{response["permalink"]}')
+
+    @commands.command(alias=['imagesearch'])
+    async def image(self, ctx, *, query: str):
+    """Search the internet for a nice image for you"""
+
+    image = await self.ddg.get_image(query)
+    if image is None:
+        return await ctx.send('No results found')
+
+    await ctx.send(':outbox_tray: Sent to DMs.')
+    return await ctx.author.send(f'I found {image}')
+
+    @commands.command(alias=['square_i'])
+    async def squarei(self, ctx, *, query: str):
+    """Search the internet for a nice square picture for you"""
+
+    image = await self.ddg.get_pfp_image(query)
+    if image is None:
+        return await ctx.send('No results found')
+
+    return await ctx.send(f'I found {image}')
 
 
 def setup(bot):

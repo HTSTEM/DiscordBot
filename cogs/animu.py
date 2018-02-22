@@ -12,7 +12,6 @@ import pixiv
 
 from .util.checks import right_channel
 from .util.da import DeviationCollector
-from .util.pfp_gen import PFPGrabber
 
 
 class Animu:
@@ -21,7 +20,6 @@ class Animu:
         self.mal_client = tokage.Client()
 
         self.dc = DeviationCollector(bot)
-        self.pg = PFPGrabber(bot)
 
         creds = bot.config['danbooru']
         key_file = creds.get('key_file')
@@ -146,16 +144,6 @@ class Animu:
             with open(fn, 'rb') as f:
                 await ctx.send(f'I found:', file=discord.File(f))
             os.remove(fn)
-
-    @commands.command()
-    async def pfp(self, ctx, *, query: str):
-        """Search the internet for a nice square anime picture for you"""
-
-        image = await self.pg.get_image(query)
-        if image is None:
-            return await ctx.send('No results found')
-
-        return await ctx.send(f'I found {image}')
 
 
 def setup(bot):

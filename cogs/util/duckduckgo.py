@@ -3,11 +3,11 @@ import json
 import re
 
 
-class PFPGrabber:
+class DuckDuckGo:
     def __init__(self, bot):
         self.bot = bot
         self.session = bot.session
-    
+
     async def _search(self, keywords):
         url = 'https://duckduckgo.com/'
         params = {'q': keywords}
@@ -42,24 +42,28 @@ class PFPGrabber:
         )
 
         request_url = url + "i.js"
-        
+
         async with self.session.get(request_url, params=params, headers=headers) as response:
             data = await response.text()
-            
+
             jdata = json.loads(data)
-            
+
             return jdata.get('results')
-    
+
     async def get_image(self, term):
+        results = await self._search(term)
+        return random.choice(results)
+
+    async def get_pfp_image(self, term):
         term = f'{term} profile picture'
-        
+
         results = await self._search(term)
         random.shuffle(results)
-        
+
         best = (None, 0)
         for r in results:
             ar = r.get('width') / r.get('height')
             if abs(1 - best[1]) > abs(1 - ar) + 0.2:  # Make it slightly lenient
                 best = (r.get('image'), ar)
-        
+
         return best[0]
