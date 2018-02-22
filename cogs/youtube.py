@@ -33,6 +33,7 @@ class YouTube:
         return ctx.guild.id == guild_id if not ctx.bot.debug else True
 
     @commands.group(aliases=['yt'], invoke_without_command=True)
+    @commands.guild_only()
     async def youtube(self, ctx):
         '''Commands related to the YouTube feed.'''
         formatted = await ctx.bot.formatter.format_help_for(ctx, ctx.command)
