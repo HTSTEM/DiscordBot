@@ -466,24 +466,24 @@ class Internet:
 
     @commands.command(alias=['imagesearch'])
     async def image(self, ctx, *, query: str):
-    """Search the internet for a nice image for you"""
+        """Search the internet for a nice image for you"""
 
-    image = await self.ddg.get_image(query)
-    if image is None:
-        return await ctx.send('No results found')
+        image = await self.ddg.get_image(query)
+        if image is None:
+            return await ctx.send('No results found')
 
-    await ctx.send(':outbox_tray: Sent to DMs.')
-    return await ctx.author.send(f'I found {image}')
+        await ctx.send(':outbox_tray: Sent to DMs.')
+        return await ctx.author.send(f'I found {image}')
 
     @commands.command(alias=['square_i'])
     async def squarei(self, ctx, *, query: str):
-    """Search the internet for a nice square picture for you"""
+        """Search the internet for a nice square picture for you"""
 
-    image = await self.ddg.get_pfp_image(query)
-    if image is None:
-        return await ctx.send('No results found')
+        image = await self.ddg.get_pfp_image(query)
+        if image is None:
+            return await ctx.send('No results found')
 
-    return await ctx.send(f'I found {image}')
+        return await ctx.send(f'I found {image}')
 
 
 def setup(bot):
