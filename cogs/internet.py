@@ -473,7 +473,7 @@ class Internet:
             return await ctx.send('No results found')
 
         await ctx.send(':outbox_tray: Sent to DMs.')
-        return await ctx.author.send(f'I found {image}')
+        return await ctx.author.send(f':inbox_tray: I found {image}')
 
     @commands.command(alias=['square_i'])
     async def squarei(self, ctx, *, query: str):
