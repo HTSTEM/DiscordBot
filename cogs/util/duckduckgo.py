@@ -52,7 +52,7 @@ class DuckDuckGo:
 
     async def get_image(self, term):
         results = await self._search(term)
-        return random.choice(results)
+        return random.choice(results)['image']
 
     async def get_pfp_image(self, term):
         term = f'{term} profile picture'
