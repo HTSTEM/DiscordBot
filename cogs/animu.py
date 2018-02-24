@@ -1,4 +1,5 @@
 import random
+import io
 import os
 
 import discord
@@ -15,6 +16,8 @@ from .util.da import DeviationCollector
 
 
 class Animu:
+    AWWNIME = 'https://www.reddit.com/r/awwnime.json?limit={}'
+
     def __init__(self, bot):
         self.bot = bot
         self.mal_client = tokage.Client()
@@ -118,6 +121,27 @@ class Animu:
             return await ctx.send(f'<{fileurl}>')  # antiembed for accidental lewdness prevention
 
         return await ctx.send(fileurl)
+
+    @commands.command(aliases=['moe'])
+    async def awwnime(self, ctx, limit:int=100):
+        """Sometimes we all just need a little moe."""
+        async with ctx.typing():
+            async with self.bot.session.get(self.AWWNIME.format(limit)) as resp:
+                dat = await resp.json()
+            dat = dat.get('data', {}).get('children', [])
+            dat = [
+                i for i in dat if i.get('data', {}).get('post_hint', '') == 'image' and not i.get('data', {}).get('over_18', True)
+            ]
+            if not dat:
+                return await ctx.send('I failed to find moe (somehow). Try again later.')
+
+            dat = random.choice(dat).get('data', {})
+
+            if 'url' not in dat:
+                return await ctx.send('Something went very wrong. Please try again.')
+
+            msg = f'**{dat["title"]}**:\n{dat["url"]}'
+            await ctx.send(msg)
 
     @commands.command()
     async def pixiv(self, ctx, *, query: str):
