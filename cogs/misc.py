@@ -4,7 +4,10 @@ import base64
 import random
 import time
 import math
+import io
 import os
+
+from PIL import Image, ImageDraw, ImageOps
 
 from discord.ext import commands
 import discord
@@ -294,6 +297,51 @@ class Misc:
 
         final_url = f'<{source_url}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>'
         await ctx.send(final_url)
+
+    async def get_image(self, message, first=True):
+        back_prop = 25
+
+        if first:
+            for user in message.mentions:
+                return user.avatar_url_as(format='png')
+
+        for attachment in message.attachments:
+            if attachment.width is not None:
+                return attachment.url
+
+        if not first:
+            return None
+
+        async for m in message.channel.history(limit=back_prop):
+            i = await self.get_image(m, False)
+            if i is not None:
+                return i
+
+        return None
+
+    @commands.command()
+    async def circle(self, ctx):
+        def crop_circle(im):
+            mask = Image.new('L', im.size, 0)
+            draw = ImageDraw.Draw(mask)
+            draw.ellipse((0, 0) + im.size, fill=255)
+
+            output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
+            output.putalpha(mask)
+
+            imagefileobject = io.BytesIO()
+            output.save(imagefileobject, format='png')
+            imagefileobject.seek(0)
+            return imagefileobject
+
+        url = await self.get_image(ctx.message)
+        if url is None:
+            return await ctx.send('No image found.')
+
+        async with self.bot.session.get(url) as resp:
+            with Image.open(io.BytesIO(await resp.read())).convert('RGBA') as image:
+                angry_image = await self.bot.loop.run_in_executor(None, crop_circle, image)
+            await ctx.send(file=discord.File(fp=angry_image, filename='circle.png'))
 
     @commands.command()
     async def help(self, ctx, *args):
