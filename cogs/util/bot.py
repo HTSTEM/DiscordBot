@@ -32,7 +32,7 @@ class HTSTEMBote(commands.AutoShardedBot):
         self.logger = logging.getLogger('bot')
 
         super().__init__(
-            command_prefix='',
+            command_prefix='!',
             command_not_found=HelperBodge('No command called `{}` found.'),
             *args,
             **kwargs

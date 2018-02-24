@@ -6,7 +6,7 @@ from cogs.util.bot import HTSTEMBote
 
 def main():
     bot = HTSTEMBote()
-
+    print(bot.command_prefix)
     bot.run()
 
 

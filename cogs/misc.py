@@ -7,7 +7,7 @@ import math
 import io
 import os
 
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw, ImageOps, ImageChops
 
 from discord.ext import commands
 import discord
@@ -322,12 +322,12 @@ class Misc:
     @commands.command()
     async def circle(self, ctx):
         def crop_circle(im):
-            mask = Image.new('L', im.size, 0)
+            mask = Image.new('RGBA', im.size, (0, 0, 0, 0))
             draw = ImageDraw.Draw(mask)
-            draw.ellipse((0, 0) + im.size, fill=255)
+            draw.ellipse((0, 0) + im.size, fill=(255, 255, 255, 255))
 
             output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
-            output.putalpha(mask)
+            output = ImageChops.multiply(output, mask)
 
             imagefileobject = io.BytesIO()
             output.save(imagefileobject, format='png')
