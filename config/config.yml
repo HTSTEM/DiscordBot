@@ -93,6 +93,6 @@ cogs:
 global_coms:
   - memo
   - remind
-  - circle
+#  - circle
   - paste
   - google
