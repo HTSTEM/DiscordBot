@@ -35,6 +35,8 @@ cog = None
 
 
 class Moderation:
+    MAX_RATELIMIT = 300
+
     def __init__(self, bot):
         super().__init__()
 
@@ -179,6 +181,8 @@ class Moderation:
     async def ratelimit(self, ctx, messages: int=-1, seconds: int=0):
         self.message_rates = {}
         if messages > -1 and seconds > 0:
+            if seconds / messages > self.MAX_RATELIMIT:
+                return await ctx.send('That is a silly number. Try again with something less silly.')
             self.limit = (messages, seconds)
             await ctx.send(f'Rate limit set to {self.limit[0]} message(s) every {self.limit[1]} second(s).')
         else:
