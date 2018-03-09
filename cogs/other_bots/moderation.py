@@ -114,8 +114,8 @@ class Moderation:
                 # Use Manage Messages to test if a member classes as a moderator
                 return
 
-            if 'http://' not in message and 'https://' not in message and\
-               'ftp://' not in message and not message.attachments:
+            if 'http://' not in message.content and 'https://' not in message.content and\
+               'ftp://' not in message.content and not message.attachments:
                 return
 
             try:
