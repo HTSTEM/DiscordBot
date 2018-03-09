@@ -114,6 +114,10 @@ class Moderation:
                 # Use Manage Messages to test if a member classes as a moderator
                 return
 
+            if 'http://' not in message and 'https://' not in message and\
+               'ftp://' not in message and not message.attachments:
+                return
+
             try:
                 now = time.time()
                 for i in list(self.message_rates[message.author.id]):
