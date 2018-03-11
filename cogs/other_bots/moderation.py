@@ -135,6 +135,7 @@ class Moderation:
 
     async def on_message_edit(self, old, message):
         if message.guild is None or message.guild.id != HTC: return
+        if message.channel.id == LOG_CHANNEL: return
 
         channel = self.bot.get_guild(HTC).get_channel(LOG_CHANNEL)
         embed = discord.Embed(title=f'Message edited in #{message.channel.name}',
