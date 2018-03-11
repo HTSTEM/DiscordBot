@@ -31,6 +31,8 @@ else: # htc
     MEMES_VC = 334321731277684736
     MUTED_ROLE = 388886242458075137
 
+    LOG_CHANNEL = 422185780564459540
+
 cog = None
 
 
@@ -131,6 +133,15 @@ class Moderation:
             except KeyError:
                 self.message_rates[message.author.id] = [time.time()]
 
+    async def on_message_delete(self, message):
+        channel = self.bot.get_guild(HTC).get_channel(LOG_CHANNEL)
+        embed = discord.Embed(title=f'Message deleted in <#{message.channel.id}>',
+                              colour=0xff0000,
+                              description=message.content,
+                              timestamp=message.created_at)
+        embed.set_author(name=message.author.name, icon_url=message.author.avatar_url_as(format='png'))
+        await channel.send(embed=embed)
+
     async def on_member_ban(self, guild, member):
         self.bannedusers[guild.id] = member.id
 
@@ -147,6 +158,7 @@ class Moderation:
          member.id == self.bannedusers[member.guild.id]:
             del self.bannedusers[member.guild.id]
             return
+
 
         if self.memelord_role in member.roles:
             channel = self.bot.get_guild(HTC).get_channel(JOINBOT_CHANNEL)
