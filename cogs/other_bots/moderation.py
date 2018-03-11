@@ -133,9 +133,23 @@ class Moderation:
             except KeyError:
                 self.message_rates[message.author.id] = [time.time()]
 
-    async def on_message_delete(self, message):
+    async def on_message_edit(self, old, message):
+        if message.channel.id != HTC: return
+
         channel = self.bot.get_guild(HTC).get_channel(LOG_CHANNEL)
-        embed = discord.Embed(title=f'Message deleted in <#{message.channel.id}>',
+        embed = discord.Embed(title=f'Message edited in #{message.channel.name}',
+                              colour=0xff7f00,
+                              description=message.content,
+                              timestamp=old.created_at)
+        embed.add_field(name='Old content:', value=old.content)
+        embed.set_author(name=message.author.name, icon_url=message.author.avatar_url_as(format='png'))
+        await channel.send(embed=embed)
+
+    async def on_message_delete(self, message):
+        if message.channel.id != HTC: return
+
+        channel = self.bot.get_guild(HTC).get_channel(LOG_CHANNEL)
+        embed = discord.Embed(title=f'Message deleted in #{message.channel.name}',
                               colour=0xff0000,
                               description=message.content,
                               timestamp=message.created_at)
