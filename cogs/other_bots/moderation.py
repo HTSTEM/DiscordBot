@@ -134,7 +134,7 @@ class Moderation:
                 self.message_rates[message.author.id] = [time.time()]
 
     async def on_message_edit(self, old, message):
-        if message.channel.id != HTC: return
+        if message.guild is None or message.guild.id != HTC: return
 
         channel = self.bot.get_guild(HTC).get_channel(LOG_CHANNEL)
         embed = discord.Embed(title=f'Message edited in #{message.channel.name}',
@@ -146,7 +146,7 @@ class Moderation:
         await channel.send(embed=embed)
 
     async def on_message_delete(self, message):
-        if message.channel.id != HTC: return
+        if message.guild is None or message.guild.id != HTC: return
 
         channel = self.bot.get_guild(HTC).get_channel(LOG_CHANNEL)
         embed = discord.Embed(title=f'Message deleted in #{message.channel.name}',
