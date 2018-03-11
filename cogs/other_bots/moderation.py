@@ -141,7 +141,8 @@ class Moderation:
                               colour=0xff7f00,
                               description=message.content,
                               timestamp=old.created_at)
-        embed.add_field(name='Old content:', value=old.content)
+        if old.content:
+            embed.add_field(name='Old content:', value=old.content[:1024])
         embed.set_author(name=message.author.name, icon_url=message.author.avatar_url_as(format='png'))
         await channel.send(embed=embed)
 
