@@ -109,7 +109,8 @@ class Moderation:
                         msg += f' because:\n{reason}'
                     else:
                         msg += '.'
-                    msg += '\nIf you continue to break rules in here, you may be banned immediately.'
+                    msg += '\nIf you continue to break rules in here, you may be banned immediately.\n' \
+                           'If you leave the server, you *will* be banned immediately.'
                     await message.channel.send(msg)
         elif self.limit != (-1, 0) and message.channel.id == MEMES_CHANNEL:
             if message.channel.permissions_for(message.author).manage_messages:
