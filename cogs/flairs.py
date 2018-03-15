@@ -106,7 +106,7 @@ class Flairs:
                 embed.add_field(
                     name=f'*{f}*',
                     value='\n'.join(f'`{ctx.prefix}f {i}`' for i in flairs[f]),
-                    inline=False)
+                    inline=True)
         embed.set_footer(text=f'Requested by {ctx.author}')
 
         await ctx.send(embed=embed)
