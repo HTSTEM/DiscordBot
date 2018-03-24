@@ -312,6 +312,16 @@ class Moderation:
             if member.voice.mute or member.voice.self_mute:
                 await member.move_to(afk, reason='Muted member cleaning')
 
+    @commands.command()
+    async def hackban(self, ctx, user_id: int, *, reason=''):
+        user = discord.Object(user_id)
+        try:
+            await ctx.guild.ban(user, reason=reason)
+            await ctx.send(f'Banned <@{user_id}>')
+        except discord.Forbidden:
+            await ctx.send('I do not have permissions.')
+        except discord.HTTPException:
+            await ctx.send('Banning failed, did you type the id correctly?')
 
 def setup(bot):
     global cog
