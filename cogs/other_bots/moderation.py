@@ -214,6 +214,7 @@ class Moderation:
 
     @commands.command()
     async def ratelimit(self, ctx, messages: int=-1, seconds: int=0):
+        """Set the ratelimit for memes channel"""
         self.message_rates = {}
         if messages > -1 and seconds > 0:
             if seconds / messages > self.MAX_RATELIMIT:
@@ -226,6 +227,7 @@ class Moderation:
 
     @commands.command()
     async def forget_memelord(self, ctx, member: commands.MemberConverter):
+        """Unmemelord someone"""
         changed = False
         for i in list(self.memelordings):
             if i[0] == member.id:
@@ -238,6 +240,7 @@ class Moderation:
 
     @commands.command()
     async def memelord(self, ctx, member: commands.MemberConverter, length: str, *, reason: str=''):
+        """Memelord someone"""
         unit = length[-1]
         try:
             if unit in '0123456789':
@@ -300,6 +303,7 @@ class Moderation:
 
     @commands.command(aliases=['cleanvc'])
     async def clean_vc(self, ctx):
+        """Remove muted members from VC"""
         afk = ctx.guild.afk_channel
         if afk is None:
             return await ctx.send('No AFK channel found.')
@@ -314,6 +318,7 @@ class Moderation:
 
     @commands.command()
     async def hackban(self, ctx, user_id: int, *, reason=''):
+        """Ban a user by ID"""
         user = discord.Object(user_id)
         try:
             await ctx.guild.ban(user, reason=reason)
@@ -322,6 +327,7 @@ class Moderation:
             await ctx.send('I do not have permissions.')
         except discord.HTTPException:
             await ctx.send('Banning failed, did you type the id correctly?')
+
 
 def setup(bot):
     global cog
