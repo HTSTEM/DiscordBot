@@ -51,17 +51,17 @@ class Internet:
 
             await asyncio.sleep(600)
 
-    @commands.command(aliases=['adam', 'slice', 'jake', 'sills', 'zwei'])
+    @commands.command(aliases=['jake', 'sills', 'zwei'])
     async def dog(self, ctx):
         """Sends a picture of a random dog"""
         async with ctx.bot.session.get('http://random.dog/woof.json') as resp:
             json = await resp.json()
             await ctx.send(json['url'])
 
-    @commands.command(aliases=['b1nzy'])
+    @commands.command(aliases=['adam', 'b1nzy'])
     async def cat(self, ctx):
         """Sends a picture of a random cat"""
-        async with ctx.bot.session.get('http://random.cat/meow') as resp:
+        async with ctx.bot.session.get('https://aws.random.cat/meow') as resp:
             json = await resp.json()
             await ctx.send(json['file'])
 
