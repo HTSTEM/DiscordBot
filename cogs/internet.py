@@ -58,7 +58,7 @@ class Internet:
             json = await resp.json()
             await ctx.send(json['url'])
 
-    @commands.command(aliases=['adam', 'b1nzy'])
+    @commands.command(aliases=['adam', 'b1nzy', 'spd'])
     async def cat(self, ctx):
         """Sends a picture of a random cat"""
         async with ctx.bot.session.get('https://aws.random.cat/meow') as resp:
