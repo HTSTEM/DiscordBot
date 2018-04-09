@@ -85,7 +85,7 @@ class Core:
             ctx.bot.config = yaml.load(f, Loader=yaml.Loader)
         await ctx.send('Reloaded config file.')
 
-    @commands.command(aliases=['git_pull'])
+    @commands.command(aliases=['git_pull', 'pull'])
     @is_developer()
     async def update(self, ctx):
         '''Updates the bot from git'''
