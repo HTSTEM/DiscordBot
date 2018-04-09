@@ -59,9 +59,13 @@ class Internet:
             await ctx.send(json['url'])
 
     @commands.command(aliases=['adam', 'b1nzy', 'spd'])
-    async def cat(self, ctx):
+    async def cat(self, ctx, format=''):
         """Sends a picture of a random cat"""
-        async with ctx.bot.session.get('http://thecatapi.com/api/images/get') as resp:
+        if format not in ['jpg', 'png', 'gif']:
+            format = ''
+        else:
+            format = f'?format={format}'
+        async with ctx.bot.session.get(f'http://thecatapi.com/api/images/get{format}') as resp:
             await ctx.send(resp.url)
 
     def parse_google_card(self, node):
