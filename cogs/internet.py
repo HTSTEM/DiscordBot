@@ -64,7 +64,7 @@ class Internet:
         if format not in ['jpg', 'png', 'gif']:
             format = ''
         else:
-            format = f'?format={format}'
+            format = f'?type={format}'
         async with ctx.bot.session.get(f'http://thecatapi.com/api/images/get{format}') as resp:
             await ctx.send(resp.url)
 
