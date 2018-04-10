@@ -169,6 +169,10 @@ class Flairs:
     @commands.command()
     @commands.guild_only()
     async def f_remove_all(self, ctx, *, flair: str):
+        if not ctx.channel.permissions_for(ctx.author).manage_roles:
+            await self.safe_delete(ctx)
+            return
+
         flairs = FLAIRS.get(ctx.guild.id)
         if flairs is None or len(flairs) == 0:
             return await ctx.send('No flairs setup')
