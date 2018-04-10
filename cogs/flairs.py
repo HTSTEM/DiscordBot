@@ -23,7 +23,7 @@ FLAIRS = {
         },
         'Spoilers': {
             'spoilers': 392842859931369483,
-            'spoiler_forever': 392847202575187970,
+            'spoilers_forever': 392847202575187970,
         },
         'Vote Spoilers': {
             'vote_spoilers': 397130936464048129,
