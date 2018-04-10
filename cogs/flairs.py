@@ -22,11 +22,12 @@ FLAIRS = {
             'yessoan': 334310796219908098,
         },
         'Spoilers': {
-            'spoilers': 392842859931369483,
-            'spoilers_forever': 392847202575187970,
+            'spoilers': (392842859931369483, ['spoilers', 'spoil', 'spoilme', 'spoil_me']),
+            'spoilers_forever': (392847202575187970, ['spoil_forever', 'spoilforever', 'spoilersforever', 'sadama']),
         },
         'Vote Spoilers': {
-            'vote_spoilers': 397130936464048129,
+            'vote_spoilers': (397130936464048129, ['votespoilers', 'spoilvotes', 'spoilv', 'vspoilers', 'vspoil',
+                                                   'spoil_votes', 'vote_spoilers']),
         }
     },
     282219466589208576: {
@@ -142,8 +143,11 @@ class Flairs:
 
             to_remove = []
             for f in flairs[category]:
+                id_ = flairs[category][f]
+                if isinstance(id_, tuple):
+                    id_ = id_[0]
                 role = discord.utils.get(ctx.guild.roles,
-                                         id=flairs[category][f])
+                                         id=id_)
                 if role is not None:
                     to_remove.append(role)
 
@@ -180,9 +184,15 @@ class Flairs:
         if not ctx.me.guild_permissions.manage_roles:
             return await ctx.send('I don\'t have `Manage Roles` permission.')
 
-        flairs = [(i, flairs[category][i]) for category in flairs for i in flairs[category]]
-        for flair_name, flair_id in flairs:
+        flat_flairs = [(i, flairs[category][i]) for category in flairs for i in flairs[category]]
+        for flair_name, flair_id in flat_flairs:
+            if isinstance(flair_id, tuple):
+                if flair.lower() in [i.lower() for i in flair_id[1]]:
+                    flair_id = flair_id[0]
+                    break
             if flair_name.lower() == flair.lower():
+                if isinstance(flair_id, tuple):
+                    flair_id = flair_id[0]
                 break
         else:
             return await ctx.send('No flair found with that name.')
@@ -211,30 +221,36 @@ class Flairs:
             return await ctx.send('No flairs setup', delete_after=5)
 
         if not flair:
-            return await ctx.send('I need to know what flair you want.. '
-                                  f'Use `{ctx.prefix}flairs` to list them all.',
+            return await ctx.send(f'I need to know what flair you want.. Use `{ctx.prefix}flairs` to list them all.',
                                   delete_after=5)
 
         if not ctx.me.guild_permissions.manage_roles:
-            return await ctx.send('I don\'t have `Manage Roles` permission.',
-                                  delete_after=5)
+            return await ctx.send('I don\'t have `Manage Roles` permission.', delete_after=5)
 
-        for category in flairs:
-            if flair in flairs[category]:
+        flat_flairs = [(i, flairs[category][i], category) for category in flairs for i in flairs[category]]
+        for flair_name, flair_id, category in flat_flairs:
+            if isinstance(flair_id, tuple):
+                if flair.lower() in [i.lower() for i in flair_id[1]]:
+                    flair_id = flair_id[0]
+                    break
+            if flair.lower() == flair_name.lower():
+                if isinstance(flair_id, tuple):
+                    flair_id = flair_id[0]
                 break
         else:
-            return await ctx.send('No such flair avaliable with that name.',
-                                  delete_after=5)
+            return await ctx.send('No such flair available with that name.', delete_after=5)
 
         to_remove = []
         to_add = None
         for f in flairs[category]:
-            role = discord.utils.get(ctx.guild.roles, id=flairs[category][f])
-            if f == flair:
+            if isinstance(flairs[category][f], tuple):
+                id_ = flairs[category][f][0]
+            else:
+                id_ = flairs[category][f]
+            role = discord.utils.get(ctx.guild.roles, id=id_)
+            if id_ == flair_id:
                 if role is None:
-                    return await ctx.send('The flairs have be configured '
-                                          'incorrectly; this flair is '
-                                          'unavaliable.',
+                    return await ctx.send('The flairs have be configured incorrectly; this flair is unavailable.',
                                           delete_after=5)
                 to_add = role
             elif role is not None:
@@ -243,8 +259,7 @@ class Flairs:
         await ctx.author.remove_roles(*to_remove)
         await ctx.author.add_roles(to_add)
 
-        return await ctx.send('You have been given the requested flair!',
-                              delete_after=5)
+        return await ctx.send('You have been given the requested flair!', delete_after=5)
 
 
 def setup(bot):
