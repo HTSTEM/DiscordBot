@@ -21,6 +21,13 @@ FLAIRS = {
             'meester': 334311173619056641,
             'yessoan': 334310796219908098,
         },
+        'Spoilers': {
+            'spoilers': 392842859931369483,
+            'spoiler_forever': 392847202575187970,
+        },
+        'Vote Spoilers': {
+            'vote_spoilers': 397130936464048129,
+        }
     },
     282219466589208576: {
         'Colors': {
@@ -158,6 +165,36 @@ class Flairs:
 
             return await ctx.send('All your flairs have been removed.',
                                   delete_after=5)
+
+    @commands.command()
+    @commands.guild_only()
+    async def f_remove_all(self, ctx, *, flair: str):
+        flairs = FLAIRS.get(ctx.guild.id)
+        if flairs is None or len(flairs) == 0:
+            return await ctx.send('No flairs setup')
+
+        if not ctx.me.guild_permissions.manage_roles:
+            return await ctx.send('I don\'t have `Manage Roles` permission.')
+
+        flairs = [(i, flairs[category][i]) for category in flairs for i in flairs[category]]
+        for flair_name, flair_id in flairs:
+            if flair_name.lower() == flair.lower():
+                break
+        else:
+            return await ctx.send('No flair found with that name.')
+
+        role = discord.utils.get(ctx.guild.roles, id=flair_id)
+
+        if role is None:
+            return await ctx.send(f'Failed to locate the role with id {flair_id}. Please check the configuration.')
+
+        if ctx.guild.large:
+            await ctx.bot.request_offline_members(ctx.guild)
+        for member in ctx.guild.members:
+            if role in member.roles:
+                await member.remove_roles(role)
+
+        return await ctx.send(f'The flair "{flair_name}" has been removed from every member.')
 
     @commands.command(aliases=['flair'])
     @commands.guild_only()
