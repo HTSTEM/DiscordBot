@@ -87,7 +87,6 @@ cogs:
   - cogs.other_bots.archive
   - cogs.other_bots.joinbot
   - cogs.other_bots.starbot
-  - cogs.other_bots.spoilers
   - cogs.other_bots.moderation
 
 global_coms:
