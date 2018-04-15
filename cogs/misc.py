@@ -35,7 +35,10 @@ class Misc:
             try:
                 await self.bot.get_invite(invites[0])
             except discord.NotFound:
-                await message.channel.send('The invite you just sent appears to be invalid. You might want to fix it.')
+                try:
+                    await message.channel.send('The invite you just sent appears to be invalid. You might want to fix it.')
+                except discord.Forbidden:
+                    pass
 
     @staticmethod
     def format_args(cmd):
