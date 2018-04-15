@@ -6,6 +6,7 @@ import time
 import math
 import io
 import os
+import re
 
 from PIL import Image, ImageDraw, ImageOps, ImageChops
 
@@ -18,6 +19,7 @@ guild_id = 184755239952318464
 
 
 class Misc:
+    INVITE_REGEX = re.compile(r'\bhttps:\/\/discord\.gg\/(\w{1,8})\b')
 
     @staticmethod
     async def __local_check(ctx):
@@ -26,6 +28,14 @@ class Misc:
     def __init__(self, bot):
         self.bot = bot
         self.task = self.bot.loop.create_task(self.send_reminders())
+
+    async def on_message(self, message):
+        invites = self.INVITE_REGEX.findall(message.content)
+        if invites:
+            try:
+                await self.bot.get_invite(invites[0])
+            except discord.NotFound:
+                await message.channel.send('The invite you just sent appears to be invalid. You might want to fix it.')
 
     @staticmethod
     def format_args(cmd):
