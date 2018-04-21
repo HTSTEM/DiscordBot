@@ -103,7 +103,8 @@ class StarBot:
             if emoji.name in self.config.get('stars', STAR_EMOJI_DEFAULT):
                 message = await chan.get_message(message_id)
                 if user_id == message.author.id:
-                    await message.remove_reaction(emoji, message.author)
+                    try: await message.remove_reaction(emoji, message.author)
+                    except discord.Forbidden: pass
                     return
 
                 await self.action(message_id, channel_id, user_id)
