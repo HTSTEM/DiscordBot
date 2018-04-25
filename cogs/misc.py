@@ -7,6 +7,8 @@ import math
 import io
 import os
 import re
+import matplotlib as mpl
+from matplotlib import pyplot as plt
 
 from PIL import Image, ImageDraw, ImageOps, ImageChops
 
@@ -17,6 +19,8 @@ from .util.checks import is_developer, right_channel
 
 guild_id = 184755239952318464
 
+mpl.rcParams['text.usetex'] = True
+mpl.use('agg')
 
 class Misc:
     INVITE_REGEX = re.compile(r'\bhttps:\/\/discord\.gg\/(\w{1,8})\b')
@@ -260,6 +264,32 @@ class Misc:
             return await ctx.send("Congratulations, you've managed to roll a die that we can't send.")
 
         await ctx.send(die_message)
+
+    @commands.command(aliases=['tex'])
+    async def latex(self, ctx, *, text):
+        """Render a LaTeX equation"""
+        plt.clf()
+        fig, ax = plt.subplots()
+        plt.rc('text', usetex=True)
+        plt.rc('text.latex', preamble=
+        r'\usepackage{amsmath}' + '\n'
+                                  r'\usepackage{esint}' + '\n'
+                                                          r'\usepackage{pxfonts}' + '\n'
+               )
+        ax.set_axis_off()
+        fig.patch.set_visible(False)
+        fig.text(0, 0.5, r'\[ ' + text.strip('`') + r' \]', fontsize=14)
+        try:
+            fig.savefig('latex.png')
+        except RuntimeError as e:
+            print(e)
+            return await ctx.send(f'Unyu? That doesn\'t look right.')
+        image = Image.open('latex.png')
+        thresholded = [(0,) * 4 if item[3] == 0 else item for item in image.getdata()]
+        image.putdata(thresholded)
+        image = image.crop(image.getbbox())
+        image.save('latex.png')
+        await ctx.send(file=discord.File('latex.png'))
 
     @commands.command()
     async def isprime(self, ctx, num: int):
