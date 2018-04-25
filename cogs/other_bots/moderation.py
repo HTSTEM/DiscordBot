@@ -7,7 +7,9 @@ from ruamel import yaml
 from discord.ext import commands
 import discord
 
-from .spoilers import SADAMA_ROLE, VSPOILER_ROLE, SPOILER_ROLE
+VSPOILER_ROLE = 397130936464048129
+SPOILER_ROLE = 392842859931369483
+SADAMA_ROLE = 392847202575187970
 
 debug = 0
 
