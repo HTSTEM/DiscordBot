@@ -8,6 +8,8 @@ import io
 import os
 import re
 import matplotlib as mpl
+mpl.rcParams['text.usetex'] = True
+mpl.use('agg')
 from matplotlib import pyplot as plt
 
 from PIL import Image, ImageDraw, ImageOps, ImageChops
@@ -19,8 +21,7 @@ from .util.checks import is_developer, right_channel
 
 guild_id = 184755239952318464
 
-mpl.rcParams['text.usetex'] = True
-mpl.use('agg')
+
 
 class Misc:
     INVITE_REGEX = re.compile(r'\bhttps:\/\/discord\.gg\/(\w{1,8})\b')
