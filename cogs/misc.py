@@ -284,7 +284,7 @@ class Misc:
             fig.savefig('latex.png')
         except RuntimeError as e:
             print(e)
-            return await ctx.send(f'Unyu? That doesn\'t look right.')
+            return await ctx.send(f'That doesn\'t look right.')
         image = Image.open('latex.png')
         thresholded = [(0,) * 4 if item[3] == 0 else item for item in image.getdata()]
         image.putdata(thresholded)
