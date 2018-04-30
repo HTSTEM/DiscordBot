@@ -282,7 +282,7 @@ class Misc:
         fig.text(0, 0.5, r'\[ ' + text.strip('`') + r' \]', fontsize=14)
         try:
             fig.savefig('latex.png')
-        except Exception as e:
+        except (RuntimeError, UnicodeEncodeError) as e:
             print(e)
             return await ctx.send(f'That doesn\'t look right.')
         image = Image.open('latex.png')
