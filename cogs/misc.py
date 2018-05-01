@@ -267,16 +267,17 @@ class Misc:
         await ctx.send(die_message)
 
     @commands.command(aliases=['tex'])
+    @commands.check(lambda c: c.guild.id != 1847552399523184642)
     async def latex(self, ctx, *, text):
         """Render a LaTeX equation"""
         plt.clf()
         fig, ax = plt.subplots()
         plt.rc('text', usetex=True)
         plt.rc('text.latex', preamble=
-        r'\usepackage{amsmath}' + '\n'
-                                  r'\usepackage{esint}' + '\n'
-                                                          r'\usepackage{pxfonts}' + '\n'
-               )
+            r'\usepackage{amsmath}' + '\n'
+            r'\usepackage{esint}' + '\n'
+            r'\usepackage{pxfonts}' + '\n'
+        )
         ax.set_axis_off()
         fig.patch.set_visible(False)
         fig.text(0, 0.5, r'\[ ' + text.strip('`') + r' \]', fontsize=14)
