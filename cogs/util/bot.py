@@ -135,6 +135,7 @@ class HTSTEMBote(commands.AutoShardedBot):
                 await self.notify_devs(lines, ctx.message)
 
         elif isinstance(exception, commands.CheckFailure):
+            if ctx.guild.id == 184755239952318464: return
             if not isinstance(exception, self.SilentCheckFailure):
                 self.logger.error(ctx.channel)
                 await ctx.send('You can\'t do that.')
