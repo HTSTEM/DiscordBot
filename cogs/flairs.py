@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 
 import asyncio
+import os
 
 
 FLAIRS = {
@@ -99,6 +100,43 @@ class Flairs:
                 await ctx.message.delete()
 
         asyncio.ensure_future(_delete(), loop=self.bot.loop)
+
+    @commands.command()
+    @commands.guild_only()
+    async def listids(self, ctx):
+        '''Get all of the IDs for the current server'''
+        data = 'Your ID: {}\n\n'.format(ctx.author.id)
+
+        data += 'Text Channel IDs:\n'
+        for c in ctx.guild.channels:
+            if isinstance(c, discord.TextChannel):
+                data += '{}: {}\n'.format(c.name, c.id)
+
+        data += '\nVoice Channel IDs:\n'
+        for c in ctx.guild.channels:
+            if isinstance(c, discord.VoiceChannel):
+                data += '{}: {}\n'.format(c.name, c.id)
+
+        data += '\nRole IDs:\n'
+        for r in ctx.guild.roles:
+            data += '{}: {}\n'.format(r.name, r.id)
+
+        data += '\nUser IDs:\n'
+        if ctx.guild.large:
+            await self.bot.request_offline_members(ctx.guild)
+        for msg in ctx.guild.members:
+            data += '{}: {}\n'.format(msg.name, msg.id)
+
+        filename = '{}-ids-all.txt'.format("".join([x if x.isalnum() else "_" for x in ctx.guild.name]))
+
+        with open(filename, 'wb') as ids_file:
+            ids_file.write(data.encode('utf-8'))
+
+        await ctx.send(':mailbox_with_mail:')
+        with open(filename, 'rb') as ids_file:
+            await ctx.author.send(file=discord.File(ids_file))
+
+        os.remove(filename)
 
     @commands.command(aliases=['listflairs'])
     @commands.guild_only()
