@@ -275,7 +275,6 @@ class Misc:
         plt.rc('text', usetex=True)
         plt.rc('text.latex', preamble=
             r'\usepackage{amsmath}' + '\n'
-            r'\usepackage{esint}' + '\n'
             r'\usepackage{pxfonts}' + '\n'
         )
         ax.set_axis_off()
