@@ -111,7 +111,8 @@ class StarBot:
                     except discord.Forbidden: pass
                     return
 
-                if self.INVITE_REGEX.search(message.content):
+                adfriendly = [282219466589208576]
+                if chan.guild.id not in adfriendly and self.INVITE_REGEX.search(message.content):
                     try: await message.remove_reaction(emoji, discord.Object(user_id))
                     except discord.Forbidden: pass
                     return
