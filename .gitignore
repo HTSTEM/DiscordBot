@@ -11,6 +11,8 @@ config/paste_ee_key.txt
 config/token.txt
 config/virustotal_key.txt
 config/slack/*
+config/pixiv.txt
+config/io_game.py
 
 # state
 videoURLS.txt
@@ -27,7 +29,7 @@ avatar_cache/
 client_secret.json
 config.yml
 memelords.yml
-
+latex.png
 
 # editor configs
 .vscode

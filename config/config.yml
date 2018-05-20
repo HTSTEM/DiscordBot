@@ -80,6 +80,7 @@ cogs:
   - cogs.misc
   - cogs.animu
   - cogs.flairs
+  - cogs.io_game
   - cogs.youtube
   - cogs.hashing
   - cogs.internet
