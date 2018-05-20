@@ -64,6 +64,8 @@ ids:
 starbot:
   stars: # a list of possible reactions
     - ⭐
+  ad_friendly:
+    - 282219465589208576
   starboards:
     282219466589208576:  # HTStem
       channel: 375361337464979467
