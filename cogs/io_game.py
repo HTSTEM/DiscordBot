@@ -25,7 +25,7 @@ class IO_Game:
     DBG_COL = (175, 175, 175)
     BG_COL = (200, 200, 200)
 
-    SUBMISSION_CHANNEL = 290757101914030080
+    SUBMISSION_CHANNEL = 364571585081901056
 
     def __init__(self, bot):
         self.bot = bot
