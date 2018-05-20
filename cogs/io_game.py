@@ -62,7 +62,7 @@ class IO_Game:
             cw =  sum(col_widths) + self.BORDER_WIDTH + self.BORDER_WIDTH * \
                     len(col_widths) + self.CELL_PADDING * 2 * len(col_widths)
             for i in range(len(col_widths)):
-                col_widths[i] += int(im_width - cw)
+                col_widths[i] += int((im_width - cw) / len(col_widths))
             cw =  sum(col_widths) + self.BORDER_WIDTH + self.BORDER_WIDTH * \
                     len(col_widths) + self.CELL_PADDING * 2 * len(col_widths)
             col_widths[-1] += im_width - cw
