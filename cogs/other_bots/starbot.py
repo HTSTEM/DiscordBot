@@ -10,7 +10,7 @@ STARBOARD_THRESHOLD_DEFAULT = 3
 
 
 class StarBot:
-    INVITE_REGEX = re.compile(r'\bhttps:\/\/discord\.gg\/(\w{1,8})\b')
+    INVITE_REGEX = re.compile(r'\bhttps:\/\/discord\.gg\/(\w{1,8})\b', re.IGNORECASE)
 
     def __init__(self, bot):
         self.bot = bot
@@ -110,7 +110,7 @@ class StarBot:
                     except discord.Forbidden: pass
                     return
 
-                if self.INVITE_REGEX.findall(message.content):
+                if self.INVITE_REGEX.search(message.content):
                     try: await message.remove_reaction(emoji, message.author)
                     except discord.Forbidden: pass
                     return
@@ -150,7 +150,7 @@ class StarBot:
         board = self.config.get('starboards').get(target_message.guild.id).get('channel')
         thresh = self.config.get('starboards').get(target_message.guild.id).get('threshold', STARBOARD_THRESHOLD_DEFAULT)
 
-        if self.INVITE_REGEX.findall(target_message):
+        if self.INVITE_REGEX.search(target_message.content):
             return
 
         count = 0
