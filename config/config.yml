@@ -69,7 +69,7 @@ starbot:
   starboards:
     282219466589208576:  # HTwins STEM
       channel: 375361337464979467
-      threshold: 3
+      threshold: 5
     381941901462470658:  # ChiP
       channel: 387055833332187159
       threshold: 5
