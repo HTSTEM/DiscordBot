@@ -106,7 +106,7 @@ class IO_Game:
     @io.command()
     async def diff(self, ctx, round_num:int):
         if round_num < 1 or round_num > len(rounds):
-            return await ctx.send(f'Please enter a round number between 1 and {len(round)}')
+            return await ctx.send(f'Please enter a round number between 1 and {len(rounds)}')
 
         doc = rounds[round_num - 1].__doc__
 
