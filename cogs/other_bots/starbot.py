@@ -111,7 +111,7 @@ class StarBot:
                     return
 
                 if self.INVITE_REGEX.findall(message.content):
-                    try: await messahe.remove_reaction(emoji, message.author)
+                    try: await message.remove_reaction(emoji, message.author)
                     except discord.Forbidden: pass
                     return
 
