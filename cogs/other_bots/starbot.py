@@ -1,4 +1,5 @@
 import sqlite3
+import re
 
 from discord.ext import commands
 import discord
@@ -9,6 +10,8 @@ STARBOARD_THRESHOLD_DEFAULT = 3
 
 
 class StarBot:
+    INVITE_REGEX = re.compile(r'\bhttps:\/\/discord\.gg\/(\w{1,8})\b')
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -107,6 +110,11 @@ class StarBot:
                     except discord.Forbidden: pass
                     return
 
+                if self.INVITE_REGEX.findall(message.content):
+                    try: await messahe.remove_reaction(emoji, message.author)
+                    except discord.Forbidden: pass
+                    return
+
                 await self.action(message_id, channel_id, user_id)
 
     async def on_raw_reaction_clear(self, message_id, channel_id):
@@ -141,6 +149,9 @@ class StarBot:
         target_message = await self.bot.get_channel(channel_id).get_message(message_id)
         board = self.config.get('starboards').get(target_message.guild.id).get('channel')
         thresh = self.config.get('starboards').get(target_message.guild.id).get('threshold', STARBOARD_THRESHOLD_DEFAULT)
+
+        if self.INVITE_REGEX.findall(target_message):
+            return
 
         count = 0
         for i in target_message.reactions:
