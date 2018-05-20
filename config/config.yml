@@ -64,10 +64,10 @@ ids:
 starbot:
   stars: # a list of possible reactions
     - ⭐
-  ad_friendly:
-    - 282219465589208576
+  ad_friendly: # list of servers where starring discord ads is ok
+    - 282219465589208576 # HTwins STEM
   starboards:
-    282219466589208576:  # HTStem
+    282219466589208576:  # HTwins STEM
       channel: 375361337464979467
       threshold: 3
     381941901462470658:  # ChiP
