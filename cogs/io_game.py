@@ -61,6 +61,10 @@ class IO_Game:
         if im_width == max(full_widths):
             cw =  sum(col_widths) + self.BORDER_WIDTH + self.BORDER_WIDTH * \
                     len(col_widths) + self.CELL_PADDING * 2 * len(col_widths)
+            for i in range(len(col_widths)):
+                col_widths[i] += int(im_width - cw)
+            cw =  sum(col_widths) + self.BORDER_WIDTH + self.BORDER_WIDTH * \
+                    len(col_widths) + self.CELL_PADDING * 2 * len(col_widths)
             col_widths[-1] += im_width - cw
 
 
@@ -205,7 +209,7 @@ class IO_Game:
 
         chan = self.bot.get_channel(self.SUBMISSION_CHANNEL)
 
-        q = await chan.send(f'Sumbmissions from {ctx.author.mention}:\n{answer}\nCorrect soltuion:\n{ans}')
+        q = await chan.send(f'Sumbmissions from {ctx.author.mention}:\n{answer}\nCorrect solution:\n{ans}')
         self.submission_queue[q.id] = (ctx, answer, q, round_num - 1)
         await q.add_reaction('✅')
         await q.add_reaction('❌')
