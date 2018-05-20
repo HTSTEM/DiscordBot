@@ -105,13 +105,14 @@ class StarBot:
         if chan.guild is not None and chan.guild.id in self.config.get('starboards', {}):
             if emoji.name in self.config.get('stars', STAR_EMOJI_DEFAULT):
                 message = await chan.get_message(message_id)
+                
                 if user_id == message.author.id:
                     try: await message.remove_reaction(emoji, message.author)
                     except discord.Forbidden: pass
                     return
 
                 if self.INVITE_REGEX.search(message.content):
-                    try: await message.remove_reaction(emoji, message.author)
+                    try: await message.remove_reaction(emoji, discord.Object(user_id))
                     except discord.Forbidden: pass
                     return
 
