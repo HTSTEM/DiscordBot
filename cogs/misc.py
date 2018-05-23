@@ -200,7 +200,7 @@ class Misc:
             await ctx.send('Reminder to `{0}` set in {1}{2}!'.format(to_remind.replace('@', '@\u200b'), rem_in, unit))
         else:
             await ctx.author.send(
-                f'Reminder to `{0}` set in {1}{2}!'.format(to_remind.replace('@', '@\u200b'), rem_in, unit)
+                'Reminder to `{0}` set in {1}{2}!'.format(to_remind.replace('@', '@\u200b'), rem_in, unit)
             )
 
     @commands.command()
