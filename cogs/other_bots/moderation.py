@@ -269,7 +269,7 @@ class Moderation:
                     length += i[1]
                 else:
                     ct = time.time()
-                    length += round(max(0, i[1] - (ct - i[2])))
+                    length += round(max(0, i[1] - (ct - i[2]) / 60))
 
         this_meme = [member.id, length, None, reason, unique_key]
         self.memelordings.append(this_meme)
