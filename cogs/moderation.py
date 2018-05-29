@@ -158,7 +158,6 @@ class Moderation:
         channel = message.guild.get_channel(self.config[message.guild.id].get('log_c', 0))
         if channel is None: return
         
-        if old.content == message.content: return
         if message.channel.id == channel.id: return
         
         embed = discord.Embed(title=f'Message deleted in #{message.channel.name}',
