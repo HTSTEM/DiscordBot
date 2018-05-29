@@ -30,6 +30,7 @@ client_secret.json
 config.yml
 memelords.yml
 latex.png
+in_jail.yml
 
 # editor configs
 .vscode

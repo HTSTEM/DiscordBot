@@ -8,6 +8,8 @@ prefix:
     'sb?'
   381941901462470658:
     '!'
+  290573725366091787:
+    '|'
 
 # External services
 paste.ee:
@@ -45,9 +47,9 @@ ids:
     - 161508165672763392
     - 140564059417346049
   developers:
-    - 140564059417346049
+   - 140564059417346049
     - 161508165672763392
-    - 240995021208289280
+   - 240995021208289280
   developer_role_id: 282642024325316609
   htstem_id: 282219466589208576
   allowed_channels:
@@ -58,6 +60,7 @@ ids:
     - 383041784495734785
     - 382704944857350155
     - 334296605349904384
+    - 290757101914030080
   blocked_channels:
     - 282631584903987201
 
@@ -84,13 +87,13 @@ cogs:
   - cogs.youtube
   - cogs.hashing
   - cogs.internet
+  - cogs.moderation
   - cogs.information
   - cogs.other_bots.rules
   - cogs.other_bots.slack
   - cogs.other_bots.archive
   - cogs.other_bots.joinbot
   - cogs.other_bots.starbot
-  - cogs.other_bots.moderation
 
 global_coms:
   - memo
