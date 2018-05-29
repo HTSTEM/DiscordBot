@@ -47,6 +47,22 @@ config = {
             'extra_msg': 'If you continue to break rules in here, you may be banned immediately.\n'
                          'If you leave the server during this timeframe, you *will* be banned immediately.'
         }
+    },
+    282219466589208576: {
+        'leave_c': 282477076454309888,  # bote-spam-but-its-a-bot
+        'leave_r': [
+            282647198322393098,  # Muted
+        ],
+
+        'log_c':   451134620612689920,  # edits-and-deletes
+
+        'jail': {
+            'channel': 282647369961570305,  # ask-about-your-mute
+            'role':    282647198322393098,  # Muted
+            'respond': False,
+            'black_roles': [],
+            'extra_msg': 'If you leave the server during this timeframe, you *will* be banned immediately.'
+        }
     }
 }
 
