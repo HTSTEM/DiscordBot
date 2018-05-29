@@ -38,7 +38,7 @@ config = {
         'jail': {
             'channel': 334296605349904384,  # snail-time
             'role':    334301546710040576,  # Memelord
-            'respond': False,
+            'respond': True,
             'black_roles': [
                 397130936464048129,  # Spoilers
                 392842859931369483,  # Vote spoilser
