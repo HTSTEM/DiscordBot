@@ -226,7 +226,7 @@ class Misc:
         patrons = []
         for user in htc.members:
             if patreonrole in user.roles:
-                patrons.append(user)
+                patrons.append(user.id)
         await ctx.send("{}".format(", ".join(patrons)))
 
     @commands.command()
