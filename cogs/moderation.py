@@ -90,24 +90,20 @@ class Moderation:
 
         while True:
             for convict in list(self.in_jail):
-                print(convict)
                 if convict[3] is not None and time.time() > convict[3]:
                     guild = self.bot.get_guild(convict[0])
 
                     if guild is None:
                         self.in_jail.remove(convict)
-                        print('g')
                         continue
 
                     member = guild.get_member(convict[1])
                     if member is None:
                         self.in_jail.remove(convict)
-                        print('m')
                         continue
 
                     if guild.id not in self.config or self.config[guild.id].get('jail', {}).get('role') is None:
                         self.in_jail.remove(convict)
-                        print('e')
                         continue
 
                     channel = guild.get_channel(self.config[guild.id]['jail']['channel'])
