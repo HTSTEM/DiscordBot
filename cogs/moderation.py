@@ -166,7 +166,7 @@ class Moderation:
         await channel.send(embed=embed)
 
     async def on_message_delete(self, message):
-        if message.guild.id not in self.config: return
+        if message.guild is None or message.guild.id not in self.config: return
         channel = message.guild.get_channel(self.config[message.guild.id].get('log_c', 0))
         if channel is None: return
         
