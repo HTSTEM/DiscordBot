@@ -177,10 +177,9 @@ class StarBot:
                 else:
                     await message.delete()
             except discord.errors.NotFound:
-                cursor.execute("""DELETE FROM stars
-                                  WHERE original_id=?""", (message_id,))
-                self.database.commit()
-                res = []
+                # Assume that either something has gone wrong or a moderator
+                # has deleted the message
+                return
 
         if not res:
             if channel_id != board:
