@@ -158,6 +158,13 @@ class StarBot:
         for i in target_message.reactions:
             if i.emoji in self.config.get('stars', STAR_EMOJI_DEFAULT):
                 count += i.count
+            if 'nostar' in self.config:
+                if i.emoji == self.config.get('nostar'):
+                    count = 0
+                    break
+                if hasattr(i.emoji, 'name') and i.emoji.name == self.config.get('nostar'):
+                    count = 0
+                    break
 
         channel = self.bot.get_channel(board)
 

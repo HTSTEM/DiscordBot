@@ -67,6 +67,7 @@ ids:
 starbot:
   stars: # a list of possible reactions
     - ⭐
+  nostar: nostar
   ad_friendly: # list of servers where starring discord ads is ok
     - 282219465589208576 # HTwins STEM
   starboards:
