@@ -63,6 +63,7 @@ ids:
     - 290757101914030080
   blocked_channels:
     - 282631584903987201
+    - 334296605349904384
 
 starbot:
   stars: # a list of possible reactions
