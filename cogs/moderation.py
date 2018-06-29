@@ -242,7 +242,7 @@ class Moderation:
             elif unit in ['m', 'h', 'd']:
                 if unit == 'm': length = int(length[:-1])
                 if unit == 'h': length = int(length[:-1]) * 60
-                if unit == 'd': length = int(length[:-1]) * 3600
+                if unit == 'd': length = int(length[:-1]) * 1440
             else:
                 return await ctx.send('Expected the unit to be "m", "h" or "d".')
         except ValueError:
