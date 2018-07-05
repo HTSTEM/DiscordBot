@@ -30,14 +30,16 @@ class StarBot:
 
     @staticmethod
     def star_emoji(stars):
-        if 5 > stars >= 0:
-            return '\N{WHITE MEDIUM STAR}'
-        elif 10 > stars >= 5:
-            return '\N{GLOWING STAR}'
-        elif 25 > stars >= 10:
-            return '\N{DIZZY SYMBOL}'
-        else:
+        if stars >= 30:
             return '\N{SPARKLES}'
+        elif stars >= 20:
+            return '\N{SHOOTING STAR}'
+        elif stars >= 15:
+            return '\N{DIZZY SYMBOL}'
+        elif stars >= 10:
+            return '\N{GLOWING STAR}'
+        else:
+            return '\N{WHITE MEDIUM STAR}'
 
     @staticmethod
     def star_gradient_colour(stars):
