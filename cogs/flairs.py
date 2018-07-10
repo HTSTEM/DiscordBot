@@ -23,12 +23,14 @@ FLAIRS = {
             'yessoan': 334310796219908098,
         },
         'Spoilers': {
-            'spoilers': (392842859931369483, ['spoilers', 'spoil', 'spoilme', 'spoil_me']),
-            'spoilers_forever': (392847202575187970, ['spoil_forever', 'spoilforever', 'spoilersforever', 'sadama']),
+            'spoilers': (392842859931369483, ['spoilers', 'spoil', 'spoilme', 'spoil_me', 'spoiler', 'spoilerme', 'spoiler_me']),
+            'spoilers_forever': (392847202575187970, ['spoil_forever', 'spoilforever', 'spoilersforever', 'sadama',
+                                                      'spoilerforever', 'spoiler_forever', 'spoilers_forever']),
         },
         'Vote Spoilers': {
             'vote_spoilers': (397130936464048129, ['votespoilers', 'spoilvotes', 'spoilv', 'vspoilers', 'vspoil',
-                                                   'spoil_votes', 'vote_spoilers']),
+                                                   'spoil_votes', 'vote_spoilers', 'spoilervote', 'spoilervotes',
+                                                   'votespoil', 'vote_spoil', 'spoiler_vote', 'spoiler_votes']),
         }
     },
     282219466589208576: {
